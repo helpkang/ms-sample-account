@@ -9,10 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import koreanair.ms.msservicetest.domain.account.Account;
 import koreanair.ms.msservicetest.domain.factory.AccountFactory;
 import koreanair.ms.msservicetest.domain.service.AccountDomainService;
 import koreanair.ms.msservicetest.repository.AccountRepository;
+import koreanair.ms.msservicetest.repository.TransferRepository;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -20,6 +21,9 @@ public class AccountDomainTests {
 
 	@Autowired
 	AccountRepository repository;
+
+	@Autowired
+	TransferRepository transferrepository;
 
 	@Autowired 
 	AccountDomainService service;
@@ -46,10 +50,11 @@ public class AccountDomainTests {
 		Account accA = repository.findById(from).get();
 		Account accB = repository.findById(to).get();
 
-		accA.transfer(accB, amount);
+		Transfer transfer = accA.transfer(accB, amount);
 
 		repository.save(accA);
 		repository.save(accB);
+		transferrepository.save(transfer);
 
 	}
 
@@ -57,10 +62,11 @@ public class AccountDomainTests {
 		Account accA = repository.findById(from).get();
 		Account accB = repository.findById(to).get();
 
-		service.transfer(accA, accB, amount);
+		Transfer transfer = service.transfer(accA, accB, amount);
 
 		repository.save(accA);
 		repository.save(accB);
+		transferrepository.save(transfer);
 	}
 
 	private void saveAccount(String name, int balance) {

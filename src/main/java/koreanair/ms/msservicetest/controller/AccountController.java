@@ -1,5 +1,8 @@
 package koreanair.ms.msservicetest.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +28,15 @@ public class AccountController {
     public Account createAccount(String name, int balance) {
          service.createAccount(name, balance);
          return service.getAccount(name);
+    }
+
+    @PostMapping("transfer")
+    public List<Account> transfer(String from, String to, int amount) {
+         service.transfer(from, to, amount);
+         List<Account> list = new ArrayList<>();
+         list.add(service.getAccount(from));
+         list.add(service.getAccount(to));
+         return list;
     }
     
 }
