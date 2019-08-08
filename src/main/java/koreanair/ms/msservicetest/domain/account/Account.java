@@ -12,11 +12,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import org.hibernate.annotations.BatchSize;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.bytebuddy.agent.builder.AgentBuilder.PoolStrategy.Eager;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -30,6 +31,7 @@ public class Account {
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(joinColumns=@JoinColumn(name="account_name"), inverseJoinColumns = @JoinColumn(name="transfer_id") )
+    @BatchSize(size=10)
     List<Transfer> transfers = new ArrayList<>();
   
     @Builder

@@ -20,15 +20,19 @@ public class AccountServiceTests {
 
 	@Test
 	public void accountCreate() {
-		service.createAccount("a", 100);
+		service.createAccount(createCreateAccount("a", 100));
 		Account a = service.getAccount("a");
 		assertEquals(100, a.getBalance());
 	}
 
+	private CreateAccountVO createCreateAccount(String name, int initBalance) {
+		return CreateAccountVO.builder().name(name).initBalance(initBalance).build();
+	}
+
 	@Test
 	public void transfer() {
-		service.createAccount("a", 100);
-		service.createAccount("b", 200);
+		service.createAccount(createCreateAccount("a", 100));
+		service.createAccount(createCreateAccount("b", 200));
 		service.transfer("a", "b", 50);
 		assertEquals(50, service.getAccount("a").getBalance());
 		assertEquals(250, service.getAccount("b").getBalance());

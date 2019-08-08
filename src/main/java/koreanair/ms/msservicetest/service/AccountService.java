@@ -28,8 +28,8 @@ public class AccountService {
     AccountFactory factory;
 
     @Transactional
-    public void createAccount(String name, int initBalance){
-        Account account = factory.createAccount(name, initBalance);
+    public void createAccount(CreateAccountVO vo){
+        Account account = factory.createAccount(vo.getName(), vo.getInitBalance());
         repository.save(account);
     }
     
@@ -47,9 +47,10 @@ public class AccountService {
     }
     
     @Transactional
-    public Account getAccount(String name) {
+    public AccountVO getAccount(String name) {
         Account account = repository.findById(name).get();
-        return account;
+        // TODO: domain to vo convert
+        return TransferAccount
         
     }
 
