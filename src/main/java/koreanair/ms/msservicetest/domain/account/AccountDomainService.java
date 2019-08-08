@@ -1,9 +1,6 @@
-package koreanair.ms.msservicetest.domain.service;
+package koreanair.ms.msservicetest.domain.account;
 
 import org.springframework.stereotype.Component;
-
-import koreanair.ms.msservicetest.domain.account.Account;
-import koreanair.ms.msservicetest.domain.account.Transfer;
 
 @Component
 public class AccountDomainService {

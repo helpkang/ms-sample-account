@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import koreanair.ms.msservicetest.domain.account.Account;
+import koreanair.ms.msservicetest.domain.account.AccountDomainService;
+import koreanair.ms.msservicetest.domain.account.AccountFactory;
 import koreanair.ms.msservicetest.domain.account.Transfer;
-import koreanair.ms.msservicetest.domain.factory.AccountFactory;
-import koreanair.ms.msservicetest.domain.service.AccountDomainService;
 import koreanair.ms.msservicetest.repository.AccountRepository;
 import koreanair.ms.msservicetest.repository.TransferRepository;
 

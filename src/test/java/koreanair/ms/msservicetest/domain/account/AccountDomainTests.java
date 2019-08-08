@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import koreanair.ms.msservicetest.domain.factory.AccountFactory;
-import koreanair.ms.msservicetest.domain.service.AccountDomainService;
 import koreanair.ms.msservicetest.repository.AccountRepository;
 import koreanair.ms.msservicetest.repository.TransferRepository;
 
