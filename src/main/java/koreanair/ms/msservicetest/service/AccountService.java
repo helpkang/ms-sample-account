@@ -50,7 +50,7 @@ public class AccountService {
     public AccountVO getAccount(String name) {
         Account account = repository.findById(name).get();
         // TODO: domain to vo convert
-        return TransferAccount
+        // return TransferAccount
         
     }
 
