@@ -19,12 +19,10 @@ public class AccountService {
 
 	@Autowired
     AccountRepository repository;
-    
-    @Autowired
-	TransferRepository transferrepository;
+
 
 	@Autowired 
-	AccountDomainService service;
+	AccountDomainService domainservice;
 
 	@Autowired
     AccountFactory factory;
@@ -41,19 +39,16 @@ public class AccountService {
         Account accA = repository.findById(from).get();
         Account accB = repository.findById(to).get();
         
-        Transfer transfer =  service.transfer(accA, accB, amount);
+        domainservice.transfer(accA, accB, amount);
         
         repository.save(accA);
         repository.save(accB);
         
-        transferrepository.save(transfer);
     }
     
     @Transactional
     public Account getAccount(String name) {
         Account account = repository.findById(name).get();
-        List<Transfer> transferList = transferrepository.findByFromNameOrToName(name, name);
-        account.setTransfers(transferList);
         return account;
         
     }

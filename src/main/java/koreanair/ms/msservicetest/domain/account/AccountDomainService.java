@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 public class AccountDomainService {
     
    
-    public Transfer transfer(Account from, Account to, int amount) {
+    public void transfer(Account from, Account to, int amount) {
         if( amount <=0){
             throw new RuntimeException("이체금액은 0보다 커야 합니다.");
         }
@@ -15,7 +15,9 @@ public class AccountDomainService {
         }
         from.reduceBalance(amount);
         to.incrementBalance(amount);
-        return Transfer.builder().fromName(from.getName()).toName(to.getName()).amount(amount).build();
+        Transfer transfer = Transfer.builder().fromName(from.getName()).toName(to.getName()).amount(amount).build();
+        from.addTransfer(transfer);
+        to.addTransfer(transfer);
     }
 
 }

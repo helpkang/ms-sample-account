@@ -3,16 +3,20 @@ package koreanair.ms.msservicetest.domain.account;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import net.bytebuddy.agent.builder.AgentBuilder.PoolStrategy.Eager;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -24,9 +28,8 @@ public class Account {
     @Column
     private int balance;
 
- 
-    @Setter
-    @Transient
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(joinColumns=@JoinColumn(name="account_name"), inverseJoinColumns = @JoinColumn(name="trasfer_id") )
     List<Transfer> transfers = new ArrayList<>();
   
     @Builder
@@ -43,18 +46,26 @@ public class Account {
         balance -= ammount;
     }
 
-    public Transfer transfer(Account to, int amount) {
+    public void transfer(Account to, int amount) {
         if( amount <=0){
             throw new RuntimeException("이체금액은 0보다 커야 합니다.");
         }
         if(balance < amount){
             throw new RuntimeException("잔액이 부족합니다.");
         }
+
+        Account from = this;
         
-        this.reduceBalance(amount);
+        from.reduceBalance(amount);
         to.incrementBalance(amount);
 
-        return Transfer.builder().fromName(name).toName(to.name).amount(amount).build();
+        Transfer transfer = Transfer.builder().fromName(from.getName()).toName(to.getName()).amount(amount).build();
+        from.addTransfer(transfer);
+        to.addTransfer(transfer);
     }
+
+	public void addTransfer(Transfer transfer) {
+        transfers.add(transfer);
+	}
 
 }

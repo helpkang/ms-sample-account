@@ -48,11 +48,10 @@ public class AccountDomainTests {
 		Account accA = repository.findById(from).get();
 		Account accB = repository.findById(to).get();
 
-		Transfer transfer = accA.transfer(accB, amount);
+		accA.transfer(accB, amount);
 
 		repository.save(accA);
 		repository.save(accB);
-		transferrepository.save(transfer);
 
 	}
 
@@ -60,11 +59,10 @@ public class AccountDomainTests {
 		Account accA = repository.findById(from).get();
 		Account accB = repository.findById(to).get();
 
-		Transfer transfer = service.transfer(accA, accB, amount);
+		service.transfer(accA, accB, amount);
 
 		repository.save(accA);
 		repository.save(accB);
-		transferrepository.save(transfer);
 	}
 
 	private void saveAccount(String name, int balance) {
