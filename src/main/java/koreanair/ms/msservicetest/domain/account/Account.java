@@ -29,7 +29,7 @@ public class Account {
     private int balance;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(joinColumns=@JoinColumn(name="account_name"), inverseJoinColumns = @JoinColumn(name="trasfer_id") )
+    @JoinTable(joinColumns=@JoinColumn(name="account_name"), inverseJoinColumns = @JoinColumn(name="transfer_id") )
     List<Transfer> transfers = new ArrayList<>();
   
     @Builder
