@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import koreanair.ms.msservicetest.repository.AccountRepository;
 import koreanair.ms.msservicetest.repository.TransferRepository;
@@ -30,6 +31,7 @@ public class AccountDomainTests {
 	AccountFactory factory;
 
 	@Test
+	@Transactional
 	public void contextLoads() {
 		saveAccount("a", 100);
 		saveAccount("b", 500);

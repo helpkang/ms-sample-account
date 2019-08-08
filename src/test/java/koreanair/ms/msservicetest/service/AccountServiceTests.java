@@ -8,8 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import koreanair.ms.msservicetest.domain.account.Account;
+import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -19,9 +18,10 @@ public class AccountServiceTests {
 	AccountService service;
 
 	@Test
+	@Transactional
 	public void accountCreate() {
 		service.createAccount(createCreateAccount("a", 100));
-		Account a = service.getAccount("a");
+		AccountVO a = service.getAccount("a");
 		assertEquals(100, a.getBalance());
 	}
 
@@ -30,6 +30,7 @@ public class AccountServiceTests {
 	}
 
 	@Test
+	@Transactional
 	public void transfer() {
 		service.createAccount(createCreateAccount("a", 100));
 		service.createAccount(createCreateAccount("b", 200));

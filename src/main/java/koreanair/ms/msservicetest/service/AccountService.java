@@ -1,7 +1,5 @@
 package koreanair.ms.msservicetest.service;
 
-import java.util.List;
-
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +8,7 @@ import org.springframework.stereotype.Service;
 import koreanair.ms.msservicetest.domain.account.Account;
 import koreanair.ms.msservicetest.domain.account.AccountDomainService;
 import koreanair.ms.msservicetest.domain.account.AccountFactory;
-import koreanair.ms.msservicetest.domain.account.Transfer;
 import koreanair.ms.msservicetest.repository.AccountRepository;
-import koreanair.ms.msservicetest.repository.TransferRepository;
 
 @Service
 public class AccountService {
@@ -34,24 +30,22 @@ public class AccountService {
     }
     
     @Transactional
-    public void transfer(String from, String to, int amount){
+    public void transfer(TransferAccountVO trasferVO){
         
-        Account accA = repository.findById(from).get();
-        Account accB = repository.findById(to).get();
+        Account accountFrom = repository.findById(trasferVO.getFrom()).get();
+        Account accountTo = repository.findById(trasferVO.getTo()).get();
         
-        domainservice.transfer(accA, accB, amount);
+        domainservice.transfer(accountFrom, accountTo, trasferVO.getAmount());
         
-        repository.save(accA);
-        repository.save(accB);
+        repository.save(accountFrom);
+        repository.save(accountTo);
         
     }
     
     @Transactional
     public AccountVO getAccount(String name) {
         Account account = repository.findById(name).get();
-        // TODO: domain to vo convert
-        // return TransferAccount
-        
+        return TransferAccount.accountToAccountVO(account);
     }
 
 }

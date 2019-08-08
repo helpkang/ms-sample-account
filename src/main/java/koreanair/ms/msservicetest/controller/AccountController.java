@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import koreanair.ms.msservicetest.domain.account.Account;
 import koreanair.ms.msservicetest.service.AccountService;
+import koreanair.ms.msservicetest.service.AccountVO;
 import koreanair.ms.msservicetest.service.CreateAccountVO;
+import koreanair.ms.msservicetest.service.TransferAccountVO;
 
 @RestController
 @RequestMapping("account")
@@ -24,7 +25,7 @@ public class AccountController {
     AccountService service;
 
     @GetMapping
-    public Account getAccount(String name) {
+    public AccountVO getAccount(String name) {
         return service.getAccount(name);    
     }
 
@@ -32,18 +33,20 @@ public class AccountController {
     @ApiOperation(value = "Finds Pets by status",
     notes = "Multiple status values can be provided with comma seperated strings"
     )
-    public Account createAccount(CreateAccountVO createAccount) {
+    public AccountVO createAccount(CreateAccountVO createAccount) {
          service.createAccount(createAccount);
          return service.getAccount(createAccount.getName());
     }
 
     
     @PostMapping("transfer")
-    public List<Account> transfer(String from, String to, int amount) {
-         service.transfer(from, to, amount);
-         List<Account> list = new ArrayList<>();
-         list.add(service.getAccount(from));
-         list.add(service.getAccount(to));
+    public List<AccountVO> transfer(TransferAccountVO trasferAccountVO) {
+         service.transfer(trasferAccountVO);
+
+         // 이체하고 계좌 정보를 보여달라는 추가 요구사항은 화면상에서 구현 하면 됨 
+         List<AccountVO> list = new ArrayList<>();
+         list.add(service.getAccount(trasferAccountVO.getFrom()));
+         list.add(service.getAccount(trasferAccountVO.getTo()));
          return list;
     }
     
