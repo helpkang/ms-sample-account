@@ -34,7 +34,7 @@ public class AccountServiceTests {
 	public void transfer() {
 		service.createAccount(createCreateAccount("a", 100));
 		service.createAccount(createCreateAccount("b", 200));
-		service.transfer("a", "b", 50);
+		service.transfer(TransferAccountVO.builder().from("a").to("b").amount(50).build());
 		assertEquals(50, service.getAccount("a").getBalance());
 		assertEquals(250, service.getAccount("b").getBalance());
 	}

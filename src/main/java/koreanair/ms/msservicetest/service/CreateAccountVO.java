@@ -6,10 +6,12 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @ApiModel(value="DifferentModel", description="Sample model for the documentation")
 public class CreateAccountVO implements Serializable{
     private static final long serialVersionUID = 1L;
@@ -27,5 +29,4 @@ public class CreateAccountVO implements Serializable{
         this.initBalance = initBalance; 
     }
 
-    public CreateAccountVO(){}
 }

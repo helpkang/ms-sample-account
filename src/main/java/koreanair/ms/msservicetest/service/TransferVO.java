@@ -2,10 +2,12 @@ package koreanair.ms.msservicetest.service;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class TransferVO {
 
     int id;
@@ -23,7 +25,5 @@ public class TransferVO {
         this.toName = toName;
         this.amount = amount;
     }
-
-    public TransferVO(){}
 
 }
