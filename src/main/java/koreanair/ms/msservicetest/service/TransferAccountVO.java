@@ -13,10 +13,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value="출금요청", description="Sample model for the documentation")
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
+@ApiModel(value="이쳬요청", description="이체요청")
 public class TransferAccountVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -26,6 +26,6 @@ public class TransferAccountVO implements Serializable {
     @ApiModelProperty(value = "받는계좌")
     String to;
 
-    @ApiModelProperty(value = "보낼금액", example="1")
+    @ApiModelProperty(value = "이체금액", example="1")
     int amount;
 }
