@@ -1,4 +1,4 @@
-package koreanair.ms.msservicetest.controller;
+package koreanair.ms.msserviceweb.controller;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;

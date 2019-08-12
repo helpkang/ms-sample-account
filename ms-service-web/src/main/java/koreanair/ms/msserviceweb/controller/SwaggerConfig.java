@@ -1,4 +1,4 @@
-package koreanair.ms.msservicetest.controller;
+package koreanair.ms.msserviceweb.controller;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,8 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)  
           .select()                                  
           .apis(RequestHandlerSelectors.any())              
-          .paths(PathSelectors.ant("/account/**"))                          
+        //   .paths(PathSelectors.ant("/account/**"))                          
+          .paths(PathSelectors.any())                          
           .build();                                           
     }
 }
