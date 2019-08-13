@@ -19,4 +19,19 @@
     <module>ms-service-domain</module>
     <module>ms-service-web</module>
   </modules>
+
+   <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>koreanair.ms</groupId>
+                <artifactId>ms-service-domain</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>koreanair.ms</groupId>
+                <artifactId>ms-service-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
