@@ -25,7 +25,7 @@ public class AccountDomainTests {
 	TransferRepository transferrepository;
 
 	@Autowired 
-	AccountDomainService service;
+	AccountDS service;
 
 	@Autowired
 	AccountFactory factory;

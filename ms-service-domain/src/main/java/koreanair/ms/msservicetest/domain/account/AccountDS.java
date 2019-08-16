@@ -3,7 +3,7 @@ package koreanair.ms.msservicetest.domain.account;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AccountDomainService {
+public class AccountDS {
     
    
     public void transfer(Account from, Account to, int amount) {
