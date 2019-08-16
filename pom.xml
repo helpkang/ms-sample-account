@@ -10,8 +10,8 @@
   </parent>
 
   <packaging>pom</packaging>
-  <groupId>koreanair.ms</groupId>
-  <artifactId>ms</artifactId>
+  <groupId>com.koreanair.ms_smaple_account</groupId>
+  <artifactId>ms_smaple_account</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>ms-service-test</name>
   
