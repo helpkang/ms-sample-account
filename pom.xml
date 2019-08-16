@@ -10,8 +10,8 @@
   </parent>
 
   <packaging>pom</packaging>
-  <groupId>com.koreanair.ms-smaple-account</groupId>
-  <artifactId>ms-smaple-account</artifactId>
+  <groupId>com.koreanair.ms_sample_account</groupId>
+  <artifactId>ms-sample-account</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>ms-service-test</name>
   
@@ -22,20 +22,20 @@
   </properties>
   
   <modules>
-    <module>ms-service-domain</module>
-    <module>ms-service-web</module>
+    <module>ms-sample-account-domain</module>
+    <module>ms-sample-account-web</module>
   </modules>
 
    <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>koreanair.ms</groupId>
-                <artifactId>ms-service-domain</artifactId>
+                <groupId>com.koreanair.ms_sample_account</groupId>
+                <artifactId>ms-sample-account-domain</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>koreanair.ms</groupId>
-                <artifactId>ms-service-service</artifactId>
+                <groupId>com.koreanair.ms_sample_account</groupId>
+                <artifactId>ms-sample-account-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
