@@ -4,13 +4,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.koreanair.ms_smaple_account</groupId>
-    <artifactId>ms_smaple_account</artifactId>
+    <groupId>com.koreanair.ms-smaple-account</groupId>
+    <artifactId>ms-smaple-account</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
 
-  <groupId>com.koreanair.ms_smaple_account</groupId>
+  <groupId>com.koreanair.ms-smaple-account</groupId>
   <artifactId>ms-service-domain</artifactId>
   <name>ms-service-domain</name>
   <description>Demo project for Spring Boot</description>
