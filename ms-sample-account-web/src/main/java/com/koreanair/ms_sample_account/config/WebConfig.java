@@ -1,4 +1,4 @@
-package com.koreanair.ms_sample_account.controller;
+package com.koreanair.ms_sample_account.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
