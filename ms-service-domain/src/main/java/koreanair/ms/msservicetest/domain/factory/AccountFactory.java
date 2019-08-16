@@ -1,4 +1,4 @@
-package koreanair.ms.msservicetest.domain.account;
+package koreanair.ms.msservicetest.domain.factory;
 
 import org.springframework.stereotype.Component;
 

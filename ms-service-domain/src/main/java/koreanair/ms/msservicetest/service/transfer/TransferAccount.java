@@ -1,4 +1,4 @@
-package koreanair.ms.msservicetest.service;
+package koreanair.ms.msservicetest.service.transfer;
 
 import java.util.List;
 import java.util.stream.Collectors;
