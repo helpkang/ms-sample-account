@@ -12,8 +12,8 @@
   <packaging>pom</packaging>
   <groupId>com.koreanair.ms_sample_account</groupId>
   <artifactId>ms-sample-account</artifactId>
+  <name>ms-sample-account</name>
   <version>0.0.1-SNAPSHOT</version>
-  <name>ms-service-test</name>
   
    <properties>
     <java.version>1.8</java.version>
@@ -23,21 +23,8 @@
   
   <modules>
     <module>ms-sample-account-domain</module>
+    <module>ms-sample-account-service</module>
     <module>ms-sample-account-web</module>
   </modules>
 
-   <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.koreanair.ms_sample_account</groupId>
-                <artifactId>ms-sample-account-domain</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.koreanair.ms_sample_account</groupId>
-                <artifactId>ms-sample-account-web</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>
