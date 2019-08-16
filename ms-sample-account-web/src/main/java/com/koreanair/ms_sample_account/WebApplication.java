@@ -1,11 +1,10 @@
-package koreanair.ms.msserviceweb;
+package com.koreanair.ms_sample_account;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = {
 	"com.koreanair.ms_sample_account",
-	"koreanair.ms.msserviceweb",
 })
 public class WebApplication {
 
