@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import koreanair.ms.msservicetest.domain.account.Account;
 import koreanair.ms.msservicetest.domain.account.Transfer;
+import koreanair.ms.msservicetest.service.vo.AccountVO;
+import koreanair.ms.msservicetest.service.vo.TransferVO;
 
 /**
  * TransferAccount

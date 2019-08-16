@@ -1,4 +1,4 @@
-package koreanair.ms.msservicetest.service;
+package koreanair.ms.msservicetest.service.vo;
 
 import lombok.Builder;
 import lombok.Getter;

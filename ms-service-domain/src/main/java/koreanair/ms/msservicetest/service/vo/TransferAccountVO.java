@@ -1,4 +1,4 @@
-package koreanair.ms.msservicetest.service;
+package koreanair.ms.msservicetest.service.vo;
 
 import java.io.Serializable;
 
@@ -16,7 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
-@ApiModel(value="이쳬요청", description="이체요청")
+@ApiModel(value="이체요청", description="이체요청")
 public class TransferAccountVO implements Serializable {
     private static final long serialVersionUID = 1L;
 

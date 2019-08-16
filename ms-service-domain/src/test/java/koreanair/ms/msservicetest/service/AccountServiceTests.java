@@ -10,6 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import koreanair.ms.msservicetest.service.vo.AccountVO;
+import koreanair.ms.msservicetest.service.vo.CreateAccountVO;
+import koreanair.ms.msservicetest.service.vo.TransferAccountVO;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class AccountServiceTests {

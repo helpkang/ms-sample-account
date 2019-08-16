@@ -16,9 +16,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import koreanair.ms.msservicetest.service.AccountService;
-import koreanair.ms.msservicetest.service.AccountVO;
-import koreanair.ms.msservicetest.service.CreateAccountVO;
-import koreanair.ms.msservicetest.service.TransferAccountVO;
+import koreanair.ms.msservicetest.service.vo.AccountVO;
+import koreanair.ms.msservicetest.service.vo.CreateAccountVO;
+import koreanair.ms.msservicetest.service.vo.TransferAccountVO;
 
 @RestController
 @RequestMapping("account")

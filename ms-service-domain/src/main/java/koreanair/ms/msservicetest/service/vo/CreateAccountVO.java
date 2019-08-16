@@ -1,4 +1,4 @@
-package koreanair.ms.msservicetest.service;
+package koreanair.ms.msservicetest.service.vo;
 
 import java.io.Serializable;
 
