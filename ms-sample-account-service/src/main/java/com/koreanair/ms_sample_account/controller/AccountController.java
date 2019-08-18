@@ -21,7 +21,7 @@ import com.koreanair.ms_sample_account.service.vo.CreateAccountVO;
 import com.koreanair.ms_sample_account.service.vo.TransferAccountVO;
 
 @RestController
-@RequestMapping("account")
+@RequestMapping("/account")
 @Api(value = "account", description = "account 와 transfer 처리")
 public class AccountController {
 
