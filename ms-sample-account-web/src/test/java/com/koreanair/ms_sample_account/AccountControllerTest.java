@@ -67,21 +67,7 @@ public class AccountControllerTest {
         .then()
         .statusCode(is(200))
         .body(containsString("a"));
-        
 
-        
-        // given
-        // final CreateAccountVO book = CreateAccountVO.builder().name("a").initBalance(10).build();
-
-        // given(bookService.getBook()).willReturn(book);
-
-        // when
-        // final ResultActions actions = mvc
-        //         .perform(post("/account").contentType(MediaType.APPLICATION_JSON_UTF8).content(objectToJson(book)))
-        //         .andExpect(status().isOk());
-        // // then
-        // actions.andExpect(status().isOk()).andExpect(jsonPath("id").value(1L))
-        // .andExpect(jsonPath("title").value("title")).andExpect(jsonPath("price").value(1000D));
     }
 
     private String objectToJson(Object o) {
