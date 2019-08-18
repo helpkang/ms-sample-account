@@ -25,12 +25,7 @@ public class AccountServiceTests {
 	@Transactional
 	public void accountCreate() {
 		service.createAccount(createCreateAccount("a", 100));
-		AccountVO a = service.getAccount("a");
-		assertEquals(100, a.getBalance());
-	}
-
-	private CreateAccountVO createCreateAccount(String name, int initBalance) {
-		return CreateAccountVO.builder().name(name).initBalance(initBalance).build();
+		assertEquals(100, getBalance("a"));
 	}
 
 	@Test
@@ -39,8 +34,20 @@ public class AccountServiceTests {
 		service.createAccount(createCreateAccount("a", 100));
 		service.createAccount(createCreateAccount("b", 200));
 		service.transfer(TransferAccountVO.builder().from("a").to("b").amount(50).build());
-		assertEquals(50, service.getAccount("a").getBalance());
-		assertEquals(250, service.getAccount("b").getBalance());
+		assertEquals(50, getBalance("a"));
+		assertEquals(250, getBalance("b"));
+	}
+	
+	
+	private int getBalance(String name){
+		return getAccount(name).getBalance();
 	}
 
+	private AccountVO getAccount(String name) {
+		return service.getAccount(name);
+	}
+
+	private CreateAccountVO createCreateAccount(String name, int initBalance) {
+		return CreateAccountVO.builder().name(name).initBalance(initBalance).build();
+	}
 }
