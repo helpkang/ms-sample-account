@@ -9,6 +9,8 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import static com.google.common.base.Predicates.*;
+
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {                                    
@@ -17,8 +19,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)  
           .select()                                  
           .apis(RequestHandlerSelectors.any())              
-        //   .paths(PathSelectors.ant("/account/**"))                          
-          .paths(PathSelectors.any())                          
+          .paths(or(PathSelectors.ant("/api/**/*"), PathSelectors.ant("/inter/**/*")))  
           .build();                                           
     }
 }
