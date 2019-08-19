@@ -1,6 +1,8 @@
 spring:
-    # main:
-    #   web-application-type: none
+    application:
+        name: ms-sample-account-v1
+    main:
+        web-application-type: servlet
     h2:
         console:
             enabled: true
@@ -8,8 +10,8 @@ spring:
         driverClassName: org.h2.Driver
     jpa:
         database-platform: org.hibernate.dialect.H2Dialect
-        # properties:
-        #     hibernate:
-        #         show_sql: true
-        #         format_sql: true
-        #         use_sql_comments: true
+        properties:
+            hibernate:
+                show_sql: true
+                format_sql: true
+                use_sql_comments: true
