@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 
@@ -26,11 +27,15 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest (webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 public class AccountControllerTest {
+
+    final String testAccountName = "xx";
+    final int testAccountBalance = 50;
     
     @Autowired
     private AccountRepository accountRepository;
@@ -40,7 +45,12 @@ public class AccountControllerTest {
 
     @Before
     public void setUp() {
-        Account account = Account.builder().name("xx").balance(10).build();
+
+        Account account = Account.builder()
+        .name(testAccountName)
+        .balance(testAccountBalance)
+        .build();
+        
         accountRepository.save(account);
     }
 
@@ -51,12 +61,7 @@ public class AccountControllerTest {
 
     @Test
     public void getAccountTest() throws Exception {
-
-        when()
-        .get(String.format("http://localhost:%s/api/account/%s", port, "xx"))
-        .then()
-        .statusCode(is(200))
-        .body(containsString("xx"));
+        getAccountSame(testAccountName, testAccountBalance);
     }
 
 
@@ -76,23 +81,19 @@ public class AccountControllerTest {
     @Test
     public void transferAccountTest() throws Exception {
 
-        String[] accounts = {"aa", "bb"};
+        final String[] accounts = {"aa", "bb"};
+        final int initBalance = 10;
+        final int trasferAmount = 2;
 
         Arrays.stream(accounts).forEach(account->{
-
-            
-        final CreateAccountVO createAccountVO = CreateAccountVO.builder().name(account).initBalance(10).build();
-            given()
-            .body(objectToJson(createAccountVO))
-            .contentType(ContentType.JSON)
-            .when()
-            .post(String.format("http://localhost:%s/api/account", port ))
-            .then()
-            .statusCode(is(200));
+            createAccountSame(account, initBalance);
         });
 
-
-        final TransferAccountVO transferAccountVO = TransferAccountVO.builder().from(accounts[0]).to(accounts[1]).amount(2).build();
+        final TransferAccountVO transferAccountVO = TransferAccountVO.builder()
+        .from(accounts[0])
+        .to(accounts[1])
+        .amount(trasferAmount)
+        .build();
 
         given()
         .body(objectToJson(transferAccountVO))
@@ -100,8 +101,52 @@ public class AccountControllerTest {
         .when()
         .post(String.format("http://localhost:%s/api/account/transfer", port ))
         .then()
-        .statusCode(is(200))
-        .body(containsString(accounts[0]));
+        .statusCode(is(200));
+
+        final int[] i = { 0 };
+        Arrays.stream(accounts).forEach(( account )->{
+            int value = i[0]==0 ? initBalance-trasferAmount : initBalance+trasferAmount;
+            getAccountSame(account, value);
+            i[0]++;
+        });
+       
+    }
+
+
+
+    public void createAccountSame(String expectAccountName, int expectBalacne){
+
+        final CreateAccountVO createAccountVO = CreateAccountVO.builder().name(expectAccountName).initBalance(expectBalacne).build();
+        Response json = given()
+        .body(objectToJson(createAccountVO))
+        .contentType(ContentType.JSON)
+        .when()
+        .contentType(ContentType.JSON)
+        .post(String.format("http://localhost:%s/api/account", port ))
+        .thenReturn();
+        
+        String name = json.jsonPath().getString("name");
+        assertEquals(expectAccountName, name);
+        
+        int balance = json.jsonPath().getInt("balance");
+        assertEquals(expectBalacne, balance);
+
+    }
+
+    public void getAccountSame(String expectAccountName, int expectBalacne) {
+
+        Response json = when()
+        .get(String.format("http://localhost:%s/api/account/%s", port, expectAccountName))
+        .then()
+        .contentType(ContentType.JSON)
+        .extract()
+        .response();
+
+        String name = json.jsonPath().getString("name");
+        assertEquals(expectAccountName, name);
+        
+        int balance = json.jsonPath().getInt("balance");
+        assertEquals(expectBalacne, balance);
     }
 
 
