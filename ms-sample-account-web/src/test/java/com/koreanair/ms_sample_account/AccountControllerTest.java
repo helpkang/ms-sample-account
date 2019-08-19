@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.koreanair.ms_sample_account.domain.account.Account;
 import com.koreanair.ms_sample_account.repository.AccountRepository;
 import com.koreanair.ms_sample_account.service.vo.CreateAccountVO;
+import com.koreanair.ms_sample_account.service.vo.TransferAccountVO;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,7 +38,7 @@ public class AccountControllerTest {
 
     @Before
     public void setUp() {
-        Account account = Account.builder().name("a1").balance(10).build();
+        Account account = Account.builder().name("a").balance(10).build();
         accountRepository.save(account);
     }
 
@@ -50,15 +51,16 @@ public class AccountControllerTest {
     public void getAccountTest() throws Exception {
 
         when()
-        .get(String.format("http://localhost:%s/account/%s", port, "a1"))
+        .get(String.format("http://localhost:%s/account/%s", port, "a"))
         .then()
         .statusCode(is(200))
-        .body(containsString("a1"));
+        .body(containsString("a"));
+    }
 
 
-
-        final CreateAccountVO createAccountVO = CreateAccountVO.builder().name("a").initBalance(10).build();
-        System.out.println("json:"+objectToJson(createAccountVO));
+    @Test
+    public void makeNewAccountTest() throws Exception {
+        final CreateAccountVO createAccountVO = CreateAccountVO.builder().name("b").initBalance(10).build();
         given()
         .body(objectToJson(createAccountVO))
         .contentType(ContentType.JSON)
@@ -66,9 +68,23 @@ public class AccountControllerTest {
         .post(String.format("http://localhost:%s/account", port ))
         .then()
         .statusCode(is(200))
-        .body(containsString("a"));
-
+        .body(containsString("b"));
     }
+
+    @Test
+    public void transferAccountTest() throws Exception {
+        final TransferAccountVO transferAccountVO = TransferAccountVO.builder().from("a").to("b").amount(2).build();
+
+        given()
+        .body(objectToJson(transferAccountVO))
+        .contentType(ContentType.JSON)
+        .when()
+        .post(String.format("http://localhost:%s/account/transfer", port ))
+        .then()
+        .statusCode(is(200))
+        .body(containsString("b"));
+    }
+
 
     private String objectToJson(Object o) {
         ObjectMapper mapper = new ObjectMapper();
