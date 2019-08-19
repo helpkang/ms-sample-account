@@ -1,4 +1,4 @@
-package com.koreanair.ms_sample_account.domain.factory;
+package com.koreanair.ms_sample_account.domain.account.factory;
 
 import org.springframework.stereotype.Component;
 

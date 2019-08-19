@@ -4,7 +4,7 @@ package com.koreanair.ms_sample_account.domain.account;
 import static org.junit.Assert.assertEquals;
 
 import com.koreanair.ms_sample_account.domain.account.ds.AccountDS;
-import com.koreanair.ms_sample_account.domain.factory.AccountFactory;
+import com.koreanair.ms_sample_account.domain.account.factory.AccountFactory;
 
 import org.junit.Test;
 
