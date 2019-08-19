@@ -5,6 +5,8 @@ import static io.restassured.RestAssured.when;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 
+import java.util.Arrays;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -38,7 +40,7 @@ public class AccountControllerTest {
 
     @Before
     public void setUp() {
-        Account account = Account.builder().name("a").balance(10).build();
+        Account account = Account.builder().name("xx").balance(10).build();
         accountRepository.save(account);
     }
 
@@ -51,38 +53,55 @@ public class AccountControllerTest {
     public void getAccountTest() throws Exception {
 
         when()
-        .get(String.format("http://localhost:%s/account/%s", port, "a"))
+        .get(String.format("http://localhost:%s/api/account/%s", port, "xx"))
         .then()
         .statusCode(is(200))
-        .body(containsString("a"));
+        .body(containsString("xx"));
     }
 
 
     @Test
     public void makeNewAccountTest() throws Exception {
-        final CreateAccountVO createAccountVO = CreateAccountVO.builder().name("b").initBalance(10).build();
+        final CreateAccountVO createAccountVO = CreateAccountVO.builder().name("yy").initBalance(10).build();
         given()
         .body(objectToJson(createAccountVO))
         .contentType(ContentType.JSON)
         .when()
-        .post(String.format("http://localhost:%s/account", port ))
+        .post(String.format("http://localhost:%s/api/account", port ))
         .then()
         .statusCode(is(200))
-        .body(containsString("b"));
+        .body(containsString("yy"));
     }
 
     @Test
     public void transferAccountTest() throws Exception {
-        final TransferAccountVO transferAccountVO = TransferAccountVO.builder().from("a").to("b").amount(2).build();
+
+        String[] accounts = {"aa", "bb"};
+
+        Arrays.stream(accounts).forEach(account->{
+
+            
+        final CreateAccountVO createAccountVO = CreateAccountVO.builder().name(account).initBalance(10).build();
+            given()
+            .body(objectToJson(createAccountVO))
+            .contentType(ContentType.JSON)
+            .when()
+            .post(String.format("http://localhost:%s/api/account", port ))
+            .then()
+            .statusCode(is(200));
+        });
+
+
+        final TransferAccountVO transferAccountVO = TransferAccountVO.builder().from(accounts[0]).to(accounts[1]).amount(2).build();
 
         given()
         .body(objectToJson(transferAccountVO))
         .contentType(ContentType.JSON)
         .when()
-        .post(String.format("http://localhost:%s/account/transfer", port ))
+        .post(String.format("http://localhost:%s/api/account/transfer", port ))
         .then()
         .statusCode(is(200))
-        .body(containsString("b"));
+        .body(containsString(accounts[0]));
     }
 
 
