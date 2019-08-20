@@ -8,13 +8,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.koreanair.ms_sample_account.domain.account.Account;
 import com.koreanair.ms_sample_account.repository.AccountRepository;
 import com.koreanair.ms_sample_account.service.vo.CreateAccountVO;
 import com.koreanair.ms_sample_account.service.vo.TransferAccountVO;
+import com.koreanair.utils.ConvertUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -69,12 +67,12 @@ public class AccountControllerTest {
     public void makeNewAccountTest() throws Exception {
         final CreateAccountVO createAccountVO = CreateAccountVO.builder().name("yy").initBalance(10).build();
         given()
-        .body(objectToJson(createAccountVO))
+        .body(ConvertUtils.objectToJson(createAccountVO))
         .contentType(ContentType.JSON)
         .when()
         .post(String.format("http://localhost:%s/api/account", port ))
         .then()
-        .statusCode(is(200))
+        .statusCode(is(201))
         .body(containsString("yy"));
     }
 
@@ -96,12 +94,12 @@ public class AccountControllerTest {
         .build();
 
         given()
-        .body(objectToJson(transferAccountVO))
+        .body(ConvertUtils.objectToJson(transferAccountVO))
         .contentType(ContentType.JSON)
         .when()
         .post(String.format("http://localhost:%s/api/account/transfer", port ))
         .then()
-        .statusCode(is(200));
+        .statusCode(is(201));
 
         final int[] i = { 0 };
         Arrays.stream(accounts).forEach(( account )->{
@@ -118,7 +116,7 @@ public class AccountControllerTest {
 
         final CreateAccountVO createAccountVO = CreateAccountVO.builder().name(expectAccountName).initBalance(expectBalacne).build();
         Response json = given()
-        .body(objectToJson(createAccountVO))
+        .body(ConvertUtils.objectToJson(createAccountVO))
         .contentType(ContentType.JSON)
         .when()
         .contentType(ContentType.JSON)
@@ -150,15 +148,15 @@ public class AccountControllerTest {
     }
 
 
-    private String objectToJson(Object o) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson = null;
-        try {
-            requestJson = ow.writeValueAsString(o);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return requestJson;
-    }
+    // private String objectToJson(Object o) {
+    //     ObjectMapper mapper = new ObjectMapper();
+    //     ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+    //     String requestJson = null;
+    //     try {
+    //         requestJson = ow.writeValueAsString(o);
+    //     } catch (JsonProcessingException e) {
+    //         e.printStackTrace();
+    //     }
+    //     return requestJson;
+    // }
 }

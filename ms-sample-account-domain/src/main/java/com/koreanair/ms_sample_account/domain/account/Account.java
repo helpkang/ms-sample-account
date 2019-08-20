@@ -13,7 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import com.koreanair.ddd.DomainType;
-import com.koreanair.ddd.DomainType.Quality;
+import com.koreanair.ddd.DomainType.Domain;
 
 import org.hibernate.annotations.BatchSize;
 
@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DomainType(Quality.AggregateRoot)
+@DomainType(Domain.AggregateRoot)
 public class Account {
     @Id
     private String name;

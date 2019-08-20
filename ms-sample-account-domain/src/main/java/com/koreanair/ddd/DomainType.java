@@ -10,6 +10,6 @@ import java.lang.annotation.*;
 })
 
 public @interface DomainType {
-    public enum Quality {Entity, AggregateRoot, ValueObject}
-    Quality value() default Quality.Entity;
+    public enum Domain {Entity, AggregateRoot, ValueObject}
+    Domain value() default Domain.Entity;
 }
