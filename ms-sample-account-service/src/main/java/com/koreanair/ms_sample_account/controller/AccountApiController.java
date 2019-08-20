@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -43,6 +45,7 @@ public class AccountApiController {
     @ApiOperation(value = "계좌 생성",
     notes = "계좌명과 잔액으로 생성"
     )
+    @ResponseStatus(HttpStatus.CREATED)
     public AccountVO createAccount(@RequestBody CreateAccountVO createAccount) {
          service.createAccount(createAccount);
          return service.getAccount(createAccount.getName());
@@ -53,10 +56,11 @@ public class AccountApiController {
     @ApiOperation(value = "이체",
     notes = "계좌명으로 이체"
     )
+    @ResponseStatus(HttpStatus.CREATED)
     public List<AccountVO> transfer(@RequestBody TransferAccountVO trasferAccountVO) {
          service.transfer(trasferAccountVO);
 
-         // 이체하고 계좌 정보를 보여달라는 추가 요구사항은 화면상에서 구현 하면 됨 
+         // 이체하고 계좌 정보를 보여달라는 추가 요구사항은 화면상에서 별도 구현해도 됨
          List<AccountVO> list = new ArrayList<>();
          list.add(service.getAccount(trasferAccountVO.getFrom()));
          list.add(service.getAccount(trasferAccountVO.getTo()));
