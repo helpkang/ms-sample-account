@@ -21,11 +21,9 @@ public class AccountService {
     AccountRepository repository;
 
 
-	@Autowired 
-	AccountDS domainservice;
+	AccountDS domainservice = new AccountDS();
 
-	@Autowired
-    AccountFactory factory;
+    AccountFactory factory = new AccountFactory();
 
     @Transactional
     public void createAccount(CreateAccountVO vo){

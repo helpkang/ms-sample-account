@@ -9,7 +9,6 @@ import com.koreanair.ms_sample_account.domain.account.factory.AccountFactory;
 import org.junit.Test;
 
 
-
 public class AccountDomainTests {
 
 	AccountDS service = new AccountDS();

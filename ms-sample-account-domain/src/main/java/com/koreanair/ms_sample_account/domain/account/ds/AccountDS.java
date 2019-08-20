@@ -1,11 +1,8 @@
 package com.koreanair.ms_sample_account.domain.account.ds;
 
-import org.springframework.stereotype.Component;
-
 import com.koreanair.ms_sample_account.domain.account.Account;
 import com.koreanair.ms_sample_account.domain.account.Transfer;
 
-@Component
 public class AccountDS {
     
    
