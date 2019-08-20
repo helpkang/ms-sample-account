@@ -147,16 +147,4 @@ public class AccountControllerTest {
         assertEquals(expectBalacne, balance);
     }
 
-
-    // private String objectToJson(Object o) {
-    //     ObjectMapper mapper = new ObjectMapper();
-    //     ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-    //     String requestJson = null;
-    //     try {
-    //         requestJson = ow.writeValueAsString(o);
-    //     } catch (JsonProcessingException e) {
-    //         e.printStackTrace();
-    //     }
-    //     return requestJson;
-    // }
 }
