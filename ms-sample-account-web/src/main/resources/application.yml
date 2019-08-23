@@ -1,17 +1,5 @@
 spring:
     application:
-        name: ms-sample-account-v1
-    main:
-        web-application-type: servlet
-    h2:
-        console:
-            enabled: true
-    datasource:
-        driverClassName: org.h2.Driver
-    jpa:
-        database-platform: org.hibernate.dialect.H2Dialect
-        properties:
-            hibernate:
-                show_sql: true
-                format_sql: true
-                use_sql_comments: true
+        name: ms-sample-account
+    # main:
+    #     web-application-type: servlet

@@ -18,6 +18,7 @@
 
   <properties>
     <swagger.version>2.9.2</swagger.version>
+    <spring-cloud.version>Greenwich.SR2</spring-cloud.version>
   </properties>
   <dependencies>
     <dependency>
@@ -37,6 +38,16 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-config</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
@@ -52,7 +63,34 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-dependencies</artifactId>
+      <version>${spring-cloud.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <build>
+
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <excludes>
+                <exclude>**/*.java</exclude>
+            </excludes>
+        </resource>
+        <resource>
+            <directory>src/main/resources-${environment}</directory>
+        </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -63,4 +101,51 @@
       </plugin>
     </plugins>
   </build>
+
+
+   <profiles>
+    <profile>
+        <id>local</id>
+        <activation>
+          <activeByDefault>true</activeByDefault>
+        </activation>
+        <properties>
+            <spring.profiles.active>local</spring.profiles.active>
+            <environment>local</environment>
+            <maven.test.skip>false</maven.test.skip>
+        </properties>
+    </profile>
+    <profile>
+        <id>dev</id>
+        <properties>
+            <spring.profiles.active>dev</spring.profiles.active>
+            <environment>dev</environment>
+            <maven.test.skip>false</maven.test.skip>
+        </properties>
+    </profile>
+    <profile>
+        <id>test</id>
+        <properties>
+          <spring.profiles.active>test</spring.profiles.active>
+            <environment>test</environment>
+            <maven.test.skip>false</maven.test.skip>
+        </properties>
+    </profile>
+    <profile>
+        <id>stag</id>
+        <properties>
+            <spring.profiles.active>stg</spring.profiles.active>
+            <environment>stag</environment>
+            <maven.test.skip>false</maven.test.skip>
+        </properties>
+    </profile>
+    <profile>
+        <id>prod</id>
+        <properties>
+            <spring.profiles.active>prod</spring.profiles.active>
+            <environment>prod</environment>
+            <maven.test.skip>false</maven.test.skip>
+        </properties>
+    </profile>
+  </profiles>
 </project>

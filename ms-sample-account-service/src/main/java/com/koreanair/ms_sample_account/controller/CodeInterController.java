@@ -5,6 +5,8 @@ import java.util.AbstractMap;
 import com.koreanair.ms_sample_account.service.AccountService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping("/inter/Code")
 @Api(value = "code", description = "code search")
+@RefreshScope
 public class CodeInterController {
 
     @Autowired
@@ -34,6 +37,18 @@ public class CodeInterController {
         AbstractMap.SimpleEntry<String, String> code = new AbstractMap.SimpleEntry<>(name, "test");
         return code;    
     }
+    
+    @Value("${test.haha}")
+    String value = "World";
+
+    @GetMapping(value = "/profile")
+    @ApiOperation(value = "코드명으로 코드 조회",
+    notes = "코드명만 있으면 명칭 조회"
+    )
+    public String get() {
+        return value;    
+    }
+
 
     
 }

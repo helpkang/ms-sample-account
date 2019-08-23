@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(value = "example", url = "${external-api.http-bin}")
+@FeignClient(value = "example", url = "${inter.test}")
 public interface ExampleClient {
  
     @GetMapping("/{method}")
