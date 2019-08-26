@@ -9,6 +9,7 @@ import com.koreanair.ddd.DomainType;
 
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DomainType
+@Data
 public class Transfer {
     @Id
 	@GeneratedValue

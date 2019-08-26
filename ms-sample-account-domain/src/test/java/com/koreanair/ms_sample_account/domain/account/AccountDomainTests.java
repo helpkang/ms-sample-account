@@ -8,7 +8,9 @@ import com.koreanair.ms_sample_account.domain.account.factory.AccountFactory;
 
 import org.junit.Test;
 
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class AccountDomainTests {
 
 	AccountDS service = new AccountDS();
@@ -43,6 +45,7 @@ public class AccountDomainTests {
 
 	private Account createAccount(String name, int balance) {
 		Account a = factory.createAccount(name, balance);
+		log.debug("{}:{}", name, a);
 		return a;
 	}
 

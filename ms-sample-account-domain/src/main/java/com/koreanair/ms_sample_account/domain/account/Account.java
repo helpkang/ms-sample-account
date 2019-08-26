@@ -19,13 +19,17 @@ import org.hibernate.annotations.BatchSize;
 
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DomainType(Domain.AggregateRoot)
+@Data
 public class Account {
     @Id
     private String name;
@@ -36,6 +40,8 @@ public class Account {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(joinColumns=@JoinColumn(name="account_name"), inverseJoinColumns = @JoinColumn(name="transfer_id") )
     @BatchSize(size=10)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     List<Transfer> transfers = new ArrayList<>();
   
     @Builder
