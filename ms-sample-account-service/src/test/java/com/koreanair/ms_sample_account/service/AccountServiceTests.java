@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import com.koreanair.ms_sample_account.domain.account.Account;
 import com.koreanair.ms_sample_account.domain.account.Transfer;
 import com.koreanair.ms_sample_account.repository.AccountRepository;
+import com.koreanair.ms_sample_account.repository.TransferRepository;
 import com.koreanair.ms_sample_account.service.vo.AccountVO;
 import com.koreanair.ms_sample_account.service.vo.CreateAccountVO;
 import com.koreanair.ms_sample_account.service.vo.TransferAccountVO;
@@ -30,6 +31,9 @@ public class AccountServiceTests {
 
 	@Autowired
 	AccountRepository accountRepository;
+
+	@Autowired
+	TransferRepository transferRepository;
 
 	@Test
 	public void accountCreate() {
@@ -60,7 +64,7 @@ public class AccountServiceTests {
 		Account fromAccount = accountRepository.findById(from).get();
 
 		PageRequest pp = PageRequest.of(0, 2);
-		Page<Transfer> page = accountRepository.findBy(fromAccount, pp);
+		Page<Transfer> page = transferRepository.findByFromAccount(fromAccount, pp);
 		log.debug("page: {}", page);
 		
 		page.get().forEach(

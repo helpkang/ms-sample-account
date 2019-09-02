@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 import com.koreanair.ddd.DomainType;
 
@@ -24,18 +25,18 @@ public class Transfer {
 	int id;
 
     @Column
-    private String fromName;
-
-    @Column
-    private String toName;
-
-    @Column
     private int amount;
 
+    @ManyToOne
+    private Account fromAccount;
+    
+    @ManyToOne
+    private Account toAccount;
+
     @Builder
-    public Transfer(String fromName, String toName, int amount) {
-        this.fromName = fromName;
-        this.toName = toName;
+    public Transfer(Account fromAccount, Account toAccount, int amount) {
+        this.fromAccount = fromAccount;
+        this.toAccount = toAccount;
         this.amount = amount;
     }
 

@@ -19,20 +19,20 @@ public final class TransferAccount {
         .balance(account.getBalance())
         .build();
         
-        List<TransferVO> list = account.getTransfers().stream().map(transfer->transferToTransferVO(transfer))
-        .collect(Collectors.toList());
-        accountVO.setTransfers(list);
+        // List<TransferVO> list = account.getTransfers().stream().map(transfer->transferToTransferVO(transfer))
+        // .collect(Collectors.toList());
+        // accountVO.setTransfers(list);
 
 		return accountVO;
 	}
     
-    public static TransferVO transferToTransferVO(Transfer transfer) {
-        return TransferVO.builder()
-        .id(transfer.getId())
-        .fromName(transfer.getFromName())
-        .toName(transfer.getToName())
-        .amount(transfer.getAmount())
-        .build();
-    }
+    // public static TransferVO transferToTransferVO(Transfer transfer) {
+    //     return TransferVO.builder()
+    //     .id(transfer.getId())
+    //     .fromName(transfer.getFromName())
+    //     .toName(transfer.getToName())
+    //     .amount(transfer.getAmount())
+    //     .build();
+    // }
     
 }

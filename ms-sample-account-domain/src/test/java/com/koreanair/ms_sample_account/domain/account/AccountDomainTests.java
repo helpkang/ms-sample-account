@@ -22,7 +22,7 @@ public class AccountDomainTests {
 		Account a = createAccount("a", 100);
 		Account b = createAccount("b", 500);
 
-		transferWithDomainOperation(a, b, 20);
+		transferWithDomainService(a, b, 20);
 		assertEquals(80, a.getBalance() );
 		assertEquals(520, b.getBalance());
 
@@ -30,11 +30,6 @@ public class AccountDomainTests {
 		transferWithDomainService(a, b, 10);
 		assertEquals(70, a.getBalance());
 		assertEquals(530, b.getBalance());
-	}
-
-	private void transferWithDomainOperation(Account from, Account to, int amount) {
-
-		from.transfer(to, amount);
 	}
 
 	private void transferWithDomainService(Account from, Account to, int amount) {

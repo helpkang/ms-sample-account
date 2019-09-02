@@ -3,7 +3,15 @@ package com.koreanair.ms_sample_account.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.koreanair.controller.PageRequest;
+import com.koreanair.ms_sample_account.domain.account.Transfer;
+import com.koreanair.ms_sample_account.service.AccountService;
+import com.koreanair.ms_sample_account.service.vo.AccountVO;
+import com.koreanair.ms_sample_account.service.vo.CreateAccountVO;
+import com.koreanair.ms_sample_account.service.vo.TransferAccountVO;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,14 +25,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import com.koreanair.ms_sample_account.service.AccountService;
-import com.koreanair.ms_sample_account.service.vo.AccountVO;
-import com.koreanair.ms_sample_account.service.vo.CreateAccountVO;
-import com.koreanair.ms_sample_account.service.vo.TransferAccountVO;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/account")
 @Api(value = "account", description = "account 와 transfer 처리")
+@Slf4j
 public class AccountApiController {
 
     @Autowired
@@ -39,6 +45,28 @@ public class AccountApiController {
     })
     public AccountVO getAccount(@PathVariable String name) {
         return service.getAccount(name);    
+    }
+
+    @GetMapping(value = "/transfer/{name}")
+    @ApiOperation(value = "거래내역조회",
+    notes = "거래내역 조회"
+    )
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "name", value = "계좌명", required = true, dataType = "string", paramType = "path"),
+        @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", value = "Results page you want to retrieve (0..N)"),
+        @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", value = "Number of records per page."),
+        @ApiImplicitParam(name = "direction", dataType = "org.springframework.data.domain.Sort.Direction", paramType = "query", value = "ASC, DESC order direction."),
+    })
+    public Page<Transfer> getTransfer(@PathVariable String name, PageRequest pageRequest) {
+        log.info("request: {}", pageRequest);
+        try {
+            return service.getTransfer(name, pageRequest);
+            
+        } catch (Exception e) {
+            log.error("msg", e);
+            throw e;
+        }
+        // return null;
     }
 
     @PostMapping

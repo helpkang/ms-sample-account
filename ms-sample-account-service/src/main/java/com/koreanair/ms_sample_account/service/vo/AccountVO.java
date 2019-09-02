@@ -22,9 +22,6 @@ public class AccountVO {
     @ApiModelProperty(value = "잔고")
     private int balance;
 
-    @ApiModelProperty(value = "거래내역")
-    List<TransferVO> transfers = new ArrayList<>();
-
     @Builder
     public AccountVO(String name, int balance){
         this.name = name;
