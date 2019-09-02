@@ -67,7 +67,7 @@ public class AccountService {
         Account account = accountRepository.findById(name)
         .orElseThrow(()->new BizException("formAccountError", "from account가 없습니다."+name));
 
-        Page<Transfer> ret = transferRepository.findByFromAccount(account, pageRequest.of());
+        Page<Transfer> ret = transferRepository.findByFromAccount(account.getName(), pageRequest.of());
 
         return ret;
     }

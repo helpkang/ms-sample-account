@@ -1,8 +1,5 @@
 package com.koreanair.ms_sample_account.service.vo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;

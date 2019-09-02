@@ -20,7 +20,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
         +"select transfer from Transfer transfer where transfer.fromAccount = :account or transfer.toAccount = :account "
     )
     public Page<Transfer> findByFromAccount(
-        @Param("account") Account account, 
+        @Param("account") String account, 
         Pageable pageable); 
         
 }

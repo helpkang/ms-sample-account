@@ -1,29 +1,17 @@
 package com.koreanair.ms_sample_account.domain.account;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 
 import com.koreanair.ddd.DomainType;
 import com.koreanair.ddd.DomainType.Domain;
 
-import org.hibernate.annotations.BatchSize;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Getter
 @Entity

@@ -1,12 +1,7 @@
 package com.koreanair.ms_sample_account.service.transfer;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.koreanair.ms_sample_account.domain.account.Account;
-import com.koreanair.ms_sample_account.domain.account.Transfer;
 import com.koreanair.ms_sample_account.service.vo.AccountVO;
-import com.koreanair.ms_sample_account.service.vo.TransferVO;
 
 /**
  * TransferAccount

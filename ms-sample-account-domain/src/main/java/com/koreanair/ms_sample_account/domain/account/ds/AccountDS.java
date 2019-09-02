@@ -15,7 +15,7 @@ public class AccountDS {
         }
         from.reduceBalance(amount);
         to.incrementBalance(amount);
-        Transfer transfer = Transfer.builder().fromAccount(from).toAccount(to).amount(amount).build();
+        Transfer transfer = Transfer.builder().fromAccount(from.getName()).toAccount(to.getName()).amount(amount).build();
         return transfer;
     }
 

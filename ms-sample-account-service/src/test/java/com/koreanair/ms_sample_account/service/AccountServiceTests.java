@@ -64,7 +64,7 @@ public class AccountServiceTests {
 		Account fromAccount = accountRepository.findById(from).get();
 
 		PageRequest pp = PageRequest.of(0, 2);
-		Page<Transfer> page = transferRepository.findByFromAccount(fromAccount, pp);
+		Page<Transfer> page = transferRepository.findByFromAccount(fromAccount.getName(), pp);
 		log.debug("page: {}", page);
 		
 		page.get().forEach(
