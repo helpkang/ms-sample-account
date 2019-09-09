@@ -14,22 +14,24 @@ import org.springframework.http.HttpStatus;
 
 import io.cucumber.java8.En;
 
+
 public class BagCucmberStepDefinitions extends SpringCucumberIntegrationTests implements En {
 	private final Logger log = LoggerFactory.getLogger(BagCucmberStepDefinitions.class);
 
 	public BagCucmberStepDefinitions() {
 
-		// Given("가방을 비우기", () -> {
-		// 	clean();
-		// 	assertThat(getContents().isEmpty()).isTrue();
-		// });
+		Given("시작", () -> {
+			// clean();
+			// assertThat(getContents().isEmpty()).isTrue();
+		});
 
 		When("Account {} 잔고 {}으로 생성 ", (final String accountName, final Integer initValance) -> {
 			// IntStream.range(0, initValance).peek(n -> log.info("가방에 {} {}개를 넣음", accountName, initValance))
 			// 		.map(ignore -> put(accountName))
 			// 		.forEach(statusCode -> assertThat(statusCode).isEqualTo(HttpStatus.CREATED.value()));
 			
-			Arrays.stream( new Integer[]{0} )
+			Arrays.asList(0)
+			.stream()
 			.map( index-> CreateAccountVO.builder().name(accountName).initBalance(initValance).build() )
 			.map( createAccountVO-> ConvertUtils.objectToJson(createAccountVO) )
 			.map( createParam -> put(createParam))
@@ -44,7 +46,8 @@ public class BagCucmberStepDefinitions extends SpringCucumberIntegrationTests im
 
 	private void assertNumberOfTimes(final String accountName, final int initValue, final boolean onlyThat) {
 		log.info("Expecting {} times {}. The bag contains {}", initValue, accountName, onlyThat);
-		Arrays.stream( new String[] { getContents(accountName) } )
+		Arrays.asList(getContents(accountName))
+		.stream()
 		.map( accountInfo -> ConvertUtils.jsonToObject(accountInfo, Map.class))
 		.map( map -> Integer.parseInt(("balance")))
 		.forEach( balance -> assertThat(balance).isEqualTo(initValue) );

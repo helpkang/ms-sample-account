@@ -1,7 +1,7 @@
 Feature: Account 기능
 
 Scenario: Account 생성
-	# Given Account 전체 비우기
+	Given 시작
 	When Account a 잔고 10으로 생성 
 	Then Account a 잔고 10 있어야 함
 

@@ -1,14 +1,18 @@
 package com.koreanair.ms_sample_account_cucumber;
 
+import com.koreanair.ms_sample_account.WebApplication;
+
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes = WebApplication.class)
 @Ignore
 public class SpringCucumberIntegrationTests {
 
@@ -29,16 +33,16 @@ public class SpringCucumberIntegrationTests {
 		return SERVER_URL + ":" + port + THINGS_ENDPOINT;
 	}
 
-	int put(String param) {
+	public int put(String param) {
 		
 		return restTemplate.postForEntity(thingsEndpoint(), param, Void.class).getStatusCodeValue();
 	}
 
-	String getContents(String param) {
+	public String getContents(String param) {
 		return restTemplate.getForEntity(thingsEndpoint(), String.class).getBody();
 	}
 
-	void clean() {
+	public void clean() {
 		restTemplate.delete(thingsEndpoint());
 	}
 

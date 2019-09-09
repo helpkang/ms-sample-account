@@ -1,6 +1,5 @@
 package com.koreanair.ms_sample_account.repository;
 
-import com.koreanair.ms_sample_account.domain.account.Account;
 import com.koreanair.ms_sample_account.domain.account.Transfer;
 
 import org.springframework.data.domain.Page;
