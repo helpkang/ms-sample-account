@@ -1,7 +1,9 @@
 package com.koreanair.ms_sample_account.service.transfer;
 
 import com.koreanair.ms_sample_account.domain.account.Account;
+import com.koreanair.ms_sample_account.domain.account.Transfer;
 import com.koreanair.ms_sample_account.service.vo.AccountVO;
+import com.koreanair.ms_sample_account.service.vo.TransferVO;
 
 /**
  * TransferAccount
@@ -29,5 +31,14 @@ public final class TransferAccount {
     //     .amount(transfer.getAmount())
     //     .build();
     // }
+	
+	 public static TransferVO transferToTransferVO(Transfer transfer) {
+	     return TransferVO.builder()
+	     .id(transfer.getId())
+	     .fromName(transfer.getFromAccount())
+	     .toName(transfer.getToAccount())
+	     .amount(transfer.getAmount())
+	     .build();
+	 }
     
 }
