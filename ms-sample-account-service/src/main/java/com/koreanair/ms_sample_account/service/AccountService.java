@@ -67,14 +67,13 @@ public class AccountService {
     
     @Transactional
     public List<TransferVO> getTransfer(String name, PageRequest pageRequest) {
-    	
-    	List<TransferVO> transferVOlist = new ArrayList<TransferVO>();
         
         Account account = accountRepository.findById(name)
         .orElseThrow(()->new BizException("formAccountError", "from account가 없습니다."+name));
-
+        
         Page<Transfer> ret = transferRepository.findByFromAccount(account.getName(), pageRequest.of());
         
+    	List<TransferVO> transferVOlist = new ArrayList<TransferVO>();
         for (Transfer transfer : ret) {
         	transferVOlist.add(TransferAccount.transferToTransferVO(transfer));
 		}
