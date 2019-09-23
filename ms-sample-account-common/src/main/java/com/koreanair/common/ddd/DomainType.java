@@ -1,4 +1,4 @@
-package com.koreanair.ddd;
+package com.koreanair.common.ddd;
 
 import java.lang.annotation.*;
 

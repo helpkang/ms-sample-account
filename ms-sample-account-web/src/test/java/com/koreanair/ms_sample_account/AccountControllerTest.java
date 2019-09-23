@@ -12,7 +12,7 @@ import com.koreanair.ms_sample_account.domain.account.Account;
 import com.koreanair.ms_sample_account.repository.AccountRepository;
 import com.koreanair.ms_sample_account.service.vo.CreateAccountVO;
 import com.koreanair.ms_sample_account.service.vo.TransferAccountVO;
-import com.koreanair.utils.ConvertUtils;
+import com.koreanair.common.utils.ConvertUtils;
 
 import org.junit.After;
 import org.junit.Before;

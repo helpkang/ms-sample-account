@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import com.koreanair.ddd.DomainType;
+import com.koreanair.common.ddd.DomainType;
 
 import lombok.AccessLevel;
 import lombok.Builder;

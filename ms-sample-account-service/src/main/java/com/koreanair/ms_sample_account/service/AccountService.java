@@ -2,8 +2,8 @@ package com.koreanair.ms_sample_account.service;
 
 import javax.transaction.Transactional;
 
-import com.koreanair.controller.PageRequest;
-import com.koreanair.exception.BizException;
+import com.koreanair.common.controller.PageRequest;
+import com.koreanair.common.exception.BizException;
 import com.koreanair.ms_sample_account.domain.account.Account;
 import com.koreanair.ms_sample_account.domain.account.Transfer;
 import com.koreanair.ms_sample_account.domain.account.ds.AccountDS;

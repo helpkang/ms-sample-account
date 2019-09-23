@@ -1,4 +1,4 @@
-package com.koreanair.controller;
+package com.koreanair.common.controller;
 
 import org.springframework.data.domain.Sort;
 

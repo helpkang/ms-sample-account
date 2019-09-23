@@ -2,8 +2,8 @@ package com.koreanair.ms_sample_account.controller;
 
 import java.util.AbstractMap;
 
-import com.koreanair.exception.ForbiddenException;
-import com.koreanair.exception.UnauthorizedException;
+import com.koreanair.common.exception.ForbiddenException;
+import com.koreanair.common.exception.UnauthorizedException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;

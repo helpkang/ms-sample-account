@@ -4,8 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import com.koreanair.ddd.DomainType;
-import com.koreanair.ddd.DomainType.Domain;
+import com.koreanair.common.ddd.DomainType;
+import com.koreanair.common.ddd.DomainType.Domain;
 
 import lombok.AccessLevel;
 import lombok.Builder;

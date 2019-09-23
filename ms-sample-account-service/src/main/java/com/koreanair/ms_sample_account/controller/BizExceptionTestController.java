@@ -2,7 +2,7 @@ package com.koreanair.ms_sample_account.controller;
 
 import java.util.AbstractMap;
 
-import com.koreanair.exception.InValidBizException;
+import com.koreanair.common.exception.InValidBizException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;

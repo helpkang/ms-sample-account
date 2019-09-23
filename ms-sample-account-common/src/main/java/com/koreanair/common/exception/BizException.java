@@ -1,4 +1,4 @@
-package com.koreanair.exception;
+package com.koreanair.common.exception;
 
 import java.util.Arrays;
 

@@ -3,7 +3,7 @@ package com.koreanair.ms_sample_account.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.koreanair.controller.PageRequest;
+import com.koreanair.common.controller.PageRequest;
 import com.koreanair.ms_sample_account.domain.account.Transfer;
 import com.koreanair.ms_sample_account.service.AccountService;
 import com.koreanair.ms_sample_account.service.vo.AccountVO;

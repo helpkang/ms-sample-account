@@ -1,9 +1,9 @@
 package com.koreanair.ms_sample_account.exception;
 
-import com.koreanair.exception.BizException;
-import com.koreanair.exception.ForbiddenException;
-import com.koreanair.exception.UnauthorizedException;
-import com.koreanair.exception.InValidBizException;
+import com.koreanair.common.exception.BizException;
+import com.koreanair.common.exception.ForbiddenException;
+import com.koreanair.common.exception.UnauthorizedException;
+import com.koreanair.common.exception.InValidBizException;
 
 import java.util.AbstractMap;
 

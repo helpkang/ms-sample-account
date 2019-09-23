@@ -1,4 +1,4 @@
-package com.koreanair.utils;
+package com.koreanair.common.utils;
 
 import java.io.IOException;
 
