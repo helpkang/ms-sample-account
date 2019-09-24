@@ -7,9 +7,9 @@
     <relativePath/>
   </parent>
   <packaging>pom</packaging>
-  <groupId>com.koreanair.ms_sample_account</groupId>
-  <artifactId>ms-sample-account</artifactId>
-  <name>ms-sample-account</name>
+  <groupId>com.koreanair.ms_ibe</groupId>
+  <artifactId>ms-ibe</artifactId>
+  <name>ms-ibe</name>
   <version>0.0.1-SNAPSHOT</version>
   
    <properties>
@@ -19,10 +19,10 @@
   </properties>
   
   <modules>
-    <module>ms-sample-account-common</module>
-    <module>ms-sample-account-domain</module>
-    <module>ms-sample-account-service</module>
-    <module>ms-sample-account-web</module>
+    <module>ms-ibe-common</module>
+    <module>ms-ibe-domain</module>
+    <module>ms-ibe-service</module>
+    <module>ms-ibe-web</module>
   </modules>
 
   <build>
