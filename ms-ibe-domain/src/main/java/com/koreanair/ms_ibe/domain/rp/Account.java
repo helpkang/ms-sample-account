@@ -1,4 +1,4 @@
-package com.koreanair.ms_sample_account.domain.account;
+package com.koreanair.ms_ibe.domain.rp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

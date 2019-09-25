@@ -1,6 +1,7 @@
-package com.koreanair.ms_sample_account.repository;
+package com.koreanair.ms_ibe.repository;
 
-import com.koreanair.ms_sample_account.domain.account.Account;
+
+import com.koreanair.ms_ibe.domain.rp.Account;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

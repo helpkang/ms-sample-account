@@ -1,4 +1,4 @@
-package com.koreanair.ms_sample_account.service.vo;
+package com.koreanair.ms_ibe.service.vo;
 
 import java.io.Serializable;
 

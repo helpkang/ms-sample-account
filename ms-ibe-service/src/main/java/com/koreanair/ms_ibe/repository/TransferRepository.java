@@ -1,6 +1,6 @@
-package com.koreanair.ms_sample_account.repository;
+package com.koreanair.ms_ibe.repository;
 
-import com.koreanair.ms_sample_account.domain.account.Transfer;
+import com.koreanair.ms_ibe.domain.rp.Transfer;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

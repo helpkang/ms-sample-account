@@ -1,4 +1,4 @@
-package com.koreanair.ms_sample_account.inter_client;
+package com.koreanair.ms_ibe.inter_client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
