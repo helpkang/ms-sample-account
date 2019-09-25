@@ -8,11 +8,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 
-import com.koreanair.ms_sample_account.domain.account.Account;
-import com.koreanair.ms_sample_account.repository.AccountRepository;
-import com.koreanair.ms_sample_account.service.vo.CreateAccountVO;
-import com.koreanair.ms_sample_account.service.vo.TransferAccountVO;
 import com.koreanair.common.utils.ConvertUtils;
+import com.koreanair.ms_ibe.domain.rp.Account;
+import com.koreanair.ms_ibe.repository.AccountRepository;
+import com.koreanair.ms_ibe.service.vo.CreateAccountVO;
+import com.koreanair.ms_ibe.service.vo.TransferAccountVO;
 
 import org.junit.After;
 import org.junit.Before;

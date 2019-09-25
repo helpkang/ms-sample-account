@@ -1,14 +1,14 @@
-package com.koreanair.ms_sample_account.controller;
+package com.koreanair.ms_ibe.controller;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.koreanair.common.controller.PageRequest;
-import com.koreanair.ms_sample_account.domain.account.Transfer;
-import com.koreanair.ms_sample_account.service.AccountService;
-import com.koreanair.ms_sample_account.service.vo.AccountVO;
-import com.koreanair.ms_sample_account.service.vo.CreateAccountVO;
-import com.koreanair.ms_sample_account.service.vo.TransferAccountVO;
+import com.koreanair.ms_ibe.domain.rp.Transfer;
+import com.koreanair.ms_ibe.service.AirOfferService;
+import com.koreanair.ms_ibe.service.vo.AccountVO;
+import com.koreanair.ms_ibe.service.vo.CreateAccountVO;
+import com.koreanair.ms_ibe.service.vo.TransferAccountVO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,10 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/account")
 @Api(value = "account", description = "account 와 transfer 처리")
 @Slf4j
-public class AccountApiController {
+public class AirOfferController {
 
     @Autowired
-    AccountService service;
+    AirOfferService service;
 
     @GetMapping(value = "/{name}")
     @ApiOperation(value = "계좌조회",

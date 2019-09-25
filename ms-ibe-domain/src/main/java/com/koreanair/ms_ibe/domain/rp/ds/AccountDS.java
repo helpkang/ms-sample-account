@@ -1,7 +1,7 @@
-package com.koreanair.ms_sample_account.domain.account.ds;
+package com.koreanair.ms_ibe.domain.rp.ds;
 
-import com.koreanair.ms_sample_account.domain.account.Account;
-import com.koreanair.ms_sample_account.domain.account.Transfer;
+import com.koreanair.ms_ibe.domain.rp.Account;
+import com.koreanair.ms_ibe.domain.rp.Transfer;
 
 public class AccountDS {
     

@@ -1,26 +1,26 @@
-package com.koreanair.ms_sample_account.service;
+package com.koreanair.ms_ibe.service;
 
 import javax.transaction.Transactional;
 
 import com.koreanair.common.controller.PageRequest;
 import com.koreanair.common.exception.BizException;
-import com.koreanair.ms_sample_account.domain.account.Account;
-import com.koreanair.ms_sample_account.domain.account.Transfer;
-import com.koreanair.ms_sample_account.domain.account.ds.AccountDS;
+import com.koreanair.ms_ibe.domain.rp.Account;
+import com.koreanair.ms_ibe.domain.rp.Transfer;
+import com.koreanair.ms_ibe.domain.rp.ds.AccountDS;
+import com.koreanair.ms_ibe.repository.AccountRepository;
+import com.koreanair.ms_ibe.repository.TransferRepository;
+import com.koreanair.ms_ibe.service.transfer.TransferAccount;
+import com.koreanair.ms_ibe.service.vo.AccountVO;
+import com.koreanair.ms_ibe.service.vo.CreateAccountVO;
+import com.koreanair.ms_ibe.service.vo.TransferAccountVO;
 import com.koreanair.ms_sample_account.domain.account.factory.AccountFactory;
-import com.koreanair.ms_sample_account.repository.AccountRepository;
-import com.koreanair.ms_sample_account.repository.TransferRepository;
-import com.koreanair.ms_sample_account.service.transfer.TransferAccount;
-import com.koreanair.ms_sample_account.service.vo.AccountVO;
-import com.koreanair.ms_sample_account.service.vo.CreateAccountVO;
-import com.koreanair.ms_sample_account.service.vo.TransferAccountVO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AccountService {
+public class AirOfferService {
 
 	@Autowired
     AccountRepository accountRepository;

@@ -1,15 +1,15 @@
-package com.koreanair.ms_sample_account.service;
+package com.koreanair.ms_ibe.service;
 
 
 import static org.junit.Assert.assertEquals;
 
-import com.koreanair.ms_sample_account.domain.account.Account;
-import com.koreanair.ms_sample_account.domain.account.Transfer;
-import com.koreanair.ms_sample_account.repository.AccountRepository;
-import com.koreanair.ms_sample_account.repository.TransferRepository;
-import com.koreanair.ms_sample_account.service.vo.AccountVO;
-import com.koreanair.ms_sample_account.service.vo.CreateAccountVO;
-import com.koreanair.ms_sample_account.service.vo.TransferAccountVO;
+import com.koreanair.ms_ibe.domain.rp.Account;
+import com.koreanair.ms_ibe.domain.rp.Transfer;
+import com.koreanair.ms_ibe.repository.AccountRepository;
+import com.koreanair.ms_ibe.repository.TransferRepository;
+import com.koreanair.ms_ibe.service.vo.AccountVO;
+import com.koreanair.ms_ibe.service.vo.CreateAccountVO;
+import com.koreanair.ms_ibe.service.vo.TransferAccountVO;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AccountServiceTests {
 
 	@Autowired
-	AccountService service;
+	AirOfferService service;
 
 	@Autowired
 	AccountRepository accountRepository;

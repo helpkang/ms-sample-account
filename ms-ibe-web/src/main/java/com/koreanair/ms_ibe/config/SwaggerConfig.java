@@ -1,4 +1,4 @@
-package com.koreanair.ms_sample_account.config;
+package com.koreanair.ms_ibe.config;
 
 import static com.google.common.base.Predicates.or;
 

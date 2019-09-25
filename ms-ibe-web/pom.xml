@@ -4,15 +4,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.koreanair.ms_sample_account</groupId>
-    <artifactId>ms-sample-account</artifactId>
+    <groupId>com.koreanair.ms_ibe</groupId>
+    <artifactId>ms-ibe</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
 
-  <groupId>com.koreanair.ms_sample_account</groupId>
-  <artifactId>ms-sample-account-web</artifactId>
-  <name>ms-sample-account-web</name>
+  <groupId>com.koreanair.ms_ibe</groupId>
+  <artifactId>ms-ibe-web</artifactId>
+  <name>ms-ibe-web</name>
   <description>Demo project for Spring Boot</description>
   <packaging>jar</packaging>
 
@@ -23,8 +23,8 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>com.koreanair.ms_sample_account</groupId>
-      <artifactId>ms-sample-account-service</artifactId>
+      <groupId>com.koreanair.ms_ibe</groupId>
+      <artifactId>ms-ibe-service</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
 
@@ -65,33 +65,33 @@
     </dependency>
 
     <dependency>
-        <groupId>io.cucumber</groupId>
+      <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java8</artifactId>
-        <version>${cucumber.version}</version>
-        <scope>test</scope>
+      <version>${cucumber.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>io.cucumber</groupId>
-        <artifactId>cucumber-junit</artifactId>
-        <version>${cucumber.version}</version>
-        <scope>test</scope>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-junit</artifactId>
+      <version>${cucumber.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>io.cucumber</groupId>
-        <artifactId>cucumber-spring</artifactId>
-        <version>${cucumber.version}</version>
-        <scope>test</scope>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-spring</artifactId>
+      <version>${cucumber.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-dependencies</artifactId>
-      <version>${spring-cloud.version}</version>
-      <type>pom</type>
-      <scope>import</scope>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -100,15 +100,15 @@
 
     <sourceDirectory>src/main/java</sourceDirectory>
     <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-            <excludes>
-                <exclude>**/*.java</exclude>
-            </excludes>
-        </resource>
-        <resource>
-            <directory>src/main/resources-${environment}</directory>
-        </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources-${environment}</directory>
+      </resource>
     </resources>
 
     <plugins>
@@ -123,49 +123,49 @@
   </build>
 
 
-   <profiles>
+  <profiles>
     <profile>
-        <id>local</id>
-        <activation>
-          <activeByDefault>true</activeByDefault>
-        </activation>
-        <properties>
-            <spring.profiles.active>local</spring.profiles.active>
-            <environment>local</environment>
-            <maven.test.skip>false</maven.test.skip>
-        </properties>
+      <id>local</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <spring.profiles.active>local</spring.profiles.active>
+        <environment>local</environment>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
     </profile>
     <profile>
-        <id>dev</id>
-        <properties>
-            <spring.profiles.active>dev</spring.profiles.active>
-            <environment>dev</environment>
-            <maven.test.skip>false</maven.test.skip>
-        </properties>
+      <id>dev</id>
+      <properties>
+        <spring.profiles.active>dev</spring.profiles.active>
+        <environment>dev</environment>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
     </profile>
     <profile>
-        <id>test</id>
-        <properties>
-          <spring.profiles.active>test</spring.profiles.active>
-            <environment>test</environment>
-            <maven.test.skip>false</maven.test.skip>
-        </properties>
+      <id>test</id>
+      <properties>
+        <spring.profiles.active>test</spring.profiles.active>
+        <environment>test</environment>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
     </profile>
     <profile>
-        <id>stag</id>
-        <properties>
-            <spring.profiles.active>stg</spring.profiles.active>
-            <environment>stag</environment>
-            <maven.test.skip>false</maven.test.skip>
-        </properties>
+      <id>stag</id>
+      <properties>
+        <spring.profiles.active>stg</spring.profiles.active>
+        <environment>stag</environment>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
     </profile>
     <profile>
-        <id>prod</id>
-        <properties>
-            <spring.profiles.active>prod</spring.profiles.active>
-            <environment>prod</environment>
-            <maven.test.skip>false</maven.test.skip>
-        </properties>
+      <id>prod</id>
+      <properties>
+        <spring.profiles.active>prod</spring.profiles.active>
+        <environment>prod</environment>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
     </profile>
   </profiles>
 </project>

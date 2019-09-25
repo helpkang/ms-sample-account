@@ -1,4 +1,4 @@
-package com.koreanair.ms_sample_account;
+package com.koreanair.ms_ibe;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

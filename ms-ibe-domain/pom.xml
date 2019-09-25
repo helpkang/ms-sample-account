@@ -4,15 +4,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.koreanair.ms_sample_account</groupId>
-    <artifactId>ms-sample-account</artifactId>
+    <groupId>com.koreanair.ms_ibe</groupId>
+    <artifactId>ms-ibe</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-
-  <groupId>com.koreanair.ms_sample_account</groupId>
-  <artifactId>ms-sample-account-domain</artifactId>
-  <name>ms-sample-account-domain</name>
+  <groupId>com.koreanair.ms_ibe</groupId>
+  <artifactId>ms-ibe-domain</artifactId>
+  <name>ms-ibe-domain</name>
   <description>Demo project for Spring Boot</description>
   <packaging>jar</packaging>
 
@@ -21,8 +20,8 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>com.koreanair.ms_sample_account</groupId>
-      <artifactId>ms-sample-account-common</artifactId>
+      <groupId>com.koreanair.ms_ibe</groupId>
+      <artifactId>ms-common</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>

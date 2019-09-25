@@ -1,4 +1,6 @@
-package com.koreanair.ms_sample_account.inter_client;
+package com.koreanair.ms_ibe.inter_client;
+
+import com.koreanair.ms_ibe.inter_client.ExampleClient;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

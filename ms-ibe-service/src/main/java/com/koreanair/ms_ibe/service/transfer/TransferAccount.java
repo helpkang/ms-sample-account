@@ -1,7 +1,7 @@
-package com.koreanair.ms_sample_account.service.transfer;
+package com.koreanair.ms_ibe.service.transfer;
 
-import com.koreanair.ms_sample_account.domain.account.Account;
-import com.koreanair.ms_sample_account.service.vo.AccountVO;
+import com.koreanair.ms_ibe.domain.rp.Account;
+import com.koreanair.ms_ibe.service.vo.AccountVO;
 
 /**
  * TransferAccount

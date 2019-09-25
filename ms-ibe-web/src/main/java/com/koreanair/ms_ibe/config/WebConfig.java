@@ -1,4 +1,4 @@
-package com.koreanair.ms_sample_account.config;
+package com.koreanair.ms_ibe.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

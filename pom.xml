@@ -19,7 +19,7 @@
   </properties>
   
   <modules>
-    <module>ms-ibe-common</module>
+    <module>ms-common</module>
     <module>ms-ibe-domain</module>
     <module>ms-ibe-service</module>
     <module>ms-ibe-web</module>

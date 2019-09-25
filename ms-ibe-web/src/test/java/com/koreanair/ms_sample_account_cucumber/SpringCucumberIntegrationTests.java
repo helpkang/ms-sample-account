@@ -1,6 +1,6 @@
 package com.koreanair.ms_sample_account_cucumber;
 
-import com.koreanair.ms_sample_account.WebApplication;
+import com.koreanair.ms_ibe.WebApplication;
 
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
