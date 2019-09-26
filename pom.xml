@@ -20,6 +20,8 @@
   
   <modules>
     <module>ms-common</module>
+    <module>common-adapter</module>
+    <module>common-external</module>
     <module>ms-ibe-domain</module>
     <module>ms-ibe-service</module>
     <module>ms-ibe-web</module>
