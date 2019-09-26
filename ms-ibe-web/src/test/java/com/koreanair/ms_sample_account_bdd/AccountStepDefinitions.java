@@ -1,4 +1,4 @@
-package com.koreanair.ms_sample_account_cucumber;
+package com.koreanair.ms_sample_account_bdd;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,10 +15,10 @@ import org.springframework.http.HttpStatus;
 import io.cucumber.java8.En;
 
 
-public class BagCucmberStepDefinitions extends SpringCucumberIntegrationTests implements En {
-	private final Logger log = LoggerFactory.getLogger(BagCucmberStepDefinitions.class);
+public class AccountStepDefinitions extends SpringIntegrationTests implements En {
+	private final Logger log = LoggerFactory.getLogger(AccountStepDefinitions.class);
 
-	public BagCucmberStepDefinitions() {
+	public AccountStepDefinitions() {
 
 		Given("시작", () -> {
 			// clean();

@@ -1,4 +1,4 @@
-package com.koreanair.ms_sample_account_cucumber;
+package com.koreanair.ms_sample_account_bdd;
 
 import com.koreanair.ms_ibe.WebApplication;
 
@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = WebApplication.class)
 @Ignore
-public class SpringCucumberIntegrationTests {
+public class SpringIntegrationTests {
 
 	private final String SERVER_URL = "http://localhost";
 	private final String THINGS_ENDPOINT = "/api/account";
@@ -24,7 +24,7 @@ public class SpringCucumberIntegrationTests {
 	@LocalServerPort
 	protected int port;
 
-	public SpringCucumberIntegrationTests() {
+	public SpringIntegrationTests() {
 
 		this.restTemplate = new RestTemplate();
 	}
