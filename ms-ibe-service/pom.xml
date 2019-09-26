@@ -22,8 +22,13 @@
   </properties>
   <dependencies>
     <dependency>
-        <groupId>com.koreanair.ms_ibe</groupId>
+      <groupId>com.koreanair.ms_ibe</groupId>
       <artifactId>ms-ibe-domain</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.koreanair.ms_ibe</groupId>
+      <artifactId>common-adapter</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>
@@ -43,7 +48,7 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -65,14 +70,14 @@
     </dependency>
   </dependencies>
   <dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>
