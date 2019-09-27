@@ -160,6 +160,7 @@ public class AirOfferAdapter {
 
 		AirOfferInputVO inputVo = new AirOfferInputVO();
 		inputVo.setDepartureDateTime("2020-02-14");
+		inputVo.setReturnDateTime("2020-03-05");
 		inputVo.setOriginLocationCode("ICN");
 		inputVo.setDestinationLocationCode("DXB");
 		inputVo.setCommercialFareFamilies(Arrays.asList("ECONOMY0", "PRESTIGE0", "FIRST0"));
@@ -167,7 +168,6 @@ public class AirOfferAdapter {
 		inputVo.setChild(2);
 		inputVo.setDirectFlights(false);
 		inputVo.setShowSoldOut(false);
-		inputVo.setReturnDateTime("2020-03-05");
 
 		AirOfferAdapter adapter = new AirOfferAdapter();
 		adapter.getAirOfferList(inputVo);
