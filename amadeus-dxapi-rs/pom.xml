@@ -1,0 +1,149 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.koreanair.external.dxapi</groupId>
+	<artifactId>amadeus-dxapi</artifactId>
+	<packaging>jar</packaging>
+	<name>amadeus-dxapi</name>
+	<description># API information The document aims at describing the Amadeus Digital Experience API.  Through Digital API, an end user is able to search air offers and related services, add all necessary information to complete a booking, display a seatmap and select seats, add traveler preferences such as meal and finally finalize a booking (creation of an order). API also allows retrieving an existing order. Since the API is REST, operations are not flow related.  ## CRUD operations We do our best to have all our URLs be [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer). Every endpoint (URL) may support one of five different http verbs. GET requests fetch information about an object, POST requests create objects, PUT requests update objects and DELETE requests will delete objects. PATCH [JSON Merge Patch](https://tools.ietf.org/html/rfc7396) requests perform partial updates.  ## Structure ### The envelope Every response is contained by an envelope. That is, each response has a predictable set of keys with which you can expect to interact: &#x60;&#x60;&#x60;json {     \&quot;warnings\&quot;: [         ...     ],     \&quot;data\&quot;: {         ...     },     \&quot;dictionaries\&quot;: {         ...     },     \&quot;errors\&quot;: [         ...     ] } &#x60;&#x60;&#x60; #### ERRORS Error messages corresponding to functional blocking issues encountered when processing an operation. When at least one message has a level &#39;error&#39; nothing has been processed so no &#39;data&#39; are returned. In this case the HTTP status become 200 for POST (instead of 201) and DELETE (instead of 204).  #### WARNINGS Warning messages corresponding to non blocking issues encountered when processing an operation.  #### DATA The data key is the meat of the response. It contains all information regarding the resource requested.  #### DICTIONARIES Each dictionary contains: - localized data : it&#39;s possible to request for a specific code (e.g. location code) the translation in the language code specified as query parameter. The translation applies as well to the related information: in case of location code, type of location (airport or city), corresponding city (for airport location), state, country, etc.) - dictionarized data : information used on different parts of the message can be defined once and referenced via an id. It that case, the id makes the connection between dictionary and data information Dictionary structure is available on page [Maps in dictionary documentation](http://e-travel.mkt.amadeus.net/dxapi/display/documentation.html#!/Maps/get).  ### Example of request/response When triggering an API operation it is interesting to evaluate the response (or the data model corresponding to the input body in case of POST). &#x60;&#x60;&#x60; GET /carts/{cartId}/travelers/{travelerId} HTTP/1.1 Accept: application/json &#x60;&#x60;&#x60;  Multiple errors can occur in response to a single request. The list of error messages is provided by the server: &#x60;&#x60;&#x60;json HTTP/1.1 400 Bad Request Content-Type: application/json {   \&quot;errors\&quot;: [     {       \&quot;code\&quot;: \&quot;04926\&quot;,       \&quot;source\&quot;: { \&quot;pointer\&quot;: \&quot;/names/0/lastName\&quot; },       \&quot;title\&quot;: \&quot;INVALID DATA RECEIVED\&quot;       \&quot;detail\&quot;: \&quot;must match \\\&quot;^[A-Za-zÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬-ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¿][A-Za-zÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬-ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¿ -.]{1,69}$\\\&quot;     },     {       \&quot;code\&quot;: \&quot;36986\&quot;,       \&quot;source\&quot;: { \&quot;pointer\&quot;: \&quot;/0/dateOfBirth\&quot; },       \&quot;detail\&quot;: \&quot;Date of birth &#39;2018-07-01&#39; should be in the past\&quot;,       \&quot;title\&quot;: \&quot;INVALID DATA RECEIVED\&quot;     },   ] } &#x60;&#x60;&#x60; Note: example added for illustration only.  A few considerations on the error message structure: - The title communicates the type of problem encountered. - The code refers to an application-specific code representing the type of problem encountered. Code and title have a similar behaviour, since they communicate which is the problem type. However, it is suggested to rely on the code as a unique identifier. - The detail is used to provide information specific to this occurrence of the problem.  Message may use source to point to the top-level of the document (\&quot;\&quot;). The source member can also be used to indicate that the error originated from a problem with a URI query parameter (parameter field used instead of pointer in that case).  Standard [HTTP response status codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) apply. As such they are not all mentioned below.  ## Top resources ### Cart The central resource is the &#x60;Cart&#x60; (shopping cart) used at shopping time to prepare a journey (shopping, booking and pricing) and later on to perform servicing on an already booked reservation. A &#x60;Cart&#x60; gather &#x60;AirOffer&#x60;s, &#x60;Traveler&#x60;s as well as &#x60;Service&#x60;s, &#x60;Seat&#x60;s, &#x60;FrequentFlyerCard&#x60;s and &#x60;Contact&#x60;s. It can be associated to zero, one or more users. At checkout time, an &#x60;Order&#x60; is created based on content selected from the &#x60;Cart&#x60;.  ### AirCalendar &#x60;Air Calendar&#x60; provides the best price per day based on input parameters.  ### AirBound &#x60;Air Bound&#x60; provides the bound-by-bound shopping proposal based on input parameters. ### AirOffer An &#x60;Air Offer&#x60; is the result of a shopping proposal. It is a collection of &#x60;OfferItem&#x60;s, each offer item containing flights.  ### Service The &#x60;&#x60;Service&#x60;&#x60; resource allows to access the list of free and/or chargeable services.  ### Seatmap &#x60;&#x60;Seatmap&#x60;&#x60; refers to display of the air seat map, allowing the end user to identify the seat to be booked for free or at a charge.  ### Order An &#x60;&#x60;Order&#x60;&#x60; corresponds to a reservation record (Amadeus PNRs). The order can contain flights, services and seats, as well as travel documents (E-Tickets and/or EMDs) in case the order has been paid and related tickets issued.  ### Payment Method A &#x60;Payment Method&#x60; refers to a payment method that be used to pay an order. The following payment methods are supported by DAPI: Payment cards, External  payment, Miles payment and Alternative Payment Method.  ## Secondary resources (main ones) ### Traveler A &#x60;&#x60;Traveler&#x60;&#x60; is an individual involved in the booking and taking part in a journey. ### Seat A &#x60;&#x60;Seat&#x60;&#x60; refers to the seat that the end user can select as part of the booking. ### Frequent Flyer &#x60;&#x60;Frequent Flyer&#x60;&#x60; contains frequent flyer cards either to accrue miles or redeem miles (only accrual supported initially). ### Contact &#x60;&#x60;Contact&#x60;&#x60; refers to emails, phone numbers and addresses. ### Travel Document A &#x60;&#x60;Travel Document&#x60;&#x60; refers to the tickets (E-Tickets and/or EMDs) issued for flights or services. ### Payment Record A &#x60;Payment Record&#x60; contains the details of the payment transaction for an order. It includes the payment method used for the order payment, as well additional information such as the approval code for a Credit Card payment. ## Limitations - Only air related content booking is supported. - Only one order is created at a time from the cart. - A cart can only contain one single airOffer.  ## Miscellaneous ### Temporary id (tid) A temporary id (&#x60;&#x60;tid&#x60;&#x60;) can be used to: - identify an object in the request of a POST operation when the id of the object is not known yet.  - identify an object in the response of a PUT operation when the id of the object is changing.  In all cases, a tid is only valid for the time of the transaction   ### Output filtering JSON output can be filtered using &#x60;&#x60;-fields&#x60;&#x60; and &#x60;&#x60;fields&#x60;&#x60; query parameters, followed by the fully qualified name of the attribute to filter/keep.  Optionally the &#x60;&#x60;keepRequiredFields&#x60;&#x60; boolean query parameter can be used to avoid filtering required fields out.  Examples: &#x60;&#x60;&#x60; GET /carts/{cartId}?-fields&#x3D;data.travelers &#x60;&#x60;&#x60; will filter all travelers out of the response &#x60;&#x60;&#x60; GET /carts/{cartId}?fields&#x3D;data.travelers.age &#x60;&#x60;&#x60; will keep only age of the travelers in response  Any questions, suggestions or feedbacks, thank you for contacting the DxAPI team  ### Traceability token For better traceability of requests, a traceability token can and should be added to every call to the API.  This token is composed of both a session part and a request part resulting in a unique ID for a single request.  This opens the door for: - Easy retrieval of information regarding that request. - Linking the request to other requests performed in the same user session.  This traceability token is materialized by an &#x60;&#x60;Ama-Client-Ref&#x60;&#x60; header to be sent in each and every request.  This header must be formatted as following: &#x60;&#x60;${SESSION_ID}:${REQUEST_ID}&#x60;&#x60;.  Where: - &#x60;&#x60;SESSION_ID&#x60;&#x60;: is a client-side generated token identifying the client-side user session matching following regular expression &#x60;&#x60;[a-zA-Z0-9-]{10,48}&#x60;&#x60;. A recommended way is to implement it as an [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) in [RFC 4122](https://tools.ietf.org/html/rfc4122) format.    - For example: &#x60;&#x60;123e4567-e89b-12d3-a456-426655440000&#x60;&#x60;  - &#x60;&#x60;REQUEST_ID&#x60;&#x60; is a client-side request id within the client-side user session matching the &#x60;&#x60;[a-zA-Z0-9]{1,10}&#x60;&#x60; format.    - For example: &#x60;&#x60;1&#x60;&#x60;, &#x60;&#x60;42&#x60;&#x60;, &#x60;&#x60;5fa2&#x60;&#x60;, &#x60;&#x60;Px2z5&#x60;&#x60;, ...    - There is no notion of order between two &#x60;&#x60;REQUEST_ID&#x60;&#x60;    - &#x60;&#x60;REQUEST_ID&#x60;&#x60; must be unique within a session.   Examples:  - Request &#x60;&#x60;2fc0&#x60;&#x60; within session &#x60;&#x60;123e4567-e89b-12d3-a456-426655440000&#x60;&#x60; traceability token:  &#x60;&#x60;Ama-Client-Ref: 123e4567-e89b-12d3-a456-426655440000:2fc0&#x60;&#x60;     - Request &#x60;&#x60;7ba19e&#x60;&#x60; within session &#x60;&#x60;123e4567-e89b-12d3-a456-426655440000&#x60;&#x60; traceability token:  &#x60;&#x60;Ama-Client-Ref: 123e4567-e89b-12d3-a456-426655440000:7ba19e&#x60;&#x60; </description>
+	<version>1.0.0</version>
+	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!--plugin> <groupId>org.eclipse.jetty</groupId> <artifactId>jetty-maven-plugin</artifactId>
+				<version>${jetty-version}</version> <configuration> <webApp> <contextPath>/</contextPath>
+				</webApp> <webAppSourceDirectory>target/${project.artifactId}-${project.version}</webAppSourceDirectory>
+				<stopPort>8079</stopPort> <stopKey>stopit</stopKey> <httpConnector> <port></port>
+				<idleTimeout>60000</idleTimeout> </httpConnector> </configuration> <executions>
+				<execution> <id>start-jetty</id> <phase>pre-integration-test</phase> <goals>
+				<goal>start</goal> </goals> <configuration> <scanIntervalSeconds>0</scanIntervalSeconds>
+				<daemon>true</daemon> </configuration> </execution> <execution> <id>stop-jetty</id>
+				<phase>post-integration-test</phase> <goals> <goal>stop</goal> </goals> </execution>
+				</executions> </plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.9.1</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/gen/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-jaxrs</artifactId>
+			<scope>compile</scope>
+			<version>${swagger-core-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback-version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback-version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit-version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- CXF Client -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-rs-client</artifactId>
+			<version>${cxf-version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- CXF server -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxrs</artifactId>
+			<version>${cxf-version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-rs-service-description</artifactId>
+			<version>${cxf-version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-ws-policy</artifactId>
+			<version>${cxf-version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-wsdl</artifactId>
+			<version>${cxf-version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+			<version>${jackson-jaxrs-version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>${jackson-jaxrs-version}</version>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<repository>
+			<id>sonatype-snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<properties>
+		<java.version>1.8</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<swagger-core-version>1.5.18</swagger-core-version>
+		<jetty-version>9.2.9.v20150224</jetty-version>
+		<junit-version>4.12</junit-version>
+		<logback-version>1.1.7</logback-version>
+		<servlet-api-version>2.5</servlet-api-version>
+		<cxf-version>3.2.1</cxf-version>
+		<jackson-jaxrs-version>2.9.9</jackson-jaxrs-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+</project>
