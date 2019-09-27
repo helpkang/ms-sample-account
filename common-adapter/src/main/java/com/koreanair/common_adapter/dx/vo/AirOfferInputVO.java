@@ -29,7 +29,9 @@ public class AirOfferInputVO implements Serializable {
 	private String destinationLocationCode;
 	private List<String> commercialFareFamilies;
 	private String returnDateTime;
-	private List<String> travelers;
+	private int adult = 0;
+	private int child = 0;
+	private int infant = 0;
 	private int max;
 	private int maxPrice;
 	private int departureTimeWindow;

@@ -15,16 +15,36 @@
  */
 package com.koreanair.common_adapter.dx.airopper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
+import com.koreanair.common_adapter.general.vo.consts.DXHeaders;
+import com.koreanair.common_adapter.general.vo.consts.PAXType;
+import com.koreanair.common_adapter.utils.GenericException;
+import com.koreanair.common_adapter.utils.GenericException.ExceptionCode;
+import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
+import com.koreanair.common_adapter.utils.RestfulInterceptor;
+import com.koreanair.external.dx.vo.AirOffersListReply;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <pre>
- * AirOffer
+ * AirOffer 조회
  * </pre>
  *
  * @author bdlee
@@ -32,35 +52,124 @@ import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
  * @version 1.0.0
  * @since 2019. 9. 26.
  */
+@Slf4j
 public class AirOfferAdapter {
 
 	private static RestTemplate restTemplate = new RestTemplate();
 
-	public void getAirOffer(AirOfferInputVO inputVo) {
-		//https://proxy.digitalforairlines.com/v2/search/air-offers?
-		//departureDateTime={{departureDate}}&originLocationCode={{departureLocation}}&destinationLocationCode={{arrivalLocation}}&commercialFareFamilies={{commercialFareFamilies}}&travelers=2ADT,1CHD&directFlights=false&showSoldOut=false&returnDateTime={{returnDate}}
+	/**
+	 * <pre>
+	 * airOffer List를 가져온다.
+	 * Created by bdlee on 2019. 9. 27.
+	 * </pre>
+	 *
+	 * @param inputVo
+	 * @return
+	 */
+	public AirOffersListReply getAirOfferList(AirOfferInputVO inputVo) {
 
-		// send
-		MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
+		if (StringUtils.isBlank(inputVo.getDepartureDateTime())) {
+			throw new GenericException(ExceptionCode.BAD_REQUEST, "출발일시는 필수 사항입니다.");
+		}
+		if (StringUtils.isBlank(inputVo.getOriginLocationCode())) {
+			throw new GenericException(ExceptionCode.BAD_REQUEST, "출발공항은 필수 사항입니다.");
+		}
+		if (StringUtils.isBlank(inputVo.getDestinationLocationCode())) {
+			throw new GenericException(ExceptionCode.BAD_REQUEST, "도착공항은 필수 사항입니다.");
+		}
+		if (ObjectUtils.isEmpty(inputVo.getCommercialFareFamilies())) {
+			throw new GenericException(ExceptionCode.BAD_REQUEST, "CFF는 한개 이상 입력되어야 합니다.");
+		}
+
+		// Get Parameter로 전달될 항목들
+		MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
 		multiValueMap.add("departureDateTime", inputVo.getDepartureDateTime());
 		multiValueMap.add("originLocationCode", inputVo.getOriginLocationCode());
 		multiValueMap.add("destinationLocationCode", inputVo.getDestinationLocationCode());
 		multiValueMap.add("commercialFareFamilies", StringUtils.join(inputVo.getCommercialFareFamilies(),","));
 		multiValueMap.add("returnDateTime", inputVo.getReturnDateTime());
-		multiValueMap.add("travelers", StringUtils.join(inputVo.getTravelers(),","));
-		multiValueMap.add("max", inputVo.getMax());
-		multiValueMap.add("maxPrice", inputVo.getMaxPrice());
-		multiValueMap.add("departureTimeWindow", inputVo.getDepartureTimeWindow());
-		multiValueMap.add("returnTimeWindow", inputVo.getReturnTimeWindow());
-		multiValueMap.add("alternateOriginLocationCode", inputVo.getAlternateOriginLocationCode());
-		multiValueMap.add("alternateDestinationLocationCode", inputVo.getAlternateDestinationLocationCode());
-		multiValueMap.add("corporateCodes", inputVo.getCorporateCodes());
-		multiValueMap.add("directFlights", inputVo.isDirectFlights());
-		multiValueMap.add("promotionCode", inputVo.getPromotionCode());
-		multiValueMap.add("promotionAirlineCode", inputVo.getPromotionAirlineCode());
-		multiValueMap.add("showSoldOut", inputVo.isShowSoldOut());
-		multiValueMap.add("lang", inputVo.getLang());
 
-		restTemplate.getForEntity("", String.class, multiValueMap);
+		List<String> travelerList = new ArrayList<>();
+		if (inputVo.getAdult() > 0) {
+			travelerList.add(inputVo.getAdult() + PAXType.ADT);
+		}
+		if (inputVo.getChild() > 0) {
+			travelerList.add(inputVo.getAdult() + PAXType.CHD);
+		}
+		if (inputVo.getInfant() > 0) {
+			travelerList.add(inputVo.getAdult() + PAXType.INF);
+		}
+		multiValueMap.add("travelers", StringUtils.join(travelerList, ","));
+		if(inputVo.getMax() > 0) {
+			multiValueMap.add("max", String.valueOf(inputVo.getMax()));
+		}
+		if(inputVo.getMaxPrice() > 0) {
+			multiValueMap.add("maxPrice", String.valueOf(inputVo.getMaxPrice()));
+		}
+		if(inputVo.getDepartureTimeWindow() > 0) {
+			multiValueMap.add("departureTimeWindow", String.valueOf(inputVo.getDepartureTimeWindow()));
+		}
+		if(inputVo.getReturnTimeWindow() > 0) {
+			multiValueMap.add("returnTimeWindow", String.valueOf(inputVo.getReturnTimeWindow()));
+		}
+		if(StringUtils.isNotBlank(inputVo.getAlternateOriginLocationCode())) {
+			multiValueMap.add("alternateOriginLocationCode", inputVo.getAlternateOriginLocationCode());
+		}
+		if(StringUtils.isNotBlank(inputVo.getAlternateOriginLocationCode())) {
+			multiValueMap.add("alternateDestinationLocationCode", inputVo.getAlternateDestinationLocationCode());
+		}
+		if(StringUtils.isNotBlank(inputVo.getAlternateOriginLocationCode())) {
+			multiValueMap.add("corporateCodes", String.valueOf(inputVo.getCorporateCodes()));
+		}
+		multiValueMap.add("directFlights", String.valueOf(inputVo.isDirectFlights()));
+		if(StringUtils.isNotBlank(inputVo.getPromotionCode())) {
+			multiValueMap.add("promotionCode", inputVo.getPromotionCode());
+		}
+		if(StringUtils.isNotBlank(inputVo.getPromotionAirlineCode())) {
+			multiValueMap.add("promotionAirlineCode", inputVo.getPromotionAirlineCode());
+		}
+		multiValueMap.add("showSoldOut", String.valueOf(inputVo.isShowSoldOut()));
+		if(StringUtils.isNotBlank(inputVo.getLang())) {
+			multiValueMap.add("lang", inputVo.getLang());
+		}
+
+		// Get URL 구성
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://proxy.digitalforairlines.com/v2/search/air-offers");
+		builder.queryParams(multiValueMap);
+		String endPoint = builder.build().toUriString();
+		log.debug("endPoint = {}", endPoint);
+
+		// http header에 인증값
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", DXHeaders.Authorization);
+		headers.set("Content-Type", "application/json");
+
+		HttpEntity<?> entity = new HttpEntity<>(headers);
+		restTemplate.setInterceptors(Collections.singletonList(new RestfulInterceptor()));
+
+		// Rest 를 Get으로 호출하여 AirOfferList를 가져온다.
+		ResponseEntity<AirOffersListReply> responseEntity = restTemplate.exchange(builder.build().toUri(), HttpMethod.GET, entity, AirOffersListReply.class);
+		log.debug("{}", ObjectSerializeUtil.getObjectToJson(responseEntity));
+		AirOffersListReply airOfferList = responseEntity.getBody();
+		log.debug("{}", ObjectSerializeUtil.getObjectToJson(airOfferList));
+
+		return airOfferList;
+	}
+
+	public static void main(String[] args) {
+
+		AirOfferInputVO inputVo = new AirOfferInputVO();
+		inputVo.setDepartureDateTime("2020-02-14");
+		inputVo.setOriginLocationCode("ICN");
+		inputVo.setDestinationLocationCode("DXB");
+		inputVo.setCommercialFareFamilies(Arrays.asList("ECONOMY0", "PRESTIGE0", "FIRST0"));
+		inputVo.setAdult(2);
+		inputVo.setChild(2);
+		inputVo.setDirectFlights(false);
+		inputVo.setShowSoldOut(false);
+		inputVo.setReturnDateTime("2020-03-05");
+
+		AirOfferAdapter adapter = new AirOfferAdapter();
+		adapter.getAirOfferList(inputVo);
 	}
 }
