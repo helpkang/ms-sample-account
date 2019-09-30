@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import com.amadeus.xml.ws._2009._01.wbs_session_2_0.Session;
-import com.kal.ibe.onea.service.AlteaSessionVO;
+// import com.amadeus.xml.ws._2009._01.wbs_session_2_0.Session;
+// import com.kal.ibe.onea.service.AlteaSessionVO;
 
 public class WebServiceVo {
 	private String host; // "http://siteacceptance.wftc3.e-travel.com/soap/SOAPRPCRouterServlet"
@@ -31,8 +31,8 @@ public class WebServiceVo {
 	private String pipdutyCode;
 	private String query;
 	private String contentsType;
-	private Session session;
-	private pip_service_library.pip_session.Session pipsession;
+	// private Session session;
+	// private pip_service_library.pip_session.Session pipsession;
 	private int headerType;
 	private String companyName;
 	private String workstationId;
@@ -173,12 +173,12 @@ public class WebServiceVo {
 		query = "";
 		contentsType = "";
 		;
-		session = null;
-		pipsession = null;
+		// session = null;
+		// pipsession = null;
 		headerType = -1;
 		companyName = "";
 		workstationId = "";
-		alteasessionVO = null;
+		// alteasessionVO = null;
 		edgeproxycip = "";
 		Xinfoperation = "";
 		XinfflowCode = "";
@@ -187,15 +187,15 @@ public class WebServiceVo {
 		this.xAtcOption = "";
 	}
 
-	public AlteaSessionVO getAlteasessionVO() {
-		return alteasessionVO;
-	}
+	// public AlteaSessionVO getAlteasessionVO() {
+	// 	return alteasessionVO;
+	// }
 
-	public void setAlteasessionVO(AlteaSessionVO alteasessionVO) {
-		this.alteasessionVO = alteasessionVO;
-	}
+	// public void setAlteasessionVO(AlteaSessionVO alteasessionVO) {
+	// 	this.alteasessionVO = alteasessionVO;
+	// }
 
-	private AlteaSessionVO alteasessionVO;
+	// private AlteaSessionVO alteasessionVO;
 
 	public String getFileName() {
 		return fileName;
@@ -237,13 +237,13 @@ public class WebServiceVo {
 		this.query = query;
 	}
 
-	public pip_service_library.pip_session.Session getPipsession() {
-		return pipsession;
-	}
+	// public pip_service_library.pip_session.Session getPipsession() {
+	// 	return pipsession;
+	// }
 
-	public void setPipsession(pip_service_library.pip_session.Session pipsession) {
-		this.pipsession = pipsession;
-	}
+	// public void setPipsession(pip_service_library.pip_session.Session pipsession) {
+	// 	this.pipsession = pipsession;
+	// }
 
 	public String getPipdutyCode() {
 		return pipdutyCode;
@@ -389,13 +389,13 @@ public class WebServiceVo {
 		this.requestMethod = requestMethod;
 	}
 
-	public Session getSession() {
-		return session;
-	}
+	// public Session getSession() {
+	// 	return session;
+	// }
 
-	public void setSession(Session session) {
-		this.session = session;
-	}
+	// public void setSession(Session session) {
+	// 	this.session = session;
+	// }
 
 	public int getHeaderType() {
 		return headerType;
