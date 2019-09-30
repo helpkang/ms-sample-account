@@ -17,6 +17,8 @@ package com.koreanair.common_adapter.eretail.avail.flexpricer;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +27,9 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import com.kal.framework.integration.adaptor.UrlConnectionService;
+import com.kal.framework.integration.adaptor.WebServiceVo;
+import com.kal.framework.integration.adaptor.support.UrlConnectionImpl;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.PTCDiscountInfoVO;
 import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
@@ -185,7 +190,7 @@ public class FlexPricerAdapter {
 		return flexPricerAvailabilityInput;
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		FlexPricerAdapter adapter = new FlexPricerAdapter();
 		// SELKE08DW
 		FlexPricerInputVO inputVo = new FlexPricerInputVO();
@@ -219,5 +224,24 @@ public class FlexPricerAdapter {
 		FlexPricerAvailabilityInputType flexPricerAvailabilityInput = adapter.organizeFlexPricerAvailabilityInput(inputVo);
 		log.debug("{}", ObjectSerializeUtil.getObjectToJson(flexPricerAvailabilityInput));
 		log.debug("{}", JAXBFactory.getObjectToXML(flexPricerAvailabilityInput));
+
+		InetAddress local;
+		String ip = "";
+		try {
+			local = InetAddress.getLocalHost();
+			ip = local.getHostAddress();
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+		}
+
+		UrlConnectionService urlCon = new UrlConnectionImpl();
+		WebServiceVo webserviceVo = new WebServiceVo();
+		webserviceVo.setHost("https://uat5.aereww.amadeus.com/soap/SOAPRPCRouterServlet");
+		webserviceVo.setHeaderType(2);	// WebServiceVo.amadeus_ecommerce_headertype
+		webserviceVo.setRequestMethod("POST");
+		webserviceVo.setEdgeproxycip(ip);
+		webserviceVo.setBodyXml(JAXBFactory.getObjectToXML(flexPricerAvailabilityInput));
+		String result = urlCon.call(webserviceVo);
+		log.debug("{}", result);
 	}
 }
