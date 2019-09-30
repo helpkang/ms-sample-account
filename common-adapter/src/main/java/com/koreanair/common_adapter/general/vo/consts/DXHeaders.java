@@ -16,5 +16,10 @@
 package com.koreanair.common_adapter.general.vo.consts;
 
 public class DXHeaders {
+
+	private  DXHeaders() {
+		throw new IllegalStateException("Consts class");
+	}
+
 	public static final String Authorization = "Z6h6u893ZR428ebUU28Y9Xs92Na886dh";
 }

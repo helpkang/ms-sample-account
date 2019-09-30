@@ -15,11 +15,29 @@
  */
 package com.koreanair.common_adapter.eretail.avail.flexpricer;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
+import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
+import com.koreanair.common_adapter.eretail.vo.PTCDiscountInfoVO;
+import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
+import com.koreanair.common_adapter.eretail.vo.SegmentInfoVO;
+import com.koreanair.common_adapter.general.vo.consts.ERetailConsts;
 import com.koreanair.common_adapter.general.vo.consts.ERetailTransactionId;
-import com.koreanair.external.eretail.vo.fare.farecommonoutput.LISTFARECONTEXTType.OVERRIDE.LISTCORPORATENUMBER;
+import com.koreanair.common_adapter.general.vo.consts.PAXType;
+import com.koreanair.common_adapter.general.vo.consts.TripType;
+import com.koreanair.common_adapter.utils.GenericException;
+import com.koreanair.common_adapter.utils.GenericException.ExceptionCode;
+import com.koreanair.common_adapter.utils.JAXBFactory;
+import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
+import com.koreanair.external.eretail.vo.farecommon.farecontext.LISTCORPORATENUMBER;
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.DISCOUNTINFOPTCLISTPTCType;
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.DISCOUNTINFOPTCType;
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.DISCOUNTINFOType;
@@ -32,113 +50,174 @@ import com.koreanair.external.eretail.vo.flexpricer.flexpricercommoninput.COMMER
 import com.koreanair.external.eretail.vo.flexpricer.flexpricercommoninput.DATERANGE;
 import com.koreanair.external.eretail.vo.flexpricer.flexpricercommoninput.LISTDESTINATION;
 
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class FlexPricerAdapter {
-	private void getFlexPricerAvailability() {
-		// fix된 값
+	public void getFlexPricerAvailability(FlexPricerInputVO inputVo) {
+		FlexPricerAvailabilityInputType flexPricerAvailabilityInput = organizeFlexPricerAvailabilityInput(inputVo);
+//		sendAndReceive();
+	}
+
+	private FlexPricerAvailabilityInputType organizeFlexPricerAvailabilityInput(FlexPricerInputVO inputVo) {
+
+		if (ObjectUtils.isEmpty(inputVo.getCffCodeList())) {
+			throw new GenericException(ExceptionCode.BAD_REQUEST, "CFF는 필수 사항입니다.");
+		}
+		if (ObjectUtils.isEmpty(inputVo.getPassengerConditionList())) {
+			throw new GenericException(ExceptionCode.BAD_REQUEST, "탑승객 정보는 필수 사항입니다.");
+		}
+
 		FlexPricerAvailabilityInputType flexPricerAvailabilityInput = new FlexPricerAvailabilityInputType();
 		flexPricerAvailabilityInput.setTRANSACTIONID(ERetailTransactionId.FLEX_PRICER_AVAILABILITY);
-		flexPricerAvailabilityInput.setSITE(CommonConstants.SITE_REVENUE);
-		flexPricerAvailabilityInput.setLANGUAGE(CommonConstants.LANGUAGE);
-		flexPricerAvailabilityInput.setARRANGEBY(CommonConstants.ARRANGE_BY);
-		flexPricerAvailabilityInput.setPRICINGTYPE("C");
+		flexPricerAvailabilityInput.setSITE(ERetailConsts.SITE_REVENUE);
+		flexPricerAvailabilityInput.setLANGUAGE(ERetailConsts.LANGUAGE);
+		flexPricerAvailabilityInput.setPRICINGTYPE("C");	// PRICING TYPE : I = Itinerary, C=One way Combinable , O=One Way Display
 		flexPricerAvailabilityInput.setDISPLAYTYPE(BigInteger.valueOf(2));
+		flexPricerAvailabilityInput.setTRIPTYPE(inputVo.getTripType().value());
 
-		// 좌석등급 셋팅 (모든 CFF 조회)
-		List<COMMERCIALFAREFAMILYInputType> fareFamilyList = flexPricerAvailabilityInput.getLISTCOMMERCIALFAREFAMILY();
-		COMMERCIALFAREFAMILYInputType fareFamily = new COMMERCIALFAREFAMILYInputType();
-		fareFamily.setCODE(CommonConstants.CABIN_DOM_ECONOMY);
-		fareFamilyList.add(fareFamily);
+		/* 정렬 기준
+				P = Fare without tax
+				T = Fare with taxes
+				D = Departure time
+				E = Elapsed flying time
+				A = Arrival time
+				N = Number of connections
+				S = Sold Out /Unavailable flights
+				R = ????
+		 */
+		flexPricerAvailabilityInput.setARRANGEBY(ERetailConsts.ARRANGE_BY);
 
-		flexPricerAvailabilityInput.setTRIPTYPE(flexPricerAvailabilityInputForm.getTripType());
-		List<LISTDESTINATION> listDestination = flexPricerAvailabilityInput.getLISTDESTINATION();
-		for (int i = 0; i < flexPricerAvailabilityInputForm.getBoundInformationList().size(); i++) {
-			BoundInfo boundInfo = flexPricerAvailabilityInputForm.getBoundInformationList().get(i);
+		if (inputVo.getTripType() == TripType.OJ) {
+			flexPricerAvailabilityInput.setOWCDUALFLOWSEQUENCE(BigInteger.ONE);
+		}
+
+		// 운임 종류 - Cabin등급에 따른 Fare 종류
+		for(String cff : inputVo.getCffCodeList()) {
+			COMMERCIALFAREFAMILYInputType cffType = new COMMERCIALFAREFAMILYInputType();
+			cffType.setCODE(cff);
+			flexPricerAvailabilityInput.getLISTCOMMERCIALFAREFAMILY().add(cffType);
+		}
+
+		for (SegmentInfoVO segmentInfo : ObjectUtils.defaultIfNull(inputVo.getSegmentInfoList(), Collections.<SegmentInfoVO>emptyList())) {
 			LISTDESTINATION destination = new LISTDESTINATION();
-			destination.setBLOCATION(boundInfo.getDepartureLocationCode());
-			destination.setELOCATION(boundInfo.getArrivalLocationCode());
-			destination.setBDATE(boundInfo.getDepartureDate() + "0000");
+			destination.setBLOCATION(segmentInfo.getDepartureAirport());
+			destination.setELOCATION(segmentInfo.getArrivalAirport());
+			destination.setBDATE(segmentInfo.getDepartureDateTime());	//yyyyMMddHHmm
 			destination.setBANYTIME(true);
-			if (null != flexPricerAvailabilityInputForm.getFlexibleDateRange() && !"0".equals(flexPricerAvailabilityInputForm.getFlexibleDateRange())) {
+			if (inputVo.getDateRange() > 0) {
 				DATERANGE value = new DATERANGE();
-				value.setQUALIFIER("C");
-				value.setVALUE(flexPricerAvailabilityInputForm.getFlexibleDateRange());
+				value.setQUALIFIER("C"); // combination mode - UPSELL 과 CALENDAR FARE를 동시에 보여주기 위한 설정.
+				value.setVALUE(String.valueOf(inputVo.getDateRange())); // 출발일자를 기준으로 +,- n일씩 CALENDAR FARE를 가져온다.
 				destination.setDATERANGE(value);
 			}
-			listDestination.add(destination);
+			flexPricerAvailabilityInput.getLISTDESTINATION().add(destination);
 		}
-		// 승객 인원과 타입에 대한 정보를 구성한다.
-		int travellerCnt = Integer.parseInt(flexPricerAvailabilityInputForm.getAdultCount()) + Integer.parseInt(flexPricerAvailabilityInputForm.getChildCount());
-		List<INPUTLISTTRAVELLERType> travellerList = flexPricerAvailabilityInput.getLISTTRAVELLER();
-		List<LISTTRAVELLERINFOType> discountList = flexPricerAvailabilityInput.getLISTTRAVELLERINFO();
-		int j = 0;
-		for (int i = 0; i < travellerCnt; i++) {
-			INPUTLISTTRAVELLERType travellerInfomation = new INPUTLISTTRAVELLERType();
-			INPUTTRAVELLERType inputtravellerType = new INPUTTRAVELLERType();
-			if (i < Integer.parseInt(flexPricerAvailabilityInputForm.getAdultCount())) {
-				inputtravellerType.setCODE(CommonConstants.ADULT);
-				travellerInfomation.setTRAVELLERTYPE(inputtravellerType);
-				if (i < Integer.parseInt(flexPricerAvailabilityInputForm.getInfantCount())) {
-					travellerInfomation.setHASINFANT(true);
-				} else {
-					travellerInfomation.setHASINFANT(false);
-				}
-				travellerInfomation.setTRAVELLERID(BigInteger.valueOf(i + 1));
+		// 여정정보 구성 end.
 
-				if (null != flexPricerAvailabilityInputForm.getAdultDiscountPassengerTypeCode() && flexPricerAvailabilityInputForm.getAdultDiscountPassengerTypeCode().size() != 0 && null != flexPricerAvailabilityInputForm.getAdultDiscountPassengerTypeCode().get(i) && !"".equals(flexPricerAvailabilityInputForm.getAdultDiscountPassengerTypeCode().get(i))) {
-					LISTTRAVELLERINFOType travellerInfo = new LISTTRAVELLERINFOType();
-					DISCOUNTINFOType discountTyppe = new DISCOUNTINFOType();
-					DISCOUNTINFOPTCType discount = new DISCOUNTINFOPTCType();
-					DISCOUNTINFOPTCLISTPTCType type = new DISCOUNTINFOPTCLISTPTCType();
-					type.setCODE(flexPricerAvailabilityInputForm.getAdultDiscountPassengerTypeCode().get(i));
-					List<DISCOUNTINFOPTCLISTPTCType> list = discount.getLISTPTC();
-					list.add(type);
-					discount.setISCUMULATIVEDISCOUNT(false);
-					discountTyppe.setPTCINFO(discount);
-					travellerInfo.setDISCOUNTINFO(discountTyppe);
-					travellerInfo.setTRAVELLERID(BigInteger.valueOf(i + 1));
-					discountList.add(travellerInfo);
-				}
-			} else {
-				inputtravellerType.setCODE(CommonConstants.CHILD);
-				travellerInfomation.setTRAVELLERTYPE(inputtravellerType);
-				travellerInfomation.setHASINFANT(false);
-				travellerInfomation.setTRAVELLERID(BigInteger.valueOf(i + 1));
-
-				if (null != flexPricerAvailabilityInputForm.getChildDiscountPassengerTypeCode() && flexPricerAvailabilityInputForm.getChildDiscountPassengerTypeCode().size() != 0 && null != flexPricerAvailabilityInputForm.getChildDiscountPassengerTypeCode().get(j) && !"".equals(flexPricerAvailabilityInputForm.getChildDiscountPassengerTypeCode().get(j))) {
-					LISTTRAVELLERINFOType travellerInfo = new LISTTRAVELLERINFOType();
-					DISCOUNTINFOType discountTyppe = new DISCOUNTINFOType();
-					DISCOUNTINFOPTCType discount = new DISCOUNTINFOPTCType();
-					DISCOUNTINFOPTCLISTPTCType type = new DISCOUNTINFOPTCLISTPTCType();
-					type.setCODE(flexPricerAvailabilityInputForm.getChildDiscountPassengerTypeCode().get(j));
-					List<DISCOUNTINFOPTCLISTPTCType> list = discount.getLISTPTC();
-					list.add(type);
-					discount.setISCUMULATIVEDISCOUNT(false);
-					discountTyppe.setPTCINFO(discount);
-					travellerInfo.setDISCOUNTINFO(discountTyppe);
-					travellerInfo.setTRAVELLERID(BigInteger.valueOf(i + 1));
-					discountList.add(travellerInfo);
-
-				}
-				j++;
+		// 탑승객 정보 구성 start.
+		List<PassengerConditionVO> infantPaxCondition = new ArrayList<>();
+		for (PassengerConditionVO paxCondition : inputVo.getPassengerConditionList()) {
+			if (PAXType.INF.equalsIgnoreCase(paxCondition.getPassengerType())) {	// 유아가 아닌 항목은 skip
+				infantPaxCondition.add(paxCondition);
 			}
-			travellerList.add(i, travellerInfomation);
 		}
-		if ("M".equals(flexPricerAvailabilityInputForm.getTripType())) {
-			flexPricerAvailabilityInput.setOWCDUALFLOWSEQUENCE(new BigInteger("1"));
+
+		int passangerCount = 1;
+		for (PassengerConditionVO paxCondition : inputVo.getPassengerConditionList()) {
+
+			// 유아의 경우 탑승여부를 성인항목의 hasinfant 항목으로 가지고 있어야 하기 때문에 skip한다.
+			if (PAXType.INF.equalsIgnoreCase(paxCondition.getPassengerType())) {
+				continue;
+			}
+
+			INPUTLISTTRAVELLERType travellerType = new INPUTLISTTRAVELLERType();
+			INPUTTRAVELLERType traveller = new INPUTTRAVELLERType();
+			traveller.setCODE(paxCondition.getPassengerType()); // ADT, CHD, INF
+			travellerType.setTRAVELLERTYPE(traveller);
+			travellerType.setTRAVELLERID(BigInteger.valueOf(passangerCount++));
+			paxCondition.setPassengerNo(String.valueOf(travellerType.getTRAVELLERID()));
+
+			flexPricerAvailabilityInput.getLISTTRAVELLER().add(travellerType);
+
+			if (PAXType.ADT.equalsIgnoreCase(paxCondition.getPassengerType()) && ObjectUtils.isNotEmpty(infantPaxCondition)) {
+				travellerType.setHASINFANT(true);
+				infantPaxCondition.remove(0);
+			}
 		}
-		if (null != flexPricerAvailabilityInputForm.getCorporatedId() && !"".equals(flexPricerAvailabilityInputForm.getCorporatedId())) {
+		// 탑승객 정보 구성 end.
+
+		// 탑승객별 PTC Discount 구성
+		for (PassengerConditionVO paxCondition : inputVo.getPassengerConditionList()) {
+			LISTTRAVELLERINFOType listTravellerInfo = new LISTTRAVELLERINFOType();
+			String ptcCode = paxCondition.getDefaultPTCDiscountInfo().getPtCode();
+			if (StringUtils.isBlank(ptcCode)) {
+				continue;
+			}
+
+			listTravellerInfo.setTRAVELLERID(NumberUtils.createBigInteger(paxCondition.getPassengerNo()));
+
+			DISCOUNTINFOType discountInfo = new DISCOUNTINFOType();
+			DISCOUNTINFOPTCType ptcInfo = new DISCOUNTINFOPTCType();
+			ptcInfo.setISCUMULATIVEDISCOUNT(false); // 중복할인 여부 : ex> corporate 에 따른 할인 + PTC 할인
+			DISCOUNTINFOPTCLISTPTCType discountCode = new DISCOUNTINFOPTCLISTPTCType();
+			discountCode.setCODE(paxCondition.getDefaultPTCDiscountInfo().getPtCode());
+
+			ptcInfo.getLISTPTC().add(discountCode);
+			discountInfo.setPTCINFO(ptcInfo);
+			listTravellerInfo.setDISCOUNTINFO(discountInfo);
+
+			flexPricerAvailabilityInput.getLISTTRAVELLERINFO().add(listTravellerInfo);
+		}
+
+		if (StringUtils.isNotBlank(inputVo.getCorporatedId())) {
 			LISTPRICINGOPTIONSTypeFlex listpricingoptions = new LISTPRICINGOPTIONSTypeFlex();
-			listpricingoptions.setTYPEOFFARE(new BigInteger("-2"));
+			listpricingoptions.setTYPEOFFARE(NumberUtils.createBigInteger("-2"));
 			listpricingoptions.setISPRICEBYINPUT(true);
-			listpricingoptions.setTYPEOFCORPORATEFARE(new BigInteger("2"));
+			listpricingoptions.setTYPEOFCORPORATEFARE(NumberUtils.createBigInteger("2"));
 
 			List<LISTCORPORATENUMBER> listcorporatenumberList = listpricingoptions.getLISTCORPORATENUMBER();
 			LISTCORPORATENUMBER listcorporatenumber = new LISTCORPORATENUMBER();
-			listcorporatenumber.setCORPORATENUMBER(flexPricerAvailabilityInputForm.getCorporatedId());
+			listcorporatenumber.setCORPORATENUMBER(inputVo.getCorporatedId());
 			listcorporatenumberList.add(listcorporatenumber);
 			flexPricerAvailabilityInput.setLISTPRICINGOPTIONS(listpricingoptions);
 		}
 		return flexPricerAvailabilityInput;
+	}
+
+	public static void main(String[] args) throws IOException {
+		FlexPricerAdapter adapter = new FlexPricerAdapter();
+		// SELKE08DW
+		FlexPricerInputVO inputVo = new FlexPricerInputVO();
+		inputVo.setDateRange(7);
+		inputVo.setTripType(TripType.RT);
+		inputVo.getCffCodeList().add("DOMECOEY");
+
+		SegmentInfoVO segmentInfo = new SegmentInfoVO();
+		segmentInfo.setDepartureAirport("GMP");
+		segmentInfo.setArrivalAirport("CJU");
+		segmentInfo.setDepartureDateTime("201910200000");
+		inputVo.getSegmentInfoList().add(segmentInfo);
+		segmentInfo = new SegmentInfoVO();
+		segmentInfo.setDepartureAirport("CJU");
+		segmentInfo.setArrivalAirport("GMP");
+		segmentInfo.setDepartureDateTime("201910220000");
+		inputVo.getSegmentInfoList().add(segmentInfo);
+
+		PassengerConditionVO passengerCondition = new PassengerConditionVO();
+		passengerCondition.setPassengerType(PAXType.ADT);
+		inputVo.getPassengerConditionList().add(passengerCondition);
+
+		passengerCondition = new PassengerConditionVO();
+		passengerCondition.setPassengerType(PAXType.CHD);
+
+		PTCDiscountInfoVO defaultPTCDiscountInfo = new PTCDiscountInfoVO();
+		defaultPTCDiscountInfo.setPtCode("CH");
+		passengerCondition.setDefaultPTCDiscountInfo(defaultPTCDiscountInfo);
+		inputVo.getPassengerConditionList().add(passengerCondition);
+
+		FlexPricerAvailabilityInputType flexPricerAvailabilityInput = adapter.organizeFlexPricerAvailabilityInput(inputVo);
+		log.debug("{}", ObjectSerializeUtil.getObjectToJson(flexPricerAvailabilityInput));
+		log.debug("{}", JAXBFactory.getObjectToXML(flexPricerAvailabilityInput));
 	}
 }

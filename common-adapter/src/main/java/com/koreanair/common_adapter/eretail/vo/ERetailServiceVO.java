@@ -16,5 +16,4 @@
 package com.koreanair.common_adapter.eretail.vo;
 
 public class ERetailServiceVO {
-	private String 
 }
