@@ -76,6 +76,22 @@
 			<scope>compile</scope>
 			<version>${swagger-core-version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.koreanair.eretail</groupId>
+			<artifactId>amadeus-eretail</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}\externalLib\amadeus-eretail.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>com.koreanair.altea</groupId>
+			<artifactId>amadeus-altea</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}\externalLib\amadeus-altea.jar</systemPath>
+		</dependency>
 	</dependencies>
 
 	<build>
