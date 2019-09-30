@@ -1079,8 +1079,8 @@ class KalProperties {
 		put("amadeus.altea.soapaction.url", "http://webservices.amadeus.com");
 	}};
 
-	public String getProperty(String string) {
-		return null;
+	public String getProperty(String key) {
+		return doubleBraceMap.get(key);
 	}
 
 }
