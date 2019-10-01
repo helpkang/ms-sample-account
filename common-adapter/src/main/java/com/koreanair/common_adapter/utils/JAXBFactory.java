@@ -63,7 +63,7 @@ public class JAXBFactory {
 		if (schemaLocation != null) {
 			marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 		}
-		marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8);
+		marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8.toString());
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
 		ByteArrayOutputStream byteArr = new ByteArrayOutputStream();

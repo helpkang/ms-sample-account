@@ -1,39 +1,31 @@
  package com.kal.framework.integration.adaptor.support;
- 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.MessageDigest;
-import java.security.SecureRandom;
-import java.text.SimpleDateFormat;
-import java.util.*;
+
+ import com.kal.framework.integration.adaptor.UrlConnectionService;
+ import com.kal.framework.integration.adaptor.WebServiceVo;
+ import net.sf.jazzlib.GZIPInputStream;
+ import org.apache.log4j.Logger;
+ import org.w3c.dom.Document;
+ import org.w3c.dom.Element;
+ import org.w3c.dom.Node;
+ import org.w3c.dom.NodeList;
+ import org.xml.sax.InputSource;
+
+ import javax.xml.parsers.DocumentBuilder;
+ import javax.xml.parsers.DocumentBuilderFactory;
+ import java.io.*;
+ import java.net.HttpURLConnection;
+ import java.net.URL;
+ import java.security.MessageDigest;
+ import java.security.SecureRandom;
+ import java.text.SimpleDateFormat;
+ import java.util.*;
 
 // import javax.annotation.Resource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 // import pip_service_library.pip_session.Session;
-
-import com.kal.framework.integration.adaptor.UrlConnectionService;
-import com.kal.framework.integration.adaptor.WebServiceVo;
 // import com.kal.framework.properties.support.KalProperties;
 // import com.kal.ibe.onea.client.SessionClient;
 // import com.kal.ibe.onea.client.SessionClients;
-
 // import org.apache.commons.lang.exception.ExceptionUtils;
-
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import net.sf.jazzlib.GZIPInputStream;
  
 public class UrlConnectionImpl implements UrlConnectionService
 {
@@ -307,7 +299,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 			result.setHost(this.propertiesService.getProperty(webserviceVo.getHost()));
 			result.setOperationName(webserviceVo.getOperationName());
 			result.setWsap(webserviceVo.getWsap());
-
+			result.setPipSourceofficeId(webserviceVo.getPipSourceofficeId());
 			result.setSoapAction(this.propertiesService.getProperty("amadeus.altea.soapaction.url") + "/" + this.propertiesService.getProperty(webserviceVo.getOperationName()));
 			result.setMessageId(webserviceVo.getMessageId());
 			result.setGuid(webserviceVo.getGuid());
@@ -377,322 +369,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 		return result;
 	}
 	
-	@SuppressWarnings("rawtypes")
-	public String call(WebServiceVo vo, KalProperties properties) throws Exception
-	{
-		WebServiceVo webserviceVo = setWebServiceVo(vo, properties);
-		String result = null;
-		OutputStreamWriter clsOutput = null;
-		BufferedReader clsInput = null;
 
-		if (webserviceVo != null)
-		{
-			StringBuffer buffer = new StringBuffer();
-
-			URL url = new URL(webserviceVo.getHost());
-			HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
-			String query = "";
-
-			switch (webserviceVo.getHeaderType())
-			{
-				case 1:
-					urlConnection.setRequestProperty("SOAPAction", "\"" + webserviceVo.getSoapAction() + "\"");
-					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
-					query = getAmadeusAlteaHeader(webserviceVo);
-					System.out.println("1a altea restful query : " + query);
-					if (!logger.isInfoEnabled()) break;
-					logger.info("1a altea restful query : " + query);
-					break;
-					
-				case 2:
-					if ((webserviceVo.getJsessionId() != null) && (webserviceVo.getJsessionId().trim().length() > 0))
-					{
-						urlConnection.setRequestProperty("Set-Cookie", "JSESSIONID=" + webserviceVo.getJsessionId());
-					}
-					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
-					// query = getAmadeusEcommerceHeader(webserviceVo);
-					System.out.println("1a ecommerce restful query : " + query);
-					if (!logger.isInfoEnabled()) break;
-					logger.info("1a ecommerce restful query : " + query);
-					break;
-					
-				case 3:
-					urlConnection.setRequestProperty("SOAPAction", "\"" + webserviceVo.getSoapAction() + "\"");
-					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
-					// query = getPipAlteaHeader(webserviceVo);
-					System.out.println("pip altea restful query : " + query);
-					if (!logger.isInfoEnabled()) break;
-					logger.info("pip altea restful query : " + query);
-					break;
-					
-				case 4:
-					if ((webserviceVo.getJsessionId() != null) && (webserviceVo.getJsessionId().trim().length() > 0)) 
-					{
-						urlConnection.setRequestProperty("Set-Cookie", "JSESSIONID=" + webserviceVo.getJsessionId());
-					}
-					urlConnection.setRequestProperty("SOAPAction", "\"" + webserviceVo.getSoapAction() + "\"");
-					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
-					query = getPipEcommerceHeader(webserviceVo);
-
-					System.out.println("pip ecommerce restful query : " + query);
-					if (!logger.isInfoEnabled()) break;
-					logger.info("pip ecommerce restful query : " + query);
-					break;
-					
-				case 5:		   		
-					urlConnection.setRequestProperty("SOAPAction", "\"" + webserviceVo.getSoapAction() + "\"");
-					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
-					// query = getPipOdsHeader(webserviceVo);
-					System.out.println("pip ods restful query : " + query);
-					if (!logger.isInfoEnabled()) break;
-					logger.info("pip ods query : " + query);
-					break;
-					
-				case 6:
-					urlConnection.setRequestProperty("SOAPAction", "\"" + webserviceVo.getSoapAction() + "\"");
-					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
-					// query = getPidHeader(webserviceVo);
-					System.out.println("pid restful query : " + query);
-					if (!logger.isInfoEnabled()) break;
-					logger.info("pid restful query : " + query);
-					break;
-					
-				default:
-					if (!logger.isInfoEnabled()) break;
-					logger.info("current host is not exist : " + query);
-			}
- 
-			urlConnection.setRequestMethod(webserviceVo.getRequestMethod());
-			urlConnection.setDoInput(true);
-			urlConnection.setDoOutput(true);
-			urlConnection.setUseCaches(false);
-
-			urlConnection.setRequestProperty("Content-Length", String.valueOf(query.length()));
-			urlConnection.setRequestProperty("Accept", "application/xml");
-
-			clsOutput = new OutputStreamWriter(urlConnection.getOutputStream());
-			clsOutput.write(query);
-			clsOutput.flush();
-			vo.setQuery(query);
-			
-			boolean soapFault = false;
-	        String res_encode = null;
-	        InputStream is = null;
-			
-			try 
-			{
-				clsInput = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"));
-			}
-			catch (Exception e)
-			{
-				soapFault = true;
-				e.printStackTrace();
-				clsInput = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream(), "UTF-8"));
-				
-				String inputLine;
-				while ((inputLine = clsInput.readLine()) != null)
-				{
-					buffer.append(inputLine);
-				}				
-				
-				clsOutput.close();
-				clsInput.close();
-
-				if ((webserviceVo.getHeaderType() == 2) || (webserviceVo.getHeaderType() == 4)) 
-				{
-					Map headers = urlConnection.getHeaderFields();
-					List jsessionIds = (List)headers.get("Set-Cookie");
-
-					String jsessionId = "";
-					jsessionId = jsessionIds.toString();
-
-					vo.setJsessionId(new String(jsessionId.substring(jsessionId.indexOf("=") + 1, jsessionId.lastIndexOf(";"))));
-				}
-				result = buffer.toString();
-			}
-			finally
-			{
-				String inputLine;
-		        while ((inputLine = clsInput.readLine()) != null)
-		        	buffer.append( inputLine ).append("\r\n");   //	buffer.append( inputLine ).append("\r\n");
-		
-		        if(clsInput != null)
-		        	clsInput.close();       
-		        if(clsOutput != null)
-		        	clsOutput.close();
-		        if(urlConnection != null)
-		        	urlConnection.disconnect();
-		        
-		        if(webserviceVo.getHeaderType() == amadeus_ecommerce_headertype || webserviceVo.getHeaderType() == pip_ecommerce_headertype){
-		        	Map<String, List<String>> headers = urlConnection.getHeaderFields();
-		        	List<String> jsessionIds = headers.get("Set-Cookie");
-		        	
-		        	if(jsessionIds != null){
-		        	 	String jsessionId = "";
-			        	jsessionId = jsessionIds.toString();
-			        //	System.out.println("jsessionId : " + jsessionId);
-			        	vo.setJsessionId(new String(jsessionId.substring(jsessionId.indexOf("=")+1, jsessionId.lastIndexOf(";"))));	
-		        	}
-		        }
-			    result = buffer.toString();
-			    
-			    /*if(webserviceVo.getHeaderType() == amadeus_altea_headertype || webserviceVo.getHeaderType() == pip_altea_headertype)
-			    {
-			    	if(soapFault)
-			    	{
-		              	 if(vo.getPipsessionType() != dedicated)
-		              	 {
-		              		inputLine = this.parseFaultString(result);
-		              		if(!(inputLine.toLowerCase().contains("session")) )
-		              		{
-		              			vo.getAlteasessionVO().sendFaultSignOut = true;
-		              		}
-		              		else
-		              		{
-		              			vo.getAlteasessionVO().sendFaultSignOut = false;
-		              		}
-		              		this.destroySession(vo);  //altea세션 정보는 비지니스 개발자에게 돌려주기 위해서 vo에 셋팅해놨음, 그래서 webservicevo를 넘기지 않고 vo를 넘김
-		              	 }
-		        	}
-			    	if(vo.getAlteasessionVO() != null)
-			    	{
-        				vo.getAlteasessionVO().setLastQueryDate(System.currentTimeMillis());
-			    	}
-			    }*/
-			}
-		}
-		return result;
-	}
- 
-	public WebServiceVo setWebServiceVo(WebServiceVo webserviceVo, KalProperties properties)
-	{
-		WebServiceVo result = new WebServiceVo();
-
-		if (webserviceVo.getHost().equals("pip.altea.host")) 
-		{
-			// Session session = webserviceVo.getPipsession();
-			// session = sessionNullCheck(webserviceVo);
-			// result.setPipsession(session);
-
-			String mustUnderstand = "";
-			mustUnderstand = mustUnderstandNullCheck(webserviceVo);
-			result.setMustUnderstand(mustUnderstand);
-
-			result.setHeaderType(3);
-			result.setHost(properties.getProperty(webserviceVo.getHost()));
-			result.setOperationName(webserviceVo.getOperationName());
-			result.setWsap(webserviceVo.getWsap());
-			result.setSoapAction(properties.getProperty("pip.altea.soapaction.url") + "/" + properties.getProperty(webserviceVo.getOperationName()));
-			result.setPiprequestSystem(webserviceVo.getPiprequestSystem());
-			result.setPipemployeeNumber(webserviceVo.getPipemployeeNumber());
-			result.setPiplssuserId(webserviceVo.getPiplssuserId());
-			result.setPipSourceofficeId(webserviceVo.getPipSourceofficeId());
-			result.setPipuserName(webserviceVo.getPipuserName());
-			result.setPippassWord(webserviceVo.getPippassWord());
-			result.setPipdutyCode(webserviceVo.getPipdutyCode());
-			result.setGuid(webserviceVo.getGuid());
-			result.setCompanyName(webserviceVo.getCompanyName());
-			result.setWorkstationId(webserviceVo.getWorkstationId());
-		}
-		else if (webserviceVo.getHost().equals("pip.ecommerce.host")) 
-		{
-			result.setHeaderType(4);
-
-			String mustUnderstand = "";
-			mustUnderstand = mustUnderstandNullCheck(webserviceVo);
-			result.setMustUnderstand(mustUnderstand);
-
-			result.setHost(properties.getProperty(webserviceVo.getHost()));
-			result.setBodyXml(webserviceVo.getBodyXml());
-			result.setWsap(webserviceVo.getWsap());
-			result.setSoapAction(properties.getProperty("pip.ecommerce.soapaction.url") + "/" + "E_Commerce");
-			result.setPiprequestSystem(webserviceVo.getPiprequestSystem());
-			result.setPipemployeeNumber(webserviceVo.getPipemployeeNumber());
-			result.setPiplssuserId(webserviceVo.getPiplssuserId());
-			result.setPipSourceofficeId(webserviceVo.getPipSourceofficeId());
-			result.setPipuserName(webserviceVo.getPipuserName());
-			result.setPippassWord(webserviceVo.getPippassWord());
-			result.setPipdutyCode(webserviceVo.getPipdutyCode());
-			result.setGuid(webserviceVo.getGuid());
-			result.setCompanyName(webserviceVo.getCompanyName());
-			result.setWorkstationId(webserviceVo.getWorkstationId());
-		}
-		else if (webserviceVo.getHost().equals("amadeus.altea.host"))
-		{
-
-			// result.setPipsession(webserviceVo.getPipsession());
-			result.setHeaderType(1);
-			result.setHost(properties.getProperty(webserviceVo.getHost()));
-			result.setOperationName(webserviceVo.getOperationName());
-			result.setWsap(webserviceVo.getWsap());
-
-			result.setSoapAction(properties.getProperty("amadeus.altea.soapaction.url") + "/" + properties.getProperty(webserviceVo.getOperationName()));
-			result.setMessageId(webserviceVo.getMessageId());
-			result.setGuid(webserviceVo.getGuid());
-		}
-		else if (webserviceVo.getHost().equals("amadeus.ecommerce.host")) 
-		{
-			// Session session = sessionNullCheck(webserviceVo);
-			// result.setPipsession(session);
-			result.setHeaderType(2);
-			result.setHost(properties.getProperty(webserviceVo.getHost()));
-		}
-		else if (webserviceVo.getHost().equals("pip.ods.host"))
-		{
-			// Session session = sessionNullCheck(webserviceVo);
-			// result.setPipsession(session);
-
-			String mustUnderstand = "";
-			mustUnderstand = mustUnderstandNullCheck(webserviceVo);
-			result.setMustUnderstand(mustUnderstand);
-
-			result.setHeaderType(5);
-			result.setHost(properties.getProperty(webserviceVo.getHost()));
-			result.setOperationName(webserviceVo.getOperationName());
-			result.setWsap(webserviceVo.getWsap());
-			result.setSoapAction(properties.getProperty("pip.altea.soapaction.url") + "/" + properties.getProperty(webserviceVo.getOperationName()));
-			result.setPiprequestSystem(webserviceVo.getPiprequestSystem());
-			result.setPipemployeeNumber(webserviceVo.getPipemployeeNumber());
-			result.setPiplssuserId(webserviceVo.getPiplssuserId());
-			result.setPipSourceofficeId(webserviceVo.getPipSourceofficeId());
-			result.setPipuserName(webserviceVo.getPipuserName());
-			result.setPippassWord(webserviceVo.getPippassWord());
-			result.setPipdutyCode(webserviceVo.getPipdutyCode());
-			result.setGuid(webserviceVo.getGuid());
-			result.setCompanyName(webserviceVo.getCompanyName());
-			result.setWorkstationId(webserviceVo.getWorkstationId());
-		}
-		else
-		{
-			// Session session = sessionNullCheck(webserviceVo);
-			// result.setPipsession(session);
-
-			String mustUnderstand = "";
-			mustUnderstand = mustUnderstandNullCheck(webserviceVo);
-			result.setMustUnderstand(mustUnderstand);
-
-			result.setHeaderType(6);
-			result.setHost(webserviceVo.getHost());
-
-			result.setWsap(webserviceVo.getWsap());
-			result.setSoapAction(webserviceVo.getSoapAction());
-			result.setPiprequestSystem(webserviceVo.getPiprequestSystem());
-			result.setPipemployeeNumber(webserviceVo.getPipemployeeNumber());
-			result.setPiplssuserId(webserviceVo.getPiplssuserId());
-			result.setPipSourceofficeId(webserviceVo.getPipSourceofficeId());
-			result.setPipuserName(webserviceVo.getPipuserName());
-			result.setPippassWord(webserviceVo.getPippassWord());
-			result.setPipdutyCode(webserviceVo.getPipdutyCode());
-			result.setGuid(webserviceVo.getGuid());
-			result.setCompanyName(webserviceVo.getCompanyName());
-			result.setWorkstationId(webserviceVo.getWorkstationId());
-
-			result.setBodyXml(webserviceVo.getBodyXml());
-			result.setRequestMethod(webserviceVo.getRequestMethod());
-		}
-		return result;
-	}
- 
 	// public Session sessionNullCheck(WebServiceVo webserviceVo)
 	// {
 	// 	Session result = new Session();
@@ -722,15 +399,15 @@ public class UrlConnectionImpl implements UrlConnectionService
 		String password = password_digest(password_encrypt("SHA-1", "AMADEUS"),nonce,created);
 
 		//TODO 4.0 Security header 김현성 추가 요청
-		String result = "<soapenv:Envelope xmlns:wsa=\"http://www.w3.org/2005/08/addressing\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:link=\"http://wsdl.amadeus.com/2010/06/ws/Link_v1\" xmlns:wbs=\"http://xml.amadeus.com/ws/2009/01/WBS_Session-2.0.xsd\"><soapenv:Header><link:TransactionFlowLink><link:Consumer><link:UniqueID>" + webserviceVo.getGuid() + "</link:UniqueID>" + "</link:Consumer>" + "</link:TransactionFlowLink>" + "<wsaw:Action>" + webserviceVo.getSoapAction() + "</wsaw:Action>" + "<wsaw:MessageID>" + webserviceVo.getMessageId() + "</wsaw:MessageID>" + "<wsaw:To>" + webserviceVo.getHost() + "/" + webserviceVo.getWsap() + "</wsaw:To>"+
-			"	<link:TransactionFlowLink xmlns:link=\"http://wsdl.amadeus.com/2010/06/ws/Link_v1\">\n" +
+		String result = "<soapenv:Envelope xmlns:wsa=\"http://www.w3.org/2005/08/addressing\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:link=\"http://wsdl.amadeus.com/2010/06/ws/Link_v1\" xmlns:wbs=\"http://xml.amadeus.com/ws/2009/01/WBS_Session-2.0.xsd\"><soapenv:Header>"+
+			/*"	<link:TransactionFlowLink xmlns:link=\"http://wsdl.amadeus.com/2010/06/ws/Link_v1\">\n" +
 			"    <link:Consumer>\n" +
 			"      <link:UniqueID>"+webserviceVo.getGuid()+"</link:UniqueID>\n" +
 			"    </link:Consumer>\n" +
-			"  </link:TransactionFlowLink>"+
-			"      <sec:AMA_SecurityHostedUser>\n" +
-			"         <sec:UserID POS_Type=\"1\" RequestorType=\"U\" PseudoCityCode=\""+webserviceVo.getPipSourceofficeId()+"\" AgentDutyCode=\"SU\"/>\n" +
-			"      </sec:AMA_SecurityHostedUser>\n" +
+			"  </link:TransactionFlowLink>"+*/
+			"      <AMA_SecurityHostedUser xmlns=\"http://xml.amadeus.com/2010/06/Security_v1\">\n" +
+			"         <UserID POS_Type=\"1\" RequestorType=\"U\" PseudoCityCode=\""+webserviceVo.getPipSourceofficeId()+"\" AgentDutyCode=\"SU\"/>\n" +
+			"      </AMA_SecurityHostedUser>\n" +
 			"      <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n" +
 			"         <wsse:UsernameToken>\n" +
 			"            <wsse:Username>WSKEIBE</wsse:Username>\n" +
@@ -745,8 +422,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 			"      </wsa:ReplyTo>\n" +
 			"      <wsa:MessageID soapenv:mustUnderstand=\"1\" xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+generate_messageID()+"</wsa:MessageID>\n" +
 			"      <wsa:To soapenv:mustUnderstand=\"1\">"+webserviceVo.getHost()+"</wsa:To>\n" +
-			"      <ses:Session TransactionStatusCode=\"Start\"/>\n" +
-				 "</soapenv:Header>" + "<soapenv:Body>" + webserviceVo.getBodyXml() + "</soapenv:Body>" + "</soapenv:Envelope>";
+				"</soapenv:Header>" + "<soapenv:Body>" + webserviceVo.getBodyXml() + "</soapenv:Body>" + "</soapenv:Envelope>";
 		return result;
 	}
 
@@ -1180,7 +856,7 @@ class KalProperties {
 	
 		put("amadeus.altea.host", "https://nodeA1.test.webservices.amadeus.com/1ASIWGENKEU/");
 		put("pip.ecommerce.soapaction.url", "http://pip.koreanair.com");
-		put("PNR_Retrieve", "PNRRET_17_2_1A");
+		put("PNR_Retrieve", "PNRRET_13_2_1A");
 		put("amadeus.altea.soapaction.url", "http://webservices.amadeus.com");
 	}};
 
