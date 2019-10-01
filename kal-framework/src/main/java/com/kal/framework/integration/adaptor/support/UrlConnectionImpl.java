@@ -729,23 +729,22 @@ public class UrlConnectionImpl implements UrlConnectionService
 			"    </link:Consumer>\n" +
 			"  </link:TransactionFlowLink>"+
 			"      <sec:AMA_SecurityHostedUser>\n" +
-			"         <sec:UserID POS_Type=\"1\" RequestorType=\"U\" PseudoCityCode=\"SELKE08IW\" AgentDutyCode=\"SU\"/>\n" +
+			"         <sec:UserID POS_Type=\"1\" RequestorType=\"U\" PseudoCityCode=\""+webserviceVo.getPipSourceofficeId()+"\" AgentDutyCode=\"SU\"/>\n" +
 			"      </sec:AMA_SecurityHostedUser>\n" +
 			"      <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n" +
 			"         <wsse:UsernameToken>\n" +
 			"            <wsse:Username>WSKEIBE</wsse:Username>\n" +
 			"            <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">"+password+"</wsse:Password>\n" +
-			//"            <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">"+generate_nonce()+"</wsse:Nonce>\n" +
 			"            <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">"+nonce+"</wsse:Nonce>\n" +
 			"            <wsu:Created>"+created+"</wsu:Created>\n" +
 			"         </wsse:UsernameToken>\n" +
 			"      </wsse:Security>\n" +
-			"      <wsa:Action soapenv:mustUnderstand=\"1\">http://webservices.amadeus.com/PNRRET_17_2_1A</wsa:Action>\n" +
+			"      <wsa:Action soapenv:mustUnderstand=\"1\">"+webserviceVo.getSoapAction()+"</wsa:Action>\n" +
 			"      <wsa:ReplyTo soapenv:mustUnderstand=\"1\">\n" +
 			"         <wsa:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa:Address>\n" +
 			"      </wsa:ReplyTo>\n" +
 			"      <wsa:MessageID soapenv:mustUnderstand=\"1\" xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+generate_messageID()+"</wsa:MessageID>\n" +
-			"      <wsa:To soapenv:mustUnderstand=\"1\">https://nodeA1.test.webservices.amadeus.com/1ASIWGENKEU</wsa:To>\n" +
+			"      <wsa:To soapenv:mustUnderstand=\"1\">"+webserviceVo.getHost()+"</wsa:To>\n" +
 			"      <ses:Session TransactionStatusCode=\"Start\"/>\n" +
 				 "</soapenv:Header>" + "<soapenv:Body>" + webserviceVo.getBodyXml() + "</soapenv:Body>" + "</soapenv:Envelope>";
 		return result;
