@@ -7,9 +7,10 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 // import javax.annotation.Resource;
 import javax.xml.parsers.DocumentBuilder;
@@ -24,6 +25,7 @@ import com.kal.framework.integration.adaptor.WebServiceVo;
 // import com.kal.ibe.onea.client.SessionClients;
 
 // import org.apache.commons.lang.exception.ExceptionUtils;
+
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -73,10 +75,14 @@ public class UrlConnectionImpl implements UrlConnectionService
 			switch (webserviceVo.getHeaderType()) 
 			{
 				case amadeus_altea_headertype:
+
+
 					urlConnection.setRequestProperty("SOAPAction", "\"" + webserviceVo.getSoapAction() + "\"");
 					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
+					urlConnection.setRequestProperty("AuthType","No Authorization");
 					query = getAmadeusAlteaHeader(webserviceVo);
-//					System.out.println("1a altea restful query : " + query);
+					System.out.println("1a altea restful query : " + query);
+
 					if (logger.isInfoEnabled()) logger.info("1a altea restful query : " + query);
 					break;
 				case amadeus_ecommerce_headertype:
@@ -145,7 +151,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 			clsOutput.write(query);
 			clsOutput.flush();
 			vo.setQuery(query);
-			
+
 			boolean soapFault = false;
 			String res_encode = null;
 			InputStream is = null;
@@ -708,19 +714,44 @@ public class UrlConnectionImpl implements UrlConnectionService
 	// 	}
 	// 	return result;
 	// }
- 
-	protected String getAmadeusAlteaHeader(WebServiceVo webserviceVo)
+
+	protected String getAmadeusAlteaHeader(WebServiceVo webserviceVo)throws Exception
 	{
+		String nonce = generate_nonce();
+		String created = generate_created();
+		String password = password_digest(password_encrypt("SHA-1", "AMADEUS"),nonce,created);
+
 		//TODO 4.0 Security header 김현성 추가 요청
-		String result = "<soapenv:Envelope xmlns:wsaw=\"http://www.w3.org/2005/08/addressing\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:link=\"http://wsdl.amadeus.com/2010/06/ws/Link_v1\" xmlns:wbs=\"http://xml.amadeus.com/ws/2009/01/WBS_Session-2.0.xsd\"><soapenv:Header><link:TransactionFlowLink><link:Consumer><link:UniqueID>" + webserviceVo.getGuid() + "</link:UniqueID>" + "</link:Consumer>" + "</link:TransactionFlowLink>" + "<wsaw:Action>" + webserviceVo.getSoapAction() + "</wsaw:Action>" + "<wsaw:MessageID>" + webserviceVo.getMessageId() + "</wsaw:MessageID>" + "<wsaw:To>" + webserviceVo.getHost() + "/" + webserviceVo.getWsap() + "</wsaw:To>" 
-		+ "<wbs:Session>" 
-		// + "<wbs:SessionId>" + webserviceVo.getPipsession().getSessionId() + "</wbs:SessionId>"
-		//  + "<wbs:SequenceNumber>" + webserviceVo.getPipsession().getSequenceNumber() + "</wbs:SequenceNumber>" 
-		//  + "<wbs:SecurityToken>" + webserviceVo.getPipsession().getSecurityToken() + "</wbs:SecurityToken>"
-		 +"</wbs:Session>" 
-		 + "</soapenv:Header>" + "<soapenv:Body>" + webserviceVo.getBodyXml() + "</soapenv:Body>" + "</soapenv:Envelope>";
+		String result = "<soapenv:Envelope xmlns:wsa=\"http://www.w3.org/2005/08/addressing\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:link=\"http://wsdl.amadeus.com/2010/06/ws/Link_v1\" xmlns:wbs=\"http://xml.amadeus.com/ws/2009/01/WBS_Session-2.0.xsd\"><soapenv:Header><link:TransactionFlowLink><link:Consumer><link:UniqueID>" + webserviceVo.getGuid() + "</link:UniqueID>" + "</link:Consumer>" + "</link:TransactionFlowLink>" + "<wsaw:Action>" + webserviceVo.getSoapAction() + "</wsaw:Action>" + "<wsaw:MessageID>" + webserviceVo.getMessageId() + "</wsaw:MessageID>" + "<wsaw:To>" + webserviceVo.getHost() + "/" + webserviceVo.getWsap() + "</wsaw:To>"+
+			"	<link:TransactionFlowLink xmlns:link=\"http://wsdl.amadeus.com/2010/06/ws/Link_v1\">\n" +
+			"    <link:Consumer>\n" +
+			"      <link:UniqueID>"+webserviceVo.getGuid()+"</link:UniqueID>\n" +
+			"    </link:Consumer>\n" +
+			"  </link:TransactionFlowLink>"+
+			"      <sec:AMA_SecurityHostedUser>\n" +
+			"         <sec:UserID POS_Type=\"1\" RequestorType=\"U\" PseudoCityCode=\"SELKE08IW\" AgentDutyCode=\"SU\"/>\n" +
+			"      </sec:AMA_SecurityHostedUser>\n" +
+			"      <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n" +
+			"         <wsse:UsernameToken>\n" +
+			"            <wsse:Username>WSKEIBE</wsse:Username>\n" +
+			"            <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">"+password+"</wsse:Password>\n" +
+			//"            <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">"+generate_nonce()+"</wsse:Nonce>\n" +
+			"            <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">"+nonce+"</wsse:Nonce>\n" +
+			"            <wsu:Created>"+created+"</wsu:Created>\n" +
+			"         </wsse:UsernameToken>\n" +
+			"      </wsse:Security>\n" +
+			"      <wsa:Action soapenv:mustUnderstand=\"1\">http://webservices.amadeus.com/PNRRET_17_2_1A</wsa:Action>\n" +
+			"      <wsa:ReplyTo soapenv:mustUnderstand=\"1\">\n" +
+			"         <wsa:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa:Address>\n" +
+			"      </wsa:ReplyTo>\n" +
+			"      <wsa:MessageID soapenv:mustUnderstand=\"1\" xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+generate_messageID()+"</wsa:MessageID>\n" +
+			"      <wsa:To soapenv:mustUnderstand=\"1\">https://nodeA1.test.webservices.amadeus.com/1ASIWGENKEU</wsa:To>\n" +
+			"      <ses:Session TransactionStatusCode=\"Start\"/>\n" +
+				 "</soapenv:Header>" + "<soapenv:Body>" + webserviceVo.getBodyXml() + "</soapenv:Body>" + "</soapenv:Envelope>";
 		return result;
 	}
+
+
  
 	// protected String getPipAlteaHeader(WebServiceVo webserviceVo)
 	// {
@@ -1063,6 +1094,81 @@ public class UrlConnectionImpl implements UrlConnectionService
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public static void main(String[] args) throws Exception{
+		UrlConnectionImpl url = new UrlConnectionImpl();
+		KalProperties pp = new KalProperties();
+		WebServiceVo vo = new WebServiceVo();
+		vo.setHeaderType(1);
+		vo.setSoapAction("http://webservices.amadeus.com/PNRRET_17_2_1A");
+		vo.setWsap("1ASIWIBEKEU");
+		vo.setHost("amadeus.altea.host");
+		vo.setOperationName("PNR_Retrieve");
+		vo.setGuid(generate_guid());
+		vo.setRequestMethod("POST");
+		vo.setNamespace("PNR_Retrieve");
+		String aa = url.call(vo);
+		System.out.println(aa);
+	}
+
+	public String generate_messageID() throws Exception {
+		SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+		random.setSeed(System.currentTimeMillis());
+		byte[] messageIDValue = new byte[16];
+		random.nextBytes(messageIDValue);
+		return org.apache.ws.security.util.Base64.encode(messageIDValue);
+	}
+
+	public String generate_nonce() throws Exception {
+		SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+		random.setSeed(System.currentTimeMillis());
+		byte[] messageIDValue = new byte[16];
+		random.nextBytes(messageIDValue);
+		return org.apache.ws.security.util.Base64.encode(messageIDValue);
+	}
+
+	public String generate_created() throws Exception {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		Calendar cal = Calendar.getInstance();
+		format.setTimeZone(TimeZone.getTimeZone("Zulu"));
+		return format.format(cal.getTime());
+	}
+	public static String generate_guid() throws Exception {
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+		Calendar cal = Calendar.getInstance();
+		format.setTimeZone(TimeZone.getTimeZone("Zulu"));
+		return "KEIBE"+format.format(cal.getTime());
+	}
+
+	public byte[] password_encrypt(String algorithm,String clearPassword)throws Exception{
+        MessageDigest sha = MessageDigest.getInstance(algorithm);
+        sha.reset();
+        String password = clearPassword;
+
+        byte[] b1 = password.getBytes("UTF-8");
+        sha.update(b1);
+        return sha.digest();
+    }
+
+    public String password_digest(byte[] password, String nonce,String created)throws Exception {
+        String passwdDigest = null;
+        byte[] b1 = nonce != null ? org.apache.ws.security.util.Base64.decode(nonce) : new byte[0];
+        byte[] b2 = created != null ? created.getBytes("UTF-8") : new byte[0];
+        byte[] b3 = password;
+        byte[] b4 = new byte[b1.length + b2.length + b3.length];
+        int offset = 0;
+        System.arraycopy(b1, 0, b4, offset, b1.length);
+        offset += b1.length;
+        System.arraycopy(b2, 0, b4, offset, b2.length);
+        offset += b2.length;
+        System.arraycopy(b3, 0, b4, offset, b3.length);
+        MessageDigest sha = MessageDigest.getInstance("SHA-1");
+        sha.reset();
+        sha.update(b4);
+        passwdDigest = org.apache.ws.security.util.Base64.encode(sha.digest());
+        return passwdDigest;
+    }
+
 }
 
 
@@ -1073,9 +1179,9 @@ class KalProperties {
 		put("connect.time.out", "3000");
 		put("read.time.out", "200000");
 	
-		put("amadeus.altea.host", "https://nodea1.test.webservices.amadeus.com/");
+		put("amadeus.altea.host", "https://nodeA1.test.webservices.amadeus.com/1ASIWGENKEU/");
 		put("pip.ecommerce.soapaction.url", "http://pip.koreanair.com");
-		put("PNR_Retrieve", "PNRRET_13_2_1A");
+		put("PNR_Retrieve", "PNRRET_17_2_1A");
 		put("amadeus.altea.soapaction.url", "http://webservices.amadeus.com");
 	}};
 
