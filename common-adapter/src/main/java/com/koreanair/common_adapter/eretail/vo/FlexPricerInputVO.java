@@ -15,5 +15,30 @@
  */
 package com.koreanair.common_adapter.eretail.vo;
 
-public class ERetailServiceVO {
+import java.util.ArrayList;
+import java.util.List;
+
+import com.koreanair.common_adapter.general.vo.consts.TripType;
+
+import lombok.Data;
+
+/**
+ * <pre>
+ * Created by bdlee on 2019. 9. 30.
+ * </pre>
+ *
+ * @author bdlee
+ *
+ * @version 1.0.0
+ * @since 2019. 9. 30.
+ */
+@Data
+public class FlexPricerInputVO {
+	private String bizType = "";
+	private TripType tripType;
+	private List<String> cffCodeList = new ArrayList<>();
+	private List<SegmentInfoVO> segmentInfoList = new ArrayList<>();
+	private List<PassengerConditionVO> passengerConditionList = new ArrayList<>();
+	private int dateRange = 0;
+	private String corporatedId = "";
 }

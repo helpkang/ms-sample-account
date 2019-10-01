@@ -15,11 +15,26 @@
  */
 package com.koreanair.common_adapter.general.vo.consts;
 
-public class DXHeaders {
+public enum TripType {
+	RT("R"), OW("O"), OJ("M"), MT("M");
 
-	private  DXHeaders() {
-		throw new IllegalStateException("Consts class");
+	private final String value;
+
+	TripType(String v) {
+		value = v;
 	}
 
-	public static final String Authorization = "Z6h6u893ZR428ebUU28Y9Xs92Na886dh";
+	public String value() {
+		return value;
+	}
+
+	public static TripType fromValue(String v) {
+		for (TripType c : TripType.values()) {
+			if (c.value.equals(v)) {
+				return c;
+			}
+		}
+		throw new IllegalArgumentException(v);
+	}
+
 }

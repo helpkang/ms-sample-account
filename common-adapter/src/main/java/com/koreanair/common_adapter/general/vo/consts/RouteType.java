@@ -15,11 +15,19 @@
  */
 package com.koreanair.common_adapter.general.vo.consts;
 
-public class DXHeaders {
+/**
+ * <pre>
+ * 국내,국제 구분
+ * </pre>
+ * @author bdlee
+ * @version 1.0.0
+ */
+public class RouteType {
 
-	private  DXHeaders() {
+	private  RouteType() {
 		throw new IllegalStateException("Consts class");
 	}
 
-	public static final String Authorization = "Z6h6u893ZR428ebUU28Y9Xs92Na886dh";
+	public static final String DOMESTIC = "D";
+	public static final String INTERNATIONAL = "I";
 }

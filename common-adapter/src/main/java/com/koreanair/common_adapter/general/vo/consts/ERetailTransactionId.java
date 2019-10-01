@@ -23,6 +23,7 @@ public class ERetailTransactionId {
 
 	// TRANSACTION_ID
 	public static final String FLEX_PRICER_AVAILABILITY 			= "FlexPricerAvailability";
+	public static final String FLEX_PRICER_AWARD_AVAILABILITY 		= "FlexPricerAwardAvailability";
 	public static final String AIR_AVAILABILITY 					= "AirAvailability";
 	public static final String AIR_COMPLEX_AVAILABILITY 			= "AirComplexAvailability";
 	public static final String AIR_COMPLEX_AVAILABILITY_CONTINUE	= "AirSelectFlightAndContinue";

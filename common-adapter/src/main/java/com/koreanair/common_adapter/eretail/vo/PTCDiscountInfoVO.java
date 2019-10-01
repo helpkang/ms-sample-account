@@ -13,13 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.koreanair.common_adapter.general.vo.consts;
+package com.koreanair.common_adapter.eretail.vo;
 
-public class DXHeaders {
+import java.io.Serializable;
 
-	private  DXHeaders() {
-		throw new IllegalStateException("Consts class");
-	}
+import lombok.Data;
 
-	public static final String Authorization = "Z6h6u893ZR428ebUU28Y9Xs92Na886dh";
+/**
+ * <pre>
+ * PTC정보를 담는다.
+ * </pre>
+ *
+ * @author bdlee
+ *
+ * @version 1.0.0
+ * @since 2019. 9. 30.
+ */
+@Data
+public class PTCDiscountInfoVO implements Serializable{
+	private String ptCode = "";
+	private String ptcRate = "";
+	private String ptcDesc = "";
 }
