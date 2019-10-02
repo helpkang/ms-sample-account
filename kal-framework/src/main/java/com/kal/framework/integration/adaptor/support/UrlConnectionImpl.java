@@ -1,24 +1,35 @@
  package com.kal.framework.integration.adaptor.support;
 
- import com.kal.framework.integration.adaptor.UrlConnectionService;
- import com.kal.framework.integration.adaptor.WebServiceVo;
- import net.sf.jazzlib.GZIPInputStream;
- import org.apache.log4j.Logger;
- import org.w3c.dom.Document;
- import org.w3c.dom.Element;
- import org.w3c.dom.Node;
- import org.w3c.dom.NodeList;
- import org.xml.sax.InputSource;
+ import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
- import javax.xml.parsers.DocumentBuilder;
- import javax.xml.parsers.DocumentBuilderFactory;
- import java.io.*;
- import java.net.HttpURLConnection;
- import java.net.URL;
- import java.security.MessageDigest;
- import java.security.SecureRandom;
- import java.text.SimpleDateFormat;
- import java.util.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import com.kal.framework.integration.adaptor.UrlConnectionService;
+import com.kal.framework.integration.adaptor.WebServiceVo;
+
+import net.sf.jazzlib.GZIPInputStream;
 
 // import javax.annotation.Resource;
 // import pip_service_library.pip_session.Session;
@@ -26,45 +37,45 @@
 // import com.kal.ibe.onea.client.SessionClient;
 // import com.kal.ibe.onea.client.SessionClients;
 // import org.apache.commons.lang.exception.ExceptionUtils;
- 
+
 public class UrlConnectionImpl implements UrlConnectionService
 {
 	private static Logger logger = Logger.getLogger(UrlConnectionImpl.class);
- 
+
 	// @Resource(name="propertiesService")
 	// protected KalProperties propertiesService;
 	protected KalProperties propertiesService = new KalProperties();
-	
+
 	private static final int amadeus_altea_headertype     = 1;
 	private static final int amadeus_ecommerce_headertype = 2;
 	private static final int pip_altea_headertype         = 3;
 	private static final int pip_ecommerce_headertype     = 4;
 	private static final int pip_ods_headertype           = 5;
 	private static final int pid_headertype     		  = 6;
-	
+
 	public void init()
 	{
 	}
-	
+
 	@SuppressWarnings("rawtypes")
-	public String call(WebServiceVo vo) throws Exception 
+	public String call(WebServiceVo vo) throws Exception
 	{
 		WebServiceVo webserviceVo = setWebServiceVo(vo);
 		String result = null;
 		OutputStreamWriter clsOutput = null;
 		BufferedReader clsInput = null;
- 
+
 		if (webserviceVo != null)
 		{
 			StringBuffer buffer = new StringBuffer();
- 
+
 			URL url = new URL(webserviceVo.getHost());
 			HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
 			urlConnection.setConnectTimeout(Integer.parseInt(this.propertiesService.getProperty("connect.time.out")));
 			urlConnection.setReadTimeout(Integer.parseInt(this.propertiesService.getProperty("read.time.out")));
 			String query = "";
- 
-			switch (webserviceVo.getHeaderType()) 
+
+			switch (webserviceVo.getHeaderType())
 			{
 				case amadeus_altea_headertype:
 
@@ -82,12 +93,12 @@ public class UrlConnectionImpl implements UrlConnectionService
 						urlConnection.setRequestProperty("Cookie", "JSESSIONID=" + webserviceVo.getJsessionId());
 					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
 					urlConnection.setRequestProperty("edgeproxy_cip", webserviceVo.getEdgeproxycip());
- 
-					// query = getAmadeusEcommerceHeader(webserviceVo);
-//					System.out.println("1a ecommerce restful query : " + query);
+
+					 query = getAmadeusEcommerceHeader(webserviceVo);
+					System.out.println("1a ecommerce restful query : " + query);
 					if (logger.isInfoEnabled()) logger.info("1a ecommerce restful query : " + query);
 					break;
-					
+
 				case pip_altea_headertype:
 					urlConnection.setRequestProperty("SOAPAction", "\"" + webserviceVo.getSoapAction() + "\"");
 					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
@@ -95,7 +106,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 //					System.out.println("pip altea restful query : " + query);
 					if (logger.isInfoEnabled()) logger.info("REQUEST MESSAGE :: " + query);
 					break;
-					
+
 				case pip_ecommerce_headertype:
 					if ((webserviceVo.getJsessionId() != null) && (webserviceVo.getJsessionId().trim().length() > 0)) {
 						urlConnection.setRequestProperty("Cookie", "JSESSIONID=" + webserviceVo.getJsessionId());
@@ -105,9 +116,9 @@ public class UrlConnectionImpl implements UrlConnectionService
 					urlConnection.setRequestProperty("edgeproxy_cip", webserviceVo.getEdgeproxycip());
 					urlConnection.setRequestProperty("X-inf-operation", webserviceVo.getXinfoperation());
 					urlConnection.setRequestProperty("X-inf-flowCode", webserviceVo.getXinfflowCode());
- 
+
 					query = getPipEcommerceHeader(webserviceVo);
- 
+
 					System.out.println("pip ecommerce restful query : " + query);
 					if (logger.isInfoEnabled()) logger.info("pip ecommerce restful query : " + query);
 					break;
@@ -125,20 +136,20 @@ public class UrlConnectionImpl implements UrlConnectionService
 					System.out.println("pid restful query : " + query);
 					if (logger.isInfoEnabled()) logger.info("pid restful query : " + query);
 					break;
-					
+
 				default:
 					if (!logger.isInfoEnabled()) logger.info("current host is not exist : " + query);
 			}
- 
+
 			urlConnection.setRequestMethod(webserviceVo.getRequestMethod());
 			urlConnection.setDoInput(true);
 			urlConnection.setDoOutput(true);
 			urlConnection.setUseCaches(false);
-			
-			urlConnection.setRequestProperty("Content-Length", String.valueOf(query.length()) );			
+
+			urlConnection.setRequestProperty("Content-Length", String.valueOf(query.length()) );
 			urlConnection.setRequestProperty("Accept", "application/xml");
 //			urlConnection.setRequestProperty("Accept-Encoding", "gzip,deflate");
- 
+
 			clsOutput = new OutputStreamWriter(urlConnection.getOutputStream());
 			clsOutput.write(query);
 			clsOutput.flush();
@@ -147,15 +158,15 @@ public class UrlConnectionImpl implements UrlConnectionService
 			boolean soapFault = false;
 			String res_encode = null;
 			InputStream is = null;
-			
+
 			try
 			{
 				is = urlConnection.getInputStream();
-				
+
 				// Response 에서 gzip 인지 여부 식별 정보
 	        	res_encode = urlConnection.getHeaderField("Content-Encoding");
-	        	
-	        	// response 가 gzip 인경우 
+
+	        	// response 가 gzip 인경우
 	        	if("gzip".equalsIgnoreCase(res_encode))
 	        	{
 	        		clsInput = new BufferedReader(new InputStreamReader(new GZIPInputStream(is), "UTF-8"));
@@ -176,11 +187,11 @@ public class UrlConnectionImpl implements UrlConnectionService
 //					logger.debug("[ " + "HOST = " + vo.getHost() + ", WSAP = " + vo.getWsap() + ", OperationName = " + vo.getOperationName() + " ]");
 //					logger.debug("SOAP FAULT TRACE :: " + e.fillInStackTrace());
 //				}
-				
+
 				// Response 에서 gzip 인지 여부 식별 정보
 	        	res_encode = urlConnection.getHeaderField("Content-Encoding");
-	        	
-	        	// response 가 gzip 인경우 
+
+	        	// response 가 gzip 인경우
 	        	if("gzip".equalsIgnoreCase(res_encode))
 	        	{
 	        		clsInput = new BufferedReader(new InputStreamReader(new GZIPInputStream(urlConnection.getErrorStream()), "UTF-8" ) );
@@ -197,28 +208,28 @@ public class UrlConnectionImpl implements UrlConnectionService
 				{
 					buffer.append( inputLine ).append("\r\n");
 				}
-				
+
 				if(clsInput != null) clsInput.close();
 				if(clsOutput != null) clsOutput.close();
 				if(urlConnection != null) urlConnection.disconnect();
-				
+
 				// E-commerce 인경우
 				if ((webserviceVo.getHeaderType() == amadeus_ecommerce_headertype) || (webserviceVo.getHeaderType() == pip_ecommerce_headertype))
 				{
-					
-					Map headers = urlConnection.getHeaderFields();					
+
+					Map headers = urlConnection.getHeaderFields();
 					List jsessionIds = (List)headers.get("Set-Cookie");
- 
-					if (jsessionIds != null) 
+
+					if (jsessionIds != null)
 					{
 						String jsessionId = "";
 						jsessionId = jsessionIds.toString();
- 
+
 						vo.setJsessionId(new String(jsessionId.substring(jsessionId.indexOf("=") + 1, jsessionId.lastIndexOf(";"))));
 					}
 				}
 				result = buffer.toString();
-				
+
 				// Response Message Logging
 				if(soapFault)
 				{
@@ -227,26 +238,26 @@ public class UrlConnectionImpl implements UrlConnectionService
 				else
 				{
 					if(logger.isInfoEnabled()) logger.info("RESPONSE MESSAGE(NORMAL) :: " + result );
-					
+
 				}
 	        }
     	}
 		return result;
 	}
- 
+
 	public WebServiceVo setWebServiceVo(WebServiceVo webserviceVo)
 	{
 		WebServiceVo result = new WebServiceVo();
- 
+
 		if (webserviceVo.getHost().equals("pip.altea.host")) {
 			// Session session = webserviceVo.getPipsession();
 			// session = sessionNullCheck(webserviceVo);
 			// result.setPipsession(session);
- 
+
 			String mustUnderstand = "";
 			mustUnderstand = mustUnderstandNullCheck(webserviceVo);
 			result.setMustUnderstand(mustUnderstand);
- 
+
 			result.setHeaderType(3);
 //			result.setHost(pipEndPointUrlNullCheck(webserviceVo));
 			result.setHost(this.propertiesService.getProperty(webserviceVo.getHost()));
@@ -267,11 +278,11 @@ public class UrlConnectionImpl implements UrlConnectionService
 		else if (webserviceVo.getHost().equals("pip.ecommerce.host"))
 		{
 			result.setHeaderType(4);
- 
+
 			String mustUnderstand = "";
 			mustUnderstand = mustUnderstandNullCheck(webserviceVo);
 			result.setMustUnderstand(mustUnderstand);
- 
+
 			result.setHost(this.propertiesService.getProperty(webserviceVo.getHost()));
 			result.setBodyXml(webserviceVo.getBodyXml());
 			result.setWsap(webserviceVo.getWsap());
@@ -292,9 +303,9 @@ public class UrlConnectionImpl implements UrlConnectionService
 			result.setXinfoperation(webserviceVo.getXinfoperation());
 		}
 		else if (webserviceVo.getHost().equals("amadeus.altea.host"))
-		{		   
+		{
 			// result.setPipsession(webserviceVo.getPipsession());
-		
+
 			result.setHeaderType(1);
 			result.setHost(this.propertiesService.getProperty(webserviceVo.getHost()));
 			result.setOperationName(webserviceVo.getOperationName());
@@ -304,7 +315,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 			result.setMessageId(webserviceVo.getMessageId());
 			result.setGuid(webserviceVo.getGuid());
 		}
-		else if (webserviceVo.getHost().equals("amadeus.ecommerce.host")) 
+		else if (webserviceVo.getHost().equals("amadeus.ecommerce.host"))
 		{
 			// Session session = sessionNullCheck(webserviceVo);
 			// result.setPipsession(session);
@@ -312,7 +323,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 			result.setHost(this.propertiesService.getProperty(webserviceVo.getHost()));
 			result.setJsessionId(webserviceVo.getJsessionId());
 			result.setEdgeproxycip(webserviceVo.getEdgeproxycip());
-		}	   
+		}
 		else if (webserviceVo.getHost().equals("pip.ods.host"))
 		{
 			// Session session = sessionNullCheck(webserviceVo);
@@ -368,7 +379,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 
 		return result;
 	}
-	
+
 
 	// public Session sessionNullCheck(WebServiceVo webserviceVo)
 	// {
@@ -427,109 +438,109 @@ public class UrlConnectionImpl implements UrlConnectionService
 	}
 
 
- 
+
 	// protected String getPipAlteaHeader(WebServiceVo webserviceVo)
 	// {
-	// 	String result = 
-	// 	   "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:pips=\"http://PIP_Service_Library/PIP_Session\" xmlns:pip=\"http://PIP_Service_Library/PIP_Processing\"><soapenv:Header><wsse:Security soapenv:mustUnderstand=\"" + 
-	// 	   webserviceVo.getMustUnderstand() + "\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" + 
-	// 	   "<wsse:UsernameToken wsu:Id=\"UsernameToken-1\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" + 
-	// 	   "<wsse:Username>" + webserviceVo.getPipuserName() + "</wsse:Username>" + 
-	// 	   "<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">" + webserviceVo.getPippassWord() + "</wsse:Password>" + 
-	// 	   "</wsse:UsernameToken>" + 
-	// 	   "</wsse:Security>" + 
-	// 	   "<pips:Session>" + 
-	// 	   "<pips:sessionType>" + webserviceVo.getPipsession().getSessionType() + "</pips:sessionType>" + 
-	// 	   "<pips:sessionId>" + webserviceVo.getPipsession().getSessionId() + "</pips:sessionId>" + 
-	// 	   "<pips:sequenceNumber>" + webserviceVo.getPipsession().getSequenceNumber() + "</pips:sequenceNumber>" + 
-	// 	   "<pips:securityToken>" + webserviceVo.getPipsession().getSecurityToken() + "</pips:securityToken>" + 
-	// 	   "</pips:Session>" + 
-	// 	   "<pip:ProcessingFlow>" + 
-	// 	   "<pip:guid>" + webserviceVo.getGuid() + "</pip:guid>" + 
-	// 	   "<pip:requestSystem>" + webserviceVo.getPiprequestSystem() + "</pip:requestSystem>" + 
-	// 	   "<pip:employeeNo>" + webserviceVo.getPipemployeeNumber() + "</pip:employeeNo>" + 
-	// 	   "<pip:lssUserId>" + webserviceVo.getPiplssuserId() + "</pip:lssUserId>" + 
-	// 	   "<pip:officeId>" + webserviceVo.getPipSourceofficeId() + "</pip:officeId>" + 
-	// 	   "<pip:dutyCode>" + webserviceVo.getPipdutyCode() + "</pip:dutyCode>" + 
-	// 	   "<pip:wsap>" + webserviceVo.getWsap() + "</pip:wsap>" + 
-	// 	   "<pip:companyName>" + webserviceVo.getCompanyName() + "</pip:companyName>" + 
-	// 	   "<pip:workstationId>" + webserviceVo.getWorkstationId() + "</pip:workstationId>" + 
-	// 	   "</pip:ProcessingFlow>" + 
-	// 	   "</soapenv:Header>" + 
-	// 	   "<soapenv:Body>" + 
-	// 	   webserviceVo.getBodyXml() + 
-	// 	   "</soapenv:Body>" + 
+	// 	String result =
+	// 	   "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:pips=\"http://PIP_Service_Library/PIP_Session\" xmlns:pip=\"http://PIP_Service_Library/PIP_Processing\"><soapenv:Header><wsse:Security soapenv:mustUnderstand=\"" +
+	// 	   webserviceVo.getMustUnderstand() + "\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" +
+	// 	   "<wsse:UsernameToken wsu:Id=\"UsernameToken-1\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" +
+	// 	   "<wsse:Username>" + webserviceVo.getPipuserName() + "</wsse:Username>" +
+	// 	   "<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">" + webserviceVo.getPippassWord() + "</wsse:Password>" +
+	// 	   "</wsse:UsernameToken>" +
+	// 	   "</wsse:Security>" +
+	// 	   "<pips:Session>" +
+	// 	   "<pips:sessionType>" + webserviceVo.getPipsession().getSessionType() + "</pips:sessionType>" +
+	// 	   "<pips:sessionId>" + webserviceVo.getPipsession().getSessionId() + "</pips:sessionId>" +
+	// 	   "<pips:sequenceNumber>" + webserviceVo.getPipsession().getSequenceNumber() + "</pips:sequenceNumber>" +
+	// 	   "<pips:securityToken>" + webserviceVo.getPipsession().getSecurityToken() + "</pips:securityToken>" +
+	// 	   "</pips:Session>" +
+	// 	   "<pip:ProcessingFlow>" +
+	// 	   "<pip:guid>" + webserviceVo.getGuid() + "</pip:guid>" +
+	// 	   "<pip:requestSystem>" + webserviceVo.getPiprequestSystem() + "</pip:requestSystem>" +
+	// 	   "<pip:employeeNo>" + webserviceVo.getPipemployeeNumber() + "</pip:employeeNo>" +
+	// 	   "<pip:lssUserId>" + webserviceVo.getPiplssuserId() + "</pip:lssUserId>" +
+	// 	   "<pip:officeId>" + webserviceVo.getPipSourceofficeId() + "</pip:officeId>" +
+	// 	   "<pip:dutyCode>" + webserviceVo.getPipdutyCode() + "</pip:dutyCode>" +
+	// 	   "<pip:wsap>" + webserviceVo.getWsap() + "</pip:wsap>" +
+	// 	   "<pip:companyName>" + webserviceVo.getCompanyName() + "</pip:companyName>" +
+	// 	   "<pip:workstationId>" + webserviceVo.getWorkstationId() + "</pip:workstationId>" +
+	// 	   "</pip:ProcessingFlow>" +
+	// 	   "</soapenv:Header>" +
+	// 	   "<soapenv:Body>" +
+	// 	   webserviceVo.getBodyXml() +
+	// 	   "</soapenv:Body>" +
 	// 	   "</soapenv:Envelope>";
 
 	// 	return result;
 	// }
- 
+
 	// protected String getPipOdsHeader(WebServiceVo webserviceVo)
 	// {
-	// 	String result = 
-	// 		"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:pips=\"http://PIP_Service_Library/PIP_Session\" xmlns:pip=\"http://PIP_Service_Library/PIP_Processing\" xmlns:pip2=\"http://PIP_Service_Library\"><soapenv:Header><wsse:Security soapenv:mustUnderstand=\"" + 
-	// 		webserviceVo.getMustUnderstand() + "\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" + 
-	// 		"<wsse:UsernameToken wsu:Id=\"UsernameToken-1\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" + 
-	// 		"<wsse:Username>" + webserviceVo.getPipuserName() + "</wsse:Username>" + 
-	// 		"<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">" + webserviceVo.getPippassWord() + "</wsse:Password>" + 
-	// 		"</wsse:UsernameToken>" + 
-	// 		"</wsse:Security>" + 
-	// 		"<pips:Session>" + 
-	// 		"<pips:sessionType>" + webserviceVo.getPipsession().getSessionType() + "</pips:sessionType>" + 
-	// 		"<pips:sessionId>" + webserviceVo.getPipsession().getSessionId() + "</pips:sessionId>" + 
-	// 		"<pips:sequenceNumber>" + webserviceVo.getPipsession().getSequenceNumber() + "</pips:sequenceNumber>" + 
-	// 		"<pips:securityToken>" + webserviceVo.getPipsession().getSecurityToken() + "</pips:securityToken>" + 
-	// 		"</pips:Session>" + 
-	// 		"<pip:ProcessingFlow>" + 
-	// 		"<pip:guid>" + webserviceVo.getGuid() + "</pip:guid>" + 
-	// 		"<pip:requestSystem>" + webserviceVo.getPiprequestSystem() + "</pip:requestSystem>" + 
-	// 		"<pip:employeeNo>" + webserviceVo.getPipemployeeNumber() + "</pip:employeeNo>" + 
-	// 		"<pip:lssUserId>" + webserviceVo.getPiplssuserId() + "</pip:lssUserId>" + 
-	// 		"<pip:officeId>" + webserviceVo.getPipSourceofficeId() + "</pip:officeId>" + 
-	// 		"<pip:dutyCode>" + webserviceVo.getPipdutyCode() + "</pip:dutyCode>" + 
-	// 		"<pip:wsap>" + webserviceVo.getWsap() + "</pip:wsap>" + 
-	// 		"<pip:companyName>" + webserviceVo.getCompanyName() + "</pip:companyName>" + 
-	// 		"<pip:workstationId>" + webserviceVo.getWorkstationId() + "</pip:workstationId>" + 
-	// 		"</pip:ProcessingFlow>" + 
-	// 		"</soapenv:Header>" + 
-	// 		"<soapenv:Body>" + 
-	// 		webserviceVo.getBodyXml() + 
-	// 		"</soapenv:Body>" + 
+	// 	String result =
+	// 		"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:pips=\"http://PIP_Service_Library/PIP_Session\" xmlns:pip=\"http://PIP_Service_Library/PIP_Processing\" xmlns:pip2=\"http://PIP_Service_Library\"><soapenv:Header><wsse:Security soapenv:mustUnderstand=\"" +
+	// 		webserviceVo.getMustUnderstand() + "\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" +
+	// 		"<wsse:UsernameToken wsu:Id=\"UsernameToken-1\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" +
+	// 		"<wsse:Username>" + webserviceVo.getPipuserName() + "</wsse:Username>" +
+	// 		"<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">" + webserviceVo.getPippassWord() + "</wsse:Password>" +
+	// 		"</wsse:UsernameToken>" +
+	// 		"</wsse:Security>" +
+	// 		"<pips:Session>" +
+	// 		"<pips:sessionType>" + webserviceVo.getPipsession().getSessionType() + "</pips:sessionType>" +
+	// 		"<pips:sessionId>" + webserviceVo.getPipsession().getSessionId() + "</pips:sessionId>" +
+	// 		"<pips:sequenceNumber>" + webserviceVo.getPipsession().getSequenceNumber() + "</pips:sequenceNumber>" +
+	// 		"<pips:securityToken>" + webserviceVo.getPipsession().getSecurityToken() + "</pips:securityToken>" +
+	// 		"</pips:Session>" +
+	// 		"<pip:ProcessingFlow>" +
+	// 		"<pip:guid>" + webserviceVo.getGuid() + "</pip:guid>" +
+	// 		"<pip:requestSystem>" + webserviceVo.getPiprequestSystem() + "</pip:requestSystem>" +
+	// 		"<pip:employeeNo>" + webserviceVo.getPipemployeeNumber() + "</pip:employeeNo>" +
+	// 		"<pip:lssUserId>" + webserviceVo.getPiplssuserId() + "</pip:lssUserId>" +
+	// 		"<pip:officeId>" + webserviceVo.getPipSourceofficeId() + "</pip:officeId>" +
+	// 		"<pip:dutyCode>" + webserviceVo.getPipdutyCode() + "</pip:dutyCode>" +
+	// 		"<pip:wsap>" + webserviceVo.getWsap() + "</pip:wsap>" +
+	// 		"<pip:companyName>" + webserviceVo.getCompanyName() + "</pip:companyName>" +
+	// 		"<pip:workstationId>" + webserviceVo.getWorkstationId() + "</pip:workstationId>" +
+	// 		"</pip:ProcessingFlow>" +
+	// 		"</soapenv:Header>" +
+	// 		"<soapenv:Body>" +
+	// 		webserviceVo.getBodyXml() +
+	// 		"</soapenv:Body>" +
 	// 		"</soapenv:Envelope>";
 
 	// 	return result;
 	// }
- 
+
 	// protected String getPidHeader(WebServiceVo webserviceVo)
 	// {
-	// 	String result = 
-	// 		"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:pips=\"http://PIP_Service_Library/PIP_Session\" xmlns:pip=\"http://PIP_Service_Library/PIP_Processing\"><soapenv:Header><wsse:Security soapenv:mustUnderstand=\"" + 
-	// 		webserviceVo.getMustUnderstand() + "\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" + 
-	// 		"<wsse:UsernameToken>" + 
-	// 		"<wsse:Username>" + webserviceVo.getPipuserName() + "</wsse:Username>" + 
-	// 		"<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">" + webserviceVo.getPippassWord() + "</wsse:Password>" + 
-	// 		"</wsse:UsernameToken>" + 
-	// 		"</wsse:Security>" + 
-	// 		"<pips:Session>" + 
-	// 		"<pips:sessionType>" + webserviceVo.getPipsession().getSessionType() + "</pips:sessionType>" + 
-	// 		"<pips:sessionId>" + webserviceVo.getPipsession().getSessionId() + "</pips:sessionId>" + 
-	// 		"<pips:sequenceNumber>" + webserviceVo.getPipsession().getSequenceNumber() + "</pips:sequenceNumber>" + 
-	// 		"<pips:securityToken>" + webserviceVo.getPipsession().getSecurityToken() + "</pips:securityToken>" + 
-	// 		"</pips:Session>" + 
-	// 		"<pip:ProcessingFlow>" + 
-	// 		"<pip:guid>" + webserviceVo.getGuid() + "</pip:guid>" + 
+	// 	String result =
+	// 		"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:pips=\"http://PIP_Service_Library/PIP_Session\" xmlns:pip=\"http://PIP_Service_Library/PIP_Processing\"><soapenv:Header><wsse:Security soapenv:mustUnderstand=\"" +
+	// 		webserviceVo.getMustUnderstand() + "\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" +
+	// 		"<wsse:UsernameToken>" +
+	// 		"<wsse:Username>" + webserviceVo.getPipuserName() + "</wsse:Username>" +
+	// 		"<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">" + webserviceVo.getPippassWord() + "</wsse:Password>" +
+	// 		"</wsse:UsernameToken>" +
+	// 		"</wsse:Security>" +
+	// 		"<pips:Session>" +
+	// 		"<pips:sessionType>" + webserviceVo.getPipsession().getSessionType() + "</pips:sessionType>" +
+	// 		"<pips:sessionId>" + webserviceVo.getPipsession().getSessionId() + "</pips:sessionId>" +
+	// 		"<pips:sequenceNumber>" + webserviceVo.getPipsession().getSequenceNumber() + "</pips:sequenceNumber>" +
+	// 		"<pips:securityToken>" + webserviceVo.getPipsession().getSecurityToken() + "</pips:securityToken>" +
+	// 		"</pips:Session>" +
+	// 		"<pip:ProcessingFlow>" +
+	// 		"<pip:guid>" + webserviceVo.getGuid() + "</pip:guid>" +
 	// 		"<pip:requestSystem>" + webserviceVo.getPiprequestSystem() + "</pip:requestSystem>";
 
 	// 	if ((webserviceVo.getPipemployeeNumber() == null) || (webserviceVo.getPipemployeeNumber() == ""))
 	// 	{
 	// 		result = result + "<pip:employeeNo/>";
 	// 	}
-	// 	else 
+	// 	else
 	// 	{
 	// 		result = result + "<pip:employeeNo>" + webserviceVo.getPipemployeeNumber() + "</pip:employeeNo>";
 	// 	}
- 
-	// 	result = result + "<pip:lssUserId>" + webserviceVo.getPiplssuserId() + "</pip:lssUserId>" + 
+
+	// 	result = result + "<pip:lssUserId>" + webserviceVo.getPiplssuserId() + "</pip:lssUserId>" +
 	// 	"<pip:officeId>" + webserviceVo.getPipSourceofficeId() + "</pip:officeId>";
 
 	// 	if ((webserviceVo.getPipdutyCode() == null) || (webserviceVo.getPipdutyCode() == ""))
@@ -540,66 +551,69 @@ public class UrlConnectionImpl implements UrlConnectionService
 	// 	{
 	// 		result = result + "<pip:dutyCode>" + webserviceVo.getPipdutyCode() + "</pip:dutyCode>";
 	// 	}
-	// 	result = result + 
-	// 	"<pip:wsap>" + webserviceVo.getWsap() + "</pip:wsap>" + 
-	// 	"<pip:companyName>" + webserviceVo.getCompanyName() + "</pip:companyName>" + 
-	// 	"<pip:workstationId>" + webserviceVo.getWorkstationId() + "</pip:workstationId>" + 
-	// 	"</pip:ProcessingFlow>" + 
-	// 	"</soapenv:Header>" + 
-	// 	"<soapenv:Body>" + 
-	// 	webserviceVo.getBodyXml() + 
-	// 	"</soapenv:Body>" + 
+	// 	result = result +
+	// 	"<pip:wsap>" + webserviceVo.getWsap() + "</pip:wsap>" +
+	// 	"<pip:companyName>" + webserviceVo.getCompanyName() + "</pip:companyName>" +
+	// 	"<pip:workstationId>" + webserviceVo.getWorkstationId() + "</pip:workstationId>" +
+	// 	"</pip:ProcessingFlow>" +
+	// 	"</soapenv:Header>" +
+	// 	"<soapenv:Body>" +
+	// 	webserviceVo.getBodyXml() +
+	// 	"</soapenv:Body>" +
 	// 	"</soapenv:Envelope>";
-		
+
 	// 	return result;
 	// }
- 
-	// protected String getAmadeusEcommerceHeader(WebServiceVo webserviceVo)
-	// {
-	// 	String result = "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><SOAP-ENV:Header /><SOAP-ENV:Body><ns1:process xmlns:ns1=\"urn:TripFlow\"><request xsi:type=\"xsd:string\">" + webserviceVo.getBodyXml() + "</request>" + "</ns1:process>" + "</SOAP-ENV:Body>" + "</SOAP-ENV:Envelope>";
-	// 	return result;
-	// }
- 
+
+	protected String getAmadeusEcommerceHeader(WebServiceVo webserviceVo) {
+		StringBuilder result = new StringBuilder();
+
+		result.append("").append("<?xml version='1.0' encoding='UTF-8'?>").append("<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><SOAP-ENV:Header /><SOAP-ENV:Body><ns1:process xmlns:ns1=\"urn:TripFlow\"><request xsi:type=\"xsd:string\">")
+				.append(webserviceVo.getBodyXml()).append("</request>").append("</ns1:process>").append("</SOAP-ENV:Body>").append("</SOAP-ENV:Envelope>");
+
+		return result.toString();
+	}
+
 	protected String getPipEcommerceHeader(WebServiceVo webserviceVo)
 	{
-		String result = 
-			"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:pips=\"http://PIP_Service_Library/PIP_Session\" xmlns:pip=\"http://PIP_Service_Library/PIP_Processing\" xmlns:ret=\"http://PIP1A_Retail/Retail/Retail_Request\"><soapenv:Header><wsse:Security soapenv:mustUnderstand=\"" + 
-			webserviceVo.getMustUnderstand() + "\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" + 
-			"<wsse:UsernameToken wsu:Id=\"UsernameToken-1\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" + 
-			"<wsse:Username>" + webserviceVo.getPipuserName() + "</wsse:Username>" + 
-			"<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">" + webserviceVo.getPippassWord() + "</wsse:Password>" + 
-			"</wsse:UsernameToken>" + 
-			"</wsse:Security>" + 
-			"<pips:Session>" + 
-			"<pips:sessionType>3</pips:sessionType>" + 
-			"<pips:sessionId></pips:sessionId>" + 
-			"<pips:sequenceNumber></pips:sequenceNumber>" + 
-			"<pips:securityToken></pips:securityToken>" + 
-			"</pips:Session>" + 
-			"<pip:ProcessingFlow>" + 
-			"<pip:guid>" + webserviceVo.getGuid() + "</pip:guid>" + 
-			"<pip:requestSystem>" + webserviceVo.getPiprequestSystem() + "</pip:requestSystem>" + 
-			"<pip:employeeNo>" + webserviceVo.getPipemployeeNumber() + "</pip:employeeNo>" + 
-			"<pip:lssUserId>" + webserviceVo.getPiplssuserId() + "</pip:lssUserId>" + 
-			"<pip:officeId>" + webserviceVo.getPipSourceofficeId() + "</pip:officeId>" + 
-			"<pip:dutyCode>" + webserviceVo.getPipdutyCode() + "</pip:dutyCode>" + 
-			"<pip:wsap>" + webserviceVo.getWsap() + "</pip:wsap>" + 
-			"<pip:companyName>" + webserviceVo.getCompanyName() + "</pip:companyName>" + 
-			"<pip:workstationId>" + webserviceVo.getWorkstationId() + "</pip:workstationId>" + 
-			"</pip:ProcessingFlow>" + 
-			"</soapenv:Header>" + 
-			"<soapenv:Body>" + 
-			"<ret:E_Commerce>" + 
-			"<request>" + 
-			webserviceVo.getBodyXml() + 
-			"</request>" + 
-			"</ret:E_Commerce>" + 
-			"</soapenv:Body>" + 
+		String result =
+			"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:pips=\"http://PIP_Service_Library/PIP_Session\" xmlns:pip=\"http://PIP_Service_Library/PIP_Processing\" xmlns:ret=\"http://PIP1A_Retail/Retail/Retail_Request\"><soapenv:Header><wsse:Security soapenv:mustUnderstand=\"" +
+			webserviceVo.getMustUnderstand() + "\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" +
+			"<wsse:UsernameToken wsu:Id=\"UsernameToken-1\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" +
+			"<wsse:Username>" + webserviceVo.getPipuserName() + "</wsse:Username>" +
+			"<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">" + webserviceVo.getPippassWord() + "</wsse:Password>" +
+			"</wsse:UsernameToken>" +
+			"</wsse:Security>" +
+			"<pips:Session>" +
+			"<pips:sessionType>3</pips:sessionType>" +
+			"<pips:sessionId></pips:sessionId>" +
+			"<pips:sequenceNumber></pips:sequenceNumber>" +
+			"<pips:securityToken></pips:securityToken>" +
+			"</pips:Session>" +
+			"<pip:ProcessingFlow>" +
+			"<pip:guid>" + webserviceVo.getGuid() + "</pip:guid>" +
+			"<pip:requestSystem>" + webserviceVo.getPiprequestSystem() + "</pip:requestSystem>" +
+			"<pip:employeeNo>" + webserviceVo.getPipemployeeNumber() + "</pip:employeeNo>" +
+			"<pip:lssUserId>" + webserviceVo.getPiplssuserId() + "</pip:lssUserId>" +
+			"<pip:officeId>" + webserviceVo.getPipSourceofficeId() + "</pip:officeId>" +
+			"<pip:dutyCode>" + webserviceVo.getPipdutyCode() + "</pip:dutyCode>" +
+			"<pip:wsap>" + webserviceVo.getWsap() + "</pip:wsap>" +
+			"<pip:companyName>" + webserviceVo.getCompanyName() + "</pip:companyName>" +
+			"<pip:workstationId>" + webserviceVo.getWorkstationId() + "</pip:workstationId>" +
+			"</pip:ProcessingFlow>" +
+			"</soapenv:Header>" +
+			"<soapenv:Body>" +
+			"<ret:E_Commerce>" +
+			"<request>" +
+			webserviceVo.getBodyXml() +
+			"</request>" +
+			"</ret:E_Commerce>" +
+			"</soapenv:Body>" +
 			"</soapenv:Envelope>";
 
 		return result;
 	}
- 
+
 	// public Session parseSession(String xmlResponse) throws Exception
 	// {
 	// 	Session session = null;
@@ -612,10 +626,10 @@ public class UrlConnectionImpl implements UrlConnectionService
 	// 	Document doc = dbBuilder.parse(is);
 	// 	NodeList nList = doc.getElementsByTagName("awss:Session");
 
-	// 	for (int temp = 0; temp < nList.getLength(); temp++) 
+	// 	for (int temp = 0; temp < nList.getLength(); temp++)
 	// 	{
 	// 		Node nNode = nList.item(temp);
-	// 		if (nNode.getNodeType() == 1) 
+	// 		if (nNode.getNodeType() == 1)
 	// 		{
 	// 			Element eElement = (Element)nNode;
 	// 			String sessionId = getTagValue("awss:SessionId", eElement);
@@ -630,8 +644,8 @@ public class UrlConnectionImpl implements UrlConnectionService
 	// 	}
 	// 	return session;
 	// }
- 
-	// public Session parsePipSession(String xmlResponse) throws Exception 
+
+	// public Session parsePipSession(String xmlResponse) throws Exception
 	// {
 	// 	Session session = null;
 
@@ -643,10 +657,10 @@ public class UrlConnectionImpl implements UrlConnectionService
 	// 	Document doc = dbBuilder.parse(is);
 	// 	NodeList nList = doc.getElementsByTagName("pips:Session");
 
-	// 	for (int temp = 0; temp < nList.getLength(); temp++) 
+	// 	for (int temp = 0; temp < nList.getLength(); temp++)
 	// 	{
 	// 		Node nNode = nList.item(temp);
-	// 		if (nNode.getNodeType() == 1) 
+	// 		if (nNode.getNodeType() == 1)
 	// 		{
 	// 			Element eElement = (Element)nNode;
 	// 			String sessionType = getTagValue("pips:sessionType", eElement);
@@ -663,7 +677,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 	// 	}
 	// 	return session;
 	// }
-	private static String getTagValue(String sTag, Element eElement) 
+	private static String getTagValue(String sTag, Element eElement)
 	{
 		NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
 		Node nValue = nlList.item(0);
@@ -686,16 +700,16 @@ public class UrlConnectionImpl implements UrlConnectionService
 		source = source.replaceAll("&apos;", "'");
 		return source;
 	}
- 
+
 	public Boolean releaseSession(WebServiceVo webserviceVo) throws Exception
 	{
 		return null;
 	}
- 
-	public String mustUnderstandNullCheck(WebServiceVo webserviceVo) 
+
+	public String mustUnderstandNullCheck(WebServiceVo webserviceVo)
 	{
 		String result = "";
- 
+
 		if ((webserviceVo.getMustUnderstand() != null) && (webserviceVo.getMustUnderstand() != "")) {
 			result = webserviceVo.getMustUnderstand();
 		}
@@ -705,12 +719,12 @@ public class UrlConnectionImpl implements UrlConnectionService
 		}
 		return result;
 	}
-	
+
 	public String parseFaultString(String xmlResponse) throws Exception {
 
 		// pip_service_library.pip_session.Session session = null;
 		String result = null;
-		
+
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dbBuilder = dbFactory.newDocumentBuilder();
 		InputSource is = new InputSource();
@@ -720,7 +734,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 		NodeList nList = null;
 		int isTagName = 0;
 		String[] soapFault = {"soapenv:Fault", "soap:Fault", "SOAP-ENV:Fault", "env:Fault"};
-		
+
 		for(String str : soapFault)
 		{
 			isTagName = doc.getElementsByTagName(str).getLength();
@@ -730,7 +744,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 				break;
 			}
 		}
-		
+
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 			Node nNode = nList.item(temp);
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -742,27 +756,27 @@ public class UrlConnectionImpl implements UrlConnectionService
 		return result;
 	}
 
-	public String pipEndPointUrlNullCheck(WebServiceVo webserviceVo) 
+	public String pipEndPointUrlNullCheck(WebServiceVo webserviceVo)
 	{
 		String result = "";
 
-		if ((webserviceVo.getEndPointUrl() != null) && (webserviceVo.getEndPointUrl() != "")) 
+		if ((webserviceVo.getEndPointUrl() != null) && (webserviceVo.getEndPointUrl() != ""))
 		{
 			result = this.propertiesService.getProperty(webserviceVo.getEndPointUrl());
 		}
-		else 
+		else
 		{
 			result = this.propertiesService.getProperty(webserviceVo.getHost());
 		}
 		return result;
 	}
-	
+
 	@Override
-	public Boolean destroySession(WebServiceVo webserviceVo) throws Exception 
+	public Boolean destroySession(WebServiceVo webserviceVo) throws Exception
 	{
 		return null;
 	}
-	
+
 	@Override
 	public Boolean releaseReUseSession(WebServiceVo webserviceVo) throws Exception
 	{
@@ -853,11 +867,12 @@ class KalProperties {
 	Map<String, String> doubleBraceMap  = new HashMap<String, String>() {{
 		put("connect.time.out", "3000");
 		put("read.time.out", "200000");
-	
+
 		put("amadeus.altea.host", "https://nodeA1.test.webservices.amadeus.com/1ASIWGENKEU/");
 		put("pip.ecommerce.soapaction.url", "http://pip.koreanair.com");
 		put("PNR_Retrieve", "PNRRET_13_2_1A");
 		put("amadeus.altea.soapaction.url", "http://webservices.amadeus.com");
+		put("amadeus.ecommerce.host", "https://uat5.aereww.amadeus.com/soap/SOAPRPCRouterServlet");
 	}};
 
 	public String getProperty(String key) {

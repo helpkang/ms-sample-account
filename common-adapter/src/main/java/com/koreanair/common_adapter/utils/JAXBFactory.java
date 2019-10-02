@@ -41,13 +41,25 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Element;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class JAXBFactory {
 
 	@SuppressWarnings("rawtypes")
 	private static Map<Class,JAXBContext> instances = new HashMap<>();
+
+	public static void setMultiClassInstance(Class primaryClass, Class... classes) throws JAXBException {
+		instances.put(primaryClass, JAXBContext.newInstance(classes));
+	}
 
 	@SuppressWarnings("rawtypes")
 	public static JAXBContext getIntance(Class clazz) throws JAXBException {
@@ -58,7 +70,19 @@ public class JAXBFactory {
 	}
 
 	public static String marshal(Object object, String schemaLocation) throws JAXBException {
-		JAXBContext jaxbContext = getIntance(object.getClass());
+		JAXBContext jaxbContext;
+        if(object instanceof JAXBElement) {
+            jaxbContext = getIntance(((JAXBElement<?>)object).getDeclaredType());
+        } else {
+            Class<?> clazz = object.getClass();
+            XmlRootElement r = clazz.getAnnotation(XmlRootElement.class);
+            jaxbContext = getIntance(clazz);
+            if(r==null) {
+                // we need to infer the name
+                object = new JAXBElement(new QName(inferName(clazz)),clazz,object);
+            }
+        }
+
 		Marshaller marshaller = jaxbContext.createMarshaller();
 		if (schemaLocation != null) {
 			marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
@@ -69,6 +93,14 @@ public class JAXBFactory {
 		ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
 
 		marshaller.marshal(object, byteArr);
+
+//		java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+//		Marshaller m = jaxbContext.createMarshaller();
+//		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,isFormattedOut);
+//		m.marshal(jaxbObject, toResult(out));
+//		str = new String(out.toByteArray(), StandardCharsets.UTF_8);
+//		out.flush();
+//		out.close();
 		return byteArr.toString();
 	}
 
@@ -174,5 +206,27 @@ public class JAXBFactory {
 		}
 		throw new IllegalArgumentException("I don't understand how to handle " + xml.getClass());
 	}
+
+
+    /**
+     * <pre>
+     * 신규 element를 생성한다.
+     * </pre>
+     * @param elementName
+     * @param value
+     * @return
+     */
+    public static Element createElement(String elementName, String value) {
+        Element newElement = null;
+        try {
+            newElement = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createElement(elementName);
+            newElement.setTextContent(value);
+        } catch (DOMException e) {
+            log.error("",e);
+        } catch (ParserConfigurationException e) {
+            log.error("",e);
+        }
+        return newElement;
+    }
 }
 

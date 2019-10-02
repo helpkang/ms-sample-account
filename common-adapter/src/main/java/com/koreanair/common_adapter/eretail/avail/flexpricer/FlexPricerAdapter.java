@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -42,6 +44,9 @@ import com.koreanair.common_adapter.utils.GenericException;
 import com.koreanair.common_adapter.utils.GenericException.ExceptionCode;
 import com.koreanair.common_adapter.utils.JAXBFactory;
 import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
+import com.koreanair.common_adapter.utils.SchemaLocation;
+import com.koreanair.external.eretail.vo.common.overrideinput.OverrideInput;
+import com.koreanair.external.eretail.vo.common.overrideinput.OverrideInput.EMBEDDEDTRANSACTION;
 import com.koreanair.external.eretail.vo.farecommon.farecontext.LISTCORPORATENUMBER;
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.DISCOUNTINFOPTCLISTPTCType;
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.DISCOUNTINFOPTCType;
@@ -49,8 +54,9 @@ import com.koreanair.external.eretail.vo.farecommon.travellercommon.DISCOUNTINFO
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.INPUTLISTTRAVELLERType;
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.INPUTTRAVELLERType;
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.LISTTRAVELLERINFOType;
-import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilityinputtype.FlexPricerAvailabilityInputType;
+import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilityinput.FlexPricerAvailabilityInput;
 import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilityinputtype.LISTPRICINGOPTIONSTypeFlex;
+import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilityoutput.FlexPricerAvailabilityOutput;
 import com.koreanair.external.eretail.vo.flexpricer.flexpricercommoninput.COMMERCIALFAREFAMILYInputType;
 import com.koreanair.external.eretail.vo.flexpricer.flexpricercommoninput.DATERANGE;
 import com.koreanair.external.eretail.vo.flexpricer.flexpricercommoninput.LISTDESTINATION;
@@ -59,12 +65,45 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class FlexPricerAdapter {
-	public void getFlexPricerAvailability(FlexPricerInputVO inputVo) {
-		FlexPricerAvailabilityInputType flexPricerAvailabilityInput = organizeFlexPricerAvailabilityInput(inputVo);
-//		sendAndReceive();
+	public FlexPricerAvailabilityOutput getFlexPricerAvailability(FlexPricerInputVO inputVo) throws Exception {
+		FlexPricerAvailabilityInput flexPricerAvailabilityInput = organizeFlexPricerAvailabilityInput(inputVo);
+		OverrideInput override = organizeOverrideInput(flexPricerAvailabilityInput);
+		JAXBFactory.setMultiClassInstance(OverrideInput.class, FlexPricerAvailabilityInput.class, OverrideInput.class, FlexPricerAvailabilityOutput.class );
+		log.debug("{}", ObjectSerializeUtil.getObjectToJson(override));
+		log.debug("{}", JAXBFactory.getObjectToXML(override));
+		FlexPricerAvailabilityOutput out = (FlexPricerAvailabilityOutput) sendAndRecieve(override, FlexPricerAvailabilityOutput.class);
+
+		log.debug("out = {}", JAXBFactory.getObjectToXML(out));
+		return out;
 	}
 
-	private FlexPricerAvailabilityInputType organizeFlexPricerAvailabilityInput(FlexPricerInputVO inputVo) {
+	private static Object sendAndRecieve(Object obj, Class outputClass) throws JAXBException, Exception {
+
+		InetAddress local;
+		String ip = "";
+		try {
+			local = InetAddress.getLocalHost();
+			ip = local.getHostAddress();
+		} catch (UnknownHostException e1) {
+			log.error("",e1);
+		}
+		UrlConnectionService urlCon = new UrlConnectionImpl();
+		WebServiceVo webserviceVo = new WebServiceVo();
+		webserviceVo.setHost("https://uat5.aereww.amadeus.com/soap/SOAPRPCRouterServlet");
+		webserviceVo.setHost("amadeus.ecommerce.host");
+		webserviceVo.setHeaderType(2);	// WebServiceVo.amadeus_ecommerce_headertype
+		webserviceVo.setRequestMethod("POST");
+		webserviceVo.setEdgeproxycip(ip);
+		webserviceVo.setBodyXml(getBodyStr(obj));
+		log.debug("getBodyStr = {}", getBodyStr(obj));
+		String responseMessage = urlCon.call(webserviceVo);
+		responseMessage = getOutPutBody(responseMessage);
+		log.debug("{}", responseMessage);
+		Object retObj = JAXBFactory.unmarshal(responseMessage, outputClass);
+		return retObj;
+	}
+
+	private FlexPricerAvailabilityInput organizeFlexPricerAvailabilityInput(FlexPricerInputVO inputVo) {
 
 		if (ObjectUtils.isEmpty(inputVo.getCffCodeList())) {
 			throw new GenericException(ExceptionCode.BAD_REQUEST, "CFF는 필수 사항입니다.");
@@ -73,7 +112,7 @@ public class FlexPricerAdapter {
 			throw new GenericException(ExceptionCode.BAD_REQUEST, "탑승객 정보는 필수 사항입니다.");
 		}
 
-		FlexPricerAvailabilityInputType flexPricerAvailabilityInput = new FlexPricerAvailabilityInputType();
+		FlexPricerAvailabilityInput flexPricerAvailabilityInput = new FlexPricerAvailabilityInput();
 		flexPricerAvailabilityInput.setTRANSACTIONID(ERetailTransactionId.FLEX_PRICER_AVAILABILITY);
 		flexPricerAvailabilityInput.setSITE(ERetailConsts.SITE_REVENUE);
 		flexPricerAvailabilityInput.setLANGUAGE(ERetailConsts.LANGUAGE);
@@ -190,18 +229,56 @@ public class FlexPricerAdapter {
 		return flexPricerAvailabilityInput;
 	}
 
+	private OverrideInput organizeOverrideInput(Object object) {
+		OverrideInput overrideInupt = new OverrideInput();
+		overrideInupt.setTRANSACTIONID("Override");
+		overrideInupt.setSITE("CBFICBFI");
+		overrideInupt.setLANGUAGE("GB");
+		overrideInupt.setSOSITEOFFICEID("SELKE08DM");
+		overrideInupt.setSOSITEMINAVAILDATESPAN("N30");
+		overrideInupt.setSOSITENBFLIGHTSAVAIL("30");
+		overrideInupt.setSOSITEPOINTOFSALE("SEL");
+		overrideInupt.setSOSITEPOINTOFTICKETING("SEL");
+		overrideInupt.setSOSITEMINIMALTIME("N30");
+		overrideInupt.setSOSITEAPIV2SERVER("194.156.170.78");
+		overrideInupt.setSOSITEAPIV2SERVERUSERID("GUEST");
+		overrideInupt.setSOSITEAPIV2SERVERPWD("TAZ");
+
+		log.debug("embedded call");
+		EMBEDDEDTRANSACTION embedded = new EMBEDDEDTRANSACTION();
+		String schemaLocation = SchemaLocation.get(object, "XSD_1.0");
+		embedded.setSchemaRef(schemaLocation);
+		embedded.getContent().add(object);
+		overrideInupt.setEMBEDDEDTRANSACTION(embedded);
+
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEMANUALETKTCMD", "TTP/ET"));
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESISERVERIP", "193.23.185.67"));
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESISERVERPORT", "18006"));
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESISAP", "1ASIXJCPU"));
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESIUSER", "UNSET"));
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESIPASSWORD", "UNSET"));
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESI1AXMLFROM", "SEPJCP"));
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITECORPORATEID", "SEP-UAT"));
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEAPIV2SERVERPORT", "20002"));
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEPTCCONFVALIDATION", "FALSE"));
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESENDFOIDAIRLINE", "FALSE"));
+		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEMAXRESNUMATTEMPTS", "0"));
+
+		return overrideInupt;
+	}
+
 	public static void main(String[] args) throws Exception {
 		FlexPricerAdapter adapter = new FlexPricerAdapter();
 		// SELKE08DW
 		FlexPricerInputVO inputVo = new FlexPricerInputVO();
-		inputVo.setDateRange(7);
+		inputVo.setDateRange(0);
 		inputVo.setTripType(TripType.RT);
 		inputVo.getCffCodeList().add("DOMECOEY");
 
 		SegmentInfoVO segmentInfo = new SegmentInfoVO();
 		segmentInfo.setDepartureAirport("GMP");
 		segmentInfo.setArrivalAirport("CJU");
-		segmentInfo.setDepartureDateTime("201910200000");
+		segmentInfo.setDepartureDateTime("201910080000");
 		inputVo.getSegmentInfoList().add(segmentInfo);
 		segmentInfo = new SegmentInfoVO();
 		segmentInfo.setDepartureAirport("CJU");
@@ -212,36 +289,70 @@ public class FlexPricerAdapter {
 		PassengerConditionVO passengerCondition = new PassengerConditionVO();
 		passengerCondition.setPassengerType(PAXType.ADT);
 		inputVo.getPassengerConditionList().add(passengerCondition);
+//
+//		passengerCondition = new PassengerConditionVO();
+//		passengerCondition.setPassengerType(PAXType.CHD);
+//
+//		PTCDiscountInfoVO defaultPTCDiscountInfo = new PTCDiscountInfoVO();
+//		defaultPTCDiscountInfo.setPtCode("CH");
+//		passengerCondition.setDefaultPTCDiscountInfo(defaultPTCDiscountInfo);
+//		inputVo.getPassengerConditionList().add(passengerCondition);
 
-		passengerCondition = new PassengerConditionVO();
-		passengerCondition.setPassengerType(PAXType.CHD);
+		adapter.getFlexPricerAvailability(inputVo);
 
-		PTCDiscountInfoVO defaultPTCDiscountInfo = new PTCDiscountInfoVO();
-		defaultPTCDiscountInfo.setPtCode("CH");
-		passengerCondition.setDefaultPTCDiscountInfo(defaultPTCDiscountInfo);
-		inputVo.getPassengerConditionList().add(passengerCondition);
-
-		FlexPricerAvailabilityInputType flexPricerAvailabilityInput = adapter.organizeFlexPricerAvailabilityInput(inputVo);
-		log.debug("{}", ObjectSerializeUtil.getObjectToJson(flexPricerAvailabilityInput));
-		log.debug("{}", JAXBFactory.getObjectToXML(flexPricerAvailabilityInput));
-
-		InetAddress local;
-		String ip = "";
-		try {
-			local = InetAddress.getLocalHost();
-			ip = local.getHostAddress();
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-		}
-
-		UrlConnectionService urlCon = new UrlConnectionImpl();
-		WebServiceVo webserviceVo = new WebServiceVo();
-		webserviceVo.setHost("https://uat5.aereww.amadeus.com/soap/SOAPRPCRouterServlet");
-		webserviceVo.setHeaderType(2);	// WebServiceVo.amadeus_ecommerce_headertype
-		webserviceVo.setRequestMethod("POST");
-		webserviceVo.setEdgeproxycip(ip);
-		webserviceVo.setBodyXml(JAXBFactory.getObjectToXML(flexPricerAvailabilityInput));
-		String result = urlCon.call(webserviceVo);
-		log.debug("{}", result);
 	}
+
+	private static String getBodyStr(Object object) throws JAXBException {
+		String bodyStr = null;
+		String schemaLocation = SchemaLocation.get(object, "XSD_1.0");
+		log.debug("schemaLocation = {}" , schemaLocation);
+
+		bodyStr = JAXBFactory.marshal(object, schemaLocation);
+		bodyStr = "<![CDATA[".concat(bodyStr).concat("]]>");
+		return bodyStr;
+	}
+
+	/**
+	 * marshalling 전에
+	 * Direct E-Retail input Message의 xml 예약어를 치환함
+	 * @param source
+	 * @return source
+	 */
+	private static String xmlRetailSignEnc(String source) {
+		source = source.replaceAll("<", "&lt;");
+		source = source.replaceAll(">", "&gt;");
+		return source;
+	}
+
+	/**
+	 * unmarshalling 전에
+	 * E-Retail output Message의 xml 예약어를 치환함
+	 * @param responseMessage
+	 * @return responseMessage
+	 */
+	private static String xmlRetailSignDec(String responseMessage) {
+		responseMessage = responseMessage.replaceAll("&lt;", "<");
+		responseMessage = responseMessage.replaceAll("&gt;", ">");
+		responseMessage = responseMessage.replaceAll("&apos;", "'");
+		return responseMessage;
+	}
+	private static final String SOAP_BODY_START = "<soapenv:Body";
+	private static final String SOAP_BODY_END = "</soapenv:Body>";
+	private static String getOutPutBody(String responseMessage) {
+		int startIdx = 0;
+		int endIdx = 0;
+		String bodyStartSign = "&lt;";
+		String bodyEndSign = "</return>";
+		startIdx = responseMessage.indexOf(bodyStartSign);
+		if (startIdx < 0) {
+			return responseMessage;
+		}
+		if (SOAP_BODY_START.equals(bodyStartSign))
+			startIdx = responseMessage.indexOf(">", startIdx) + 1;
+		if ("<soap:Body".equals(bodyStartSign))
+			startIdx = responseMessage.indexOf(">", startIdx) + 1;
+		endIdx = responseMessage.indexOf(bodyEndSign);
+		return xmlRetailSignDec(responseMessage.substring(startIdx, endIdx));
+	}
+
 }
