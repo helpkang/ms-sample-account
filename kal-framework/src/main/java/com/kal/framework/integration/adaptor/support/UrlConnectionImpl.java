@@ -78,8 +78,6 @@ public class UrlConnectionImpl implements UrlConnectionService
 			switch (webserviceVo.getHeaderType())
 			{
 				case amadeus_altea_headertype:
-
-
 					urlConnection.setRequestProperty("SOAPAction", "\"" + webserviceVo.getSoapAction() + "\"");
 					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
 					urlConnection.setRequestProperty("AuthType","No Authorization");
@@ -159,69 +157,49 @@ public class UrlConnectionImpl implements UrlConnectionService
 			String res_encode = null;
 			InputStream is = null;
 
-			try
-			{
+			try {
 				is = urlConnection.getInputStream();
 
 				// Response 에서 gzip 인지 여부 식별 정보
-	        	res_encode = urlConnection.getHeaderField("Content-Encoding");
+				res_encode = urlConnection.getHeaderField("Content-Encoding");
 
-	        	// response 가 gzip 인경우
-	        	if("gzip".equalsIgnoreCase(res_encode))
-	        	{
-	        		clsInput = new BufferedReader(new InputStreamReader(new GZIPInputStream(is), "UTF-8"));
-	        	}
-	        	else
-	        	{
-	        		clsInput = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-	        	}
+				// response 가 gzip 인경우
+				if ("gzip".equalsIgnoreCase(res_encode)) {
+					clsInput = new BufferedReader(new InputStreamReader(new GZIPInputStream(is), "UTF-8"));
+				} else {
+					clsInput = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+				}
 //				clsInput = new BufferedReader(new InputStreamReader(new GZIPInputStream(urlConnection.getInputStream()), "UTF-8"));
-			}
-			catch(Exception e)
-			{
+			} catch (Exception e) {
 				soapFault = true;
-//				e.printStackTrace();
 				logger.error("", e);
-//				if(logger.isDebugEnabled())
-//				{
-//					logger.debug("[ " + "HOST = " + vo.getHost() + ", WSAP = " + vo.getWsap() + ", OperationName = " + vo.getOperationName() + " ]");
-//					logger.debug("SOAP FAULT TRACE :: " + e.fillInStackTrace());
-//				}
 
 				// Response 에서 gzip 인지 여부 식별 정보
-	        	res_encode = urlConnection.getHeaderField("Content-Encoding");
+				res_encode = urlConnection.getHeaderField("Content-Encoding");
 
-	        	// response 가 gzip 인경우
-	        	if("gzip".equalsIgnoreCase(res_encode))
-	        	{
-	        		clsInput = new BufferedReader(new InputStreamReader(new GZIPInputStream(urlConnection.getErrorStream()), "UTF-8" ) );
-	        	}
-	        	else
-	        	{
-	        		clsInput = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream(), "UTF-8"));
-	        	}
-			}
-			finally
-			{
+				// response 가 gzip 인경우
+				if ("gzip".equalsIgnoreCase(res_encode)) {
+					clsInput = new BufferedReader(new InputStreamReader(new GZIPInputStream(urlConnection.getErrorStream()), "UTF-8"));
+				} else {
+					clsInput = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream(), "UTF-8"));
+				}
+			} finally {
 				String inputLine;
-				while ((inputLine = clsInput.readLine()) != null)
-				{
-					buffer.append( inputLine ).append("\r\n");
+				while ((inputLine = clsInput.readLine()) != null) {
+					buffer.append(inputLine).append("\r\n");
 				}
 
-				if(clsInput != null) clsInput.close();
-				if(clsOutput != null) clsOutput.close();
-				if(urlConnection != null) urlConnection.disconnect();
+				if (clsInput != null) clsInput.close();
+				if (clsOutput != null) clsOutput.close();
+				if (urlConnection != null) urlConnection.disconnect();
 
 				// E-commerce 인경우
-				if ((webserviceVo.getHeaderType() == amadeus_ecommerce_headertype) || (webserviceVo.getHeaderType() == pip_ecommerce_headertype))
-				{
+				if ((webserviceVo.getHeaderType() == amadeus_ecommerce_headertype) || (webserviceVo.getHeaderType() == pip_ecommerce_headertype)) {
 
 					Map headers = urlConnection.getHeaderFields();
-					List jsessionIds = (List)headers.get("Set-Cookie");
+					List jsessionIds = (List) headers.get("Set-Cookie");
 
-					if (jsessionIds != null)
-					{
+					if (jsessionIds != null) {
 						String jsessionId = "";
 						jsessionId = jsessionIds.toString();
 
@@ -231,22 +209,18 @@ public class UrlConnectionImpl implements UrlConnectionService
 				result = buffer.toString();
 
 				// Response Message Logging
-				if(soapFault)
-				{
-					if(logger.isInfoEnabled()) logger.info("RESPONSE MESSAGE(FAULT) :: " + result );
-				}
-				else
-				{
-					if(logger.isInfoEnabled()) logger.info("RESPONSE MESSAGE(NORMAL) :: " + result );
+				if (soapFault) {
+					if (logger.isInfoEnabled()) logger.info("RESPONSE MESSAGE(FAULT) :: " + result);
+				} else {
+					if (logger.isInfoEnabled()) logger.info("RESPONSE MESSAGE(NORMAL) :: " + result);
 
 				}
-	        }
+			}
     	}
 		return result;
 	}
 
-	public WebServiceVo setWebServiceVo(WebServiceVo webserviceVo)
-	{
+	public WebServiceVo setWebServiceVo(WebServiceVo webserviceVo) throws Exception {
 		WebServiceVo result = new WebServiceVo();
 
 		if (webserviceVo.getHost().equals("pip.altea.host")) {
@@ -274,9 +248,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 			result.setGuid(webserviceVo.getGuid());
 			result.setCompanyName(webserviceVo.getCompanyName());
 			result.setWorkstationId(webserviceVo.getWorkstationId());
-		}
-		else if (webserviceVo.getHost().equals("pip.ecommerce.host"))
-		{
+		} else if (webserviceVo.getHost().equals("pip.ecommerce.host")) {
 			result.setHeaderType(4);
 
 			String mustUnderstand = "";
@@ -286,7 +258,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 			result.setHost(this.propertiesService.getProperty(webserviceVo.getHost()));
 			result.setBodyXml(webserviceVo.getBodyXml());
 			result.setWsap(webserviceVo.getWsap());
-			result.setSoapAction(this.propertiesService.getProperty("pip.ecommerce.soapaction.url") + "/" + "E_Commerce");
+			result.setSoapAction(this.propertiesService.getProperty("pip.ecommerce.soapaction.url") + "/" + "E_Retail");
 			result.setPiprequestSystem(webserviceVo.getPiprequestSystem());
 			result.setPipemployeeNumber(webserviceVo.getPipemployeeNumber());
 			result.setPiplssuserId(webserviceVo.getPiplssuserId());
@@ -314,18 +286,14 @@ public class UrlConnectionImpl implements UrlConnectionService
 			result.setSoapAction(this.propertiesService.getProperty("amadeus.altea.soapaction.url") + "/" + this.propertiesService.getProperty(webserviceVo.getOperationName()));
 			result.setMessageId(webserviceVo.getMessageId());
 			result.setGuid(webserviceVo.getGuid());
-		}
-		else if (webserviceVo.getHost().equals("amadeus.ecommerce.host"))
-		{
+		} else if (webserviceVo.getHost().equals("amadeus.ecommerce.host")) {
 			// Session session = sessionNullCheck(webserviceVo);
 			// result.setPipsession(session);
 			result.setHeaderType(2);
 			result.setHost(this.propertiesService.getProperty(webserviceVo.getHost()));
 			result.setJsessionId(webserviceVo.getJsessionId());
 			result.setEdgeproxycip(webserviceVo.getEdgeproxycip());
-		}
-		else if (webserviceVo.getHost().equals("pip.ods.host"))
-		{
+		} else if (webserviceVo.getHost().equals("pip.ods.host")) {
 			// Session session = sessionNullCheck(webserviceVo);
 			// result.setPipsession(session);
 
@@ -348,9 +316,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 			result.setGuid(webserviceVo.getGuid());
 			result.setCompanyName(webserviceVo.getCompanyName());
 			result.setWorkstationId(webserviceVo.getWorkstationId());
-		}
-		else
-		{
+		} else {
 			// Session session = sessionNullCheck(webserviceVo);
 			// result.setPipsession(session);
 
@@ -405,9 +371,9 @@ public class UrlConnectionImpl implements UrlConnectionService
 
 	protected String getAmadeusAlteaHeader(WebServiceVo webserviceVo)throws Exception
 	{
-		String nonce = generate_nonce();
-		String created = generate_created();
-		String password = password_digest(password_encrypt("SHA-1", "AMADEUS"),nonce,created);
+		String nonce = generateNonce();
+		String created = generateCreated();
+		String password = passwordDigest(passwordEncrypt("SHA-1", "AMADEUS"),nonce,created);
 
 		//TODO 4.0 Security header 김현성 추가 요청
 		String result = "<soapenv:Envelope xmlns:wsa=\"http://www.w3.org/2005/08/addressing\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:link=\"http://wsdl.amadeus.com/2010/06/ws/Link_v1\" xmlns:wbs=\"http://xml.amadeus.com/ws/2009/01/WBS_Session-2.0.xsd\"><soapenv:Header>"+
@@ -431,7 +397,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 			"      <wsa:ReplyTo soapenv:mustUnderstand=\"1\">\n" +
 			"         <wsa:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa:Address>\n" +
 			"      </wsa:ReplyTo>\n" +
-			"      <wsa:MessageID soapenv:mustUnderstand=\"1\" xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+generate_messageID()+"</wsa:MessageID>\n" +
+			"      <wsa:MessageID soapenv:mustUnderstand=\"1\" xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+ generateMessageID()+"</wsa:MessageID>\n" +
 			"      <wsa:To soapenv:mustUnderstand=\"1\">"+webserviceVo.getHost()+"</wsa:To>\n" +
 				"</soapenv:Header>" + "<soapenv:Body>" + webserviceVo.getBodyXml() + "</soapenv:Body>" + "</soapenv:Envelope>";
 		return result;
@@ -603,11 +569,11 @@ public class UrlConnectionImpl implements UrlConnectionService
 			"</pip:ProcessingFlow>" +
 			"</soapenv:Header>" +
 			"<soapenv:Body>" +
-			"<ret:E_Commerce>" +
+			"<ret:E_Retail>" +
 			"<request>" +
 			webserviceVo.getBodyXml() +
 			"</request>" +
-			"</ret:E_Commerce>" +
+			"</ret:E_Retail>" +
 			"</soapenv:Body>" +
 			"</soapenv:Envelope>";
 
@@ -677,8 +643,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 	// 	}
 	// 	return session;
 	// }
-	private static String getTagValue(String sTag, Element eElement)
-	{
+	private static String getTagValue(String sTag, Element eElement) {
 		NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
 		Node nValue = nlList.item(0);
 
@@ -701,20 +666,16 @@ public class UrlConnectionImpl implements UrlConnectionService
 		return source;
 	}
 
-	public Boolean releaseSession(WebServiceVo webserviceVo) throws Exception
-	{
+	public Boolean releaseSession(WebServiceVo webserviceVo) throws Exception {
 		return null;
 	}
 
-	public String mustUnderstandNullCheck(WebServiceVo webserviceVo)
-	{
+	public String mustUnderstandNullCheck(WebServiceVo webserviceVo) {
 		String result = "";
 
 		if ((webserviceVo.getMustUnderstand() != null) && (webserviceVo.getMustUnderstand() != "")) {
 			result = webserviceVo.getMustUnderstand();
-		}
-		else
-		{
+		} else {
 			result = "1";
 		}
 		return result;
@@ -735,11 +696,9 @@ public class UrlConnectionImpl implements UrlConnectionService
 		int isTagName = 0;
 		String[] soapFault = {"soapenv:Fault", "soap:Fault", "SOAP-ENV:Fault", "env:Fault"};
 
-		for(String str : soapFault)
-		{
+		for (String str : soapFault) {
 			isTagName = doc.getElementsByTagName(str).getLength();
-			if(isTagName > 0)
-			{
+			if (isTagName > 0) {
 				nList = doc.getElementsByTagName(str);
 				break;
 			}
@@ -756,30 +715,24 @@ public class UrlConnectionImpl implements UrlConnectionService
 		return result;
 	}
 
-	public String pipEndPointUrlNullCheck(WebServiceVo webserviceVo)
-	{
+	public String pipEndPointUrlNullCheck(WebServiceVo webserviceVo) {
 		String result = "";
 
-		if ((webserviceVo.getEndPointUrl() != null) && (webserviceVo.getEndPointUrl() != ""))
-		{
+		if ((webserviceVo.getEndPointUrl() != null) && (webserviceVo.getEndPointUrl() != "")) {
 			result = this.propertiesService.getProperty(webserviceVo.getEndPointUrl());
-		}
-		else
-		{
+		} else {
 			result = this.propertiesService.getProperty(webserviceVo.getHost());
 		}
 		return result;
 	}
 
 	@Override
-	public Boolean destroySession(WebServiceVo webserviceVo) throws Exception
-	{
+	public Boolean destroySession(WebServiceVo webserviceVo) throws Exception {
 		return null;
 	}
 
 	@Override
-	public Boolean releaseReUseSession(WebServiceVo webserviceVo) throws Exception
-	{
+	public Boolean releaseReUseSession(WebServiceVo webserviceVo) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -793,14 +746,14 @@ public class UrlConnectionImpl implements UrlConnectionService
 		vo.setWsap("1ASIWIBEKEU");
 		vo.setHost("amadeus.altea.host");
 		vo.setOperationName("PNR_Retrieve");
-		vo.setGuid(generate_guid());
+		vo.setGuid(generateGuid());
 		vo.setRequestMethod("POST");
 		vo.setNamespace("PNR_Retrieve");
 		String aa = url.call(vo);
 		System.out.println(aa);
 	}
 
-	public String generate_messageID() throws Exception {
+	public String generateMessageID() throws Exception {
 		SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
 		random.setSeed(System.currentTimeMillis());
 		byte[] messageIDValue = new byte[16];
@@ -808,7 +761,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 		return org.apache.ws.security.util.Base64.encode(messageIDValue);
 	}
 
-	public String generate_nonce() throws Exception {
+	public String generateNonce() throws Exception {
 		SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
 		random.setSeed(System.currentTimeMillis());
 		byte[] messageIDValue = new byte[16];
@@ -816,48 +769,47 @@ public class UrlConnectionImpl implements UrlConnectionService
 		return org.apache.ws.security.util.Base64.encode(messageIDValue);
 	}
 
-	public String generate_created() throws Exception {
+	public String generateCreated() throws Exception {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		Calendar cal = Calendar.getInstance();
 		format.setTimeZone(TimeZone.getTimeZone("Zulu"));
 		return format.format(cal.getTime());
 	}
-	public static String generate_guid() throws Exception {
+	public static String generateGuid() throws Exception {
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
 		Calendar cal = Calendar.getInstance();
 		format.setTimeZone(TimeZone.getTimeZone("Zulu"));
-		return "KEIBE"+format.format(cal.getTime());
+		return "KEIBE" + format.format(cal.getTime());
 	}
 
-	public byte[] password_encrypt(String algorithm,String clearPassword)throws Exception{
-        MessageDigest sha = MessageDigest.getInstance(algorithm);
-        sha.reset();
-        String password = clearPassword;
+	public byte[] passwordEncrypt(String algorithm, String clearPassword)throws Exception {
+		MessageDigest sha = MessageDigest.getInstance(algorithm);
+		sha.reset();
+		String password = clearPassword;
 
-        byte[] b1 = password.getBytes("UTF-8");
-        sha.update(b1);
-        return sha.digest();
-    }
+		byte[] b1 = password.getBytes("UTF-8");
+		sha.update(b1);
+		return sha.digest();
+	}
 
-    public String password_digest(byte[] password, String nonce,String created)throws Exception {
-        String passwdDigest = null;
-        byte[] b1 = nonce != null ? org.apache.ws.security.util.Base64.decode(nonce) : new byte[0];
-        byte[] b2 = created != null ? created.getBytes("UTF-8") : new byte[0];
-        byte[] b3 = password;
-        byte[] b4 = new byte[b1.length + b2.length + b3.length];
-        int offset = 0;
-        System.arraycopy(b1, 0, b4, offset, b1.length);
-        offset += b1.length;
-        System.arraycopy(b2, 0, b4, offset, b2.length);
-        offset += b2.length;
-        System.arraycopy(b3, 0, b4, offset, b3.length);
-        MessageDigest sha = MessageDigest.getInstance("SHA-1");
-        sha.reset();
-        sha.update(b4);
-        passwdDigest = org.apache.ws.security.util.Base64.encode(sha.digest());
-        return passwdDigest;
-    }
-
+    public String passwordDigest(byte[] password, String nonce, String created)throws Exception {
+		String passwdDigest = null;
+		byte[] b1 = nonce != null ? org.apache.ws.security.util.Base64.decode(nonce) : new byte[0];
+		byte[] b2 = created != null ? created.getBytes("UTF-8") : new byte[0];
+		byte[] b3 = password;
+		byte[] b4 = new byte[b1.length + b2.length + b3.length];
+		int offset = 0;
+		System.arraycopy(b1, 0, b4, offset, b1.length);
+		offset += b1.length;
+		System.arraycopy(b2, 0, b4, offset, b2.length);
+		offset += b2.length;
+		System.arraycopy(b3, 0, b4, offset, b3.length);
+		MessageDigest sha = MessageDigest.getInstance("SHA-1");
+		sha.reset();
+		sha.update(b4);
+		passwdDigest = org.apache.ws.security.util.Base64.encode(sha.digest());
+		return passwdDigest;
+	}
 }
 
 
@@ -873,6 +825,7 @@ class KalProperties {
 		put("PNR_Retrieve", "PNRRET_13_2_1A");
 		put("amadeus.altea.soapaction.url", "http://webservices.amadeus.com");
 		put("amadeus.ecommerce.host", "https://uat5.aereww.amadeus.com/soap/SOAPRPCRouterServlet");
+		put("pip.ecommerce.host", "http://pipstg.koreanair.com/PAP1AWIBE01/V1_01");
 	}};
 
 	public String getProperty(String key) {
