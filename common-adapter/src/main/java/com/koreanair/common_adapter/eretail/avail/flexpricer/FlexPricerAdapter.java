@@ -15,7 +15,6 @@
  */
 package com.koreanair.common_adapter.eretail.avail.flexpricer;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -32,8 +31,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.kal.framework.integration.adaptor.UrlConnectionService;
 import com.kal.framework.integration.adaptor.WebServiceVo;
 import com.kal.framework.integration.adaptor.support.UrlConnectionImpl;
+import com.koreanair.common_adapter.eretail.connector.ERetailSoapConnector;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
-import com.koreanair.common_adapter.eretail.vo.PTCDiscountInfoVO;
 import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
 import com.koreanair.common_adapter.eretail.vo.SegmentInfoVO;
 import com.koreanair.common_adapter.general.vo.consts.ERetailConsts;
@@ -72,6 +71,8 @@ public class FlexPricerAdapter {
 		log.debug("{}", ObjectSerializeUtil.getObjectToJson(override));
 		log.debug("{}", JAXBFactory.getObjectToXML(override));
 		FlexPricerAvailabilityOutput out = (FlexPricerAvailabilityOutput) sendAndRecieve(override, FlexPricerAvailabilityOutput.class);
+//		ERetailSoapConnector eRetail = new ERetailSoapConnector();
+//		FlexPricerAvailabilityOutput out = (FlexPricerAvailabilityOutput) eRetail.sendAndReceive(override, FlexPricerAvailabilityOutput.class);
 
 		log.debug("out = {}", JAXBFactory.getObjectToXML(out));
 		return out;
@@ -90,6 +91,7 @@ public class FlexPricerAdapter {
 		UrlConnectionService urlCon = new UrlConnectionImpl();
 		WebServiceVo webserviceVo = new WebServiceVo();
 		webserviceVo.setHost("https://uat5.aereww.amadeus.com/soap/SOAPRPCRouterServlet");
+//		webserviceVo.setHost("http://127.0.0.1:8080/soap/SOAPRPCRouterServlet");
 		webserviceVo.setHost("amadeus.ecommerce.host");
 		webserviceVo.setHeaderType(2);	// WebServiceVo.amadeus_ecommerce_headertype
 		webserviceVo.setRequestMethod("POST");
