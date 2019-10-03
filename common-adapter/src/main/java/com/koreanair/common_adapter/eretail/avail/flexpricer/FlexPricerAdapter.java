@@ -1,22 +1,17 @@
 package com.koreanair.common_adapter.eretail.avail.flexpricer;
 
 import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.kal.framework.integration.adaptor.UrlConnectionService;
-import com.kal.framework.integration.adaptor.WebServiceVo;
-import com.kal.framework.integration.adaptor.support.UrlConnectionImpl;
-import com.koreanair.common_adapter.eretail.connector.ERetailSoapConnector;
+import com.koreanair.common_adapter.eretail.connector.ERetailConnector;
+import com.koreanair.common_adapter.eretail.connector.ERetailSoapConnectorImpl;
+import com.koreanair.common_adapter.eretail.connector.ERetailUrlConnectionConnectorImpl;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
 import com.koreanair.common_adapter.eretail.vo.SegmentInfoVO;
@@ -49,45 +44,20 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class FlexPricerAdapter {
+
+	private ERetailConnector retailCon = new ERetailSoapConnectorImpl();	// SOAPMesage 기반 connector
+//	private ERetailConnector retailCon = new ERetailUrlConnectionConnectorImpl();	// URL Connection기반 connector
+
 	public FlexPricerAvailabilityOutput getFlexPricerAvailability(FlexPricerInputVO inputVo) throws Exception {
 		FlexPricerAvailabilityInput flexPricerAvailabilityInput = organizeFlexPricerAvailabilityInput(inputVo);
 		OverrideInput override = organizeOverrideInput(flexPricerAvailabilityInput);
 		JAXBFactory.setMultiClassInstance(OverrideInput.class, FlexPricerAvailabilityInput.class, OverrideInput.class, FlexPricerAvailabilityOutput.class );
 		log.debug("{}", ObjectSerializeUtil.getObjectToJson(override));
 		log.debug("{}", JAXBFactory.getObjectToXML(override));
-		FlexPricerAvailabilityOutput out = (FlexPricerAvailabilityOutput) sendAndRecieve(override, FlexPricerAvailabilityOutput.class);
-//		ERetailSoapConnector eRetail = new ERetailSoapConnector();
-//		FlexPricerAvailabilityOutput out = (FlexPricerAvailabilityOutput) eRetail.sendAndReceive(override, FlexPricerAvailabilityOutput.class);
+		FlexPricerAvailabilityOutput out = (FlexPricerAvailabilityOutput) retailCon.sendAndReceive(override, FlexPricerAvailabilityOutput.class);
 
 		log.debug("out = {}", JAXBFactory.getObjectToXML(out));
 		return out;
-	}
-
-	private static Object sendAndRecieve(Object obj, Class outputClass) throws JAXBException, Exception {
-
-		InetAddress local;
-		String ip = "";
-		try {
-			local = InetAddress.getLocalHost();
-			ip = local.getHostAddress();
-		} catch (UnknownHostException e1) {
-			log.error("",e1);
-		}
-		UrlConnectionService urlCon = new UrlConnectionImpl();
-		WebServiceVo webserviceVo = new WebServiceVo();
-		webserviceVo.setHost("https://uat5.aereww.amadeus.com/soap/SOAPRPCRouterServlet");
-//		webserviceVo.setHost("http://127.0.0.1:8080/soap/SOAPRPCRouterServlet");
-		webserviceVo.setHost("amadeus.ecommerce.host");
-		webserviceVo.setHeaderType(2);	// WebServiceVo.amadeus_ecommerce_headertype
-		webserviceVo.setRequestMethod("POST");
-		webserviceVo.setEdgeproxycip(ip);
-		webserviceVo.setBodyXml(getBodyStr(obj));
-		log.debug("getBodyStr = {}", getBodyStr(obj));
-		String responseMessage = urlCon.call(webserviceVo);
-		responseMessage = getOutPutBody(responseMessage);
-		log.debug("{}", responseMessage);
-		Object retObj = JAXBFactory.unmarshal(responseMessage, outputClass);
-		return retObj;
 	}
 
 	private FlexPricerAvailabilityInput organizeFlexPricerAvailabilityInput(FlexPricerInputVO inputVo) {
@@ -289,57 +259,5 @@ public class FlexPricerAdapter {
 
 	}
 
-	private static String getBodyStr(Object object) throws JAXBException {
-		String bodyStr = null;
-		String schemaLocation = SchemaLocation.get(object, "XSD_1.0");
-		log.debug("schemaLocation = {}" , schemaLocation);
-
-		bodyStr = JAXBFactory.marshal(object, schemaLocation);
-		bodyStr = "<![CDATA[".concat(bodyStr).concat("]]>");
-		return bodyStr;
-	}
-
-	/**
-	 * marshalling 전에
-	 * Direct E-Retail input Message의 xml 예약어를 치환함
-	 * @param source
-	 * @return source
-	 */
-	private static String xmlRetailSignEnc(String source) {
-		source = source.replaceAll("<", "&lt;");
-		source = source.replaceAll(">", "&gt;");
-		return source;
-	}
-
-	/**
-	 * unmarshalling 전에
-	 * E-Retail output Message의 xml 예약어를 치환함
-	 * @param responseMessage
-	 * @return responseMessage
-	 */
-	private static String xmlRetailSignDec(String responseMessage) {
-		responseMessage = responseMessage.replaceAll("&lt;", "<");
-		responseMessage = responseMessage.replaceAll("&gt;", ">");
-		responseMessage = responseMessage.replaceAll("&apos;", "'");
-		return responseMessage;
-	}
-	private static final String SOAP_BODY_START = "<soapenv:Body";
-	private static final String SOAP_BODY_END = "</soapenv:Body>";
-	private static String getOutPutBody(String responseMessage) {
-		int startIdx = 0;
-		int endIdx = 0;
-		String bodyStartSign = "&lt;";
-		String bodyEndSign = "</return>";
-		startIdx = responseMessage.indexOf(bodyStartSign);
-		if (startIdx < 0) {
-			return responseMessage;
-		}
-		if (SOAP_BODY_START.equals(bodyStartSign))
-			startIdx = responseMessage.indexOf(">", startIdx) + 1;
-		if ("<soap:Body".equals(bodyStartSign))
-			startIdx = responseMessage.indexOf(">", startIdx) + 1;
-		endIdx = responseMessage.indexOf(bodyEndSign);
-		return xmlRetailSignDec(responseMessage.substring(startIdx, endIdx));
-	}
 
 }
