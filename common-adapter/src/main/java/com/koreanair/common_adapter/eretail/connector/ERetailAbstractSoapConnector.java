@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 AsianaIDT Inc.
+ * Copyright 2011-2019 KoreanAir
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package com.koreanair.common_adapter.eretail.connector;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
@@ -28,10 +30,36 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.koreanair.common_adapter.utils.JAXBFactory;
+import com.koreanair.common_adapter.utils.SchemaLocation;
 
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class ERetailAbstractSoapConnector implements ERetailConnector {
+
+	/** eRetail jsessionid 정보 */
+	protected String jsessionId = "";
+	@Override
+	public String getJsessionId() {
+		return this.jsessionId;
+	}
+
+	@Override
+	public void setJsessionId(String jsessionId) {
+		this.jsessionId = jsessionId;
+	}
+
+	/** eRetail에서 전달받은 Cookie 정보 */
+	protected Map<String, String> responseCookieMap = new LinkedHashMap<>();
+
+	@Override
+	public Map<String, String> getResponseCookieMap() {
+		return responseCookieMap;
+	}
+
+	@Override
+	public void setResponseCookieMap(Map<String, String> responseCookieMap) {
+		this.responseCookieMap = responseCookieMap;
+	}
 
 	/**
 	 * XML 문자열을 DOM(Document) 객체로 변환
@@ -87,5 +115,13 @@ public abstract class ERetailAbstractSoapConnector implements ERetailConnector {
 		responseMessage = responseMessage.replaceAll("&apos;", "'");
 		return responseMessage;
 	}
+
+	protected String getBodyContents(Object object) throws JAXBException {
+		String schemaLocation = SchemaLocation.get(object);
+		log.debug("schemaLocation = {}" , schemaLocation);
+
+		return JAXBFactory.marshal(object, schemaLocation);
+	}
+
 
 }

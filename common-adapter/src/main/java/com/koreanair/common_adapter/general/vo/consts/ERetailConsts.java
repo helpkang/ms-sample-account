@@ -20,6 +20,7 @@ public class ERetailConsts {
 	private  ERetailConsts() {
 		throw new IllegalStateException("Consts class");
 	}
+	public static final String ERETAIL_VERSION = "XSD_1.0";
 
 	public static final String SITE_REVENUE = "CBFICBFI";
 	public static final String SITE_AWARD = "CBHHCBHH";

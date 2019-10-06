@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.koreanair.common_adapter.general.vo.consts.ERetailConsts;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -36,11 +38,11 @@ public class SchemaLocation {
 		schemaLocationMap.put("DisplayTripPlanInput", "/pnr/DisplayTripPlanInput.xsd");
 	}
 
-	public static String get(Object object, String version){
+	public static String get(Object object){
 		log.debug("object.getClass().getSimpleName() = {}", object.getClass().getSimpleName());
 
 		String schemaUrl="http://uat5.aereww.amadeus.com/XMLSchemas/${version}";
-		schemaUrl = StringUtils.replace(schemaUrl, "${version}", version);
+		schemaUrl = StringUtils.replace(schemaUrl, "${version}", ERetailConsts.ERETAIL_VERSION);
 		return schemaUrl + schemaLocationMap.get(object.getClass().getSimpleName());
 	}
 }

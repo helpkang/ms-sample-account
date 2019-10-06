@@ -24,8 +24,6 @@ import javax.xml.soap.SOAPException;
 import com.kal.framework.integration.adaptor.UrlConnectionService;
 import com.kal.framework.integration.adaptor.WebServiceVo;
 import com.kal.framework.integration.adaptor.support.UrlConnectionImpl;
-import com.koreanair.common_adapter.utils.JAXBFactory;
-import com.koreanair.common_adapter.utils.SchemaLocation;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,12 +72,14 @@ public class ERetailUrlConnectionConnectorImpl extends ERetailAbstractSoapConnec
 			webserviceVo.setHeaderType(2);
 			webserviceVo.setRequestMethod("POST");
 			webserviceVo.setEdgeproxycip(ip);
-			webserviceVo.setBodyXml(getBodyStr(obj));
-			log.debug("getBodyStr = {}", getBodyStr(obj));
+			webserviceVo.setBodyXml(getBodyContents(obj));
+			log.debug("getBodyContents = {}", getBodyContents(obj));
 			String responseXml = urlCon.call(webserviceVo);
 			responseXml = getOutPutBody(responseXml);
 			log.debug("{}", responseXml);
 			retObj = unmarshalFromResponse(responseXml, responseClass);
+
+			super.setJsessionId(webserviceVo.getJsessionId());
 		} catch (Exception e) {
 			throw new SOAPException(e);
 		}
@@ -104,12 +104,9 @@ public class ERetailUrlConnectionConnectorImpl extends ERetailAbstractSoapConnec
 		return xmlRetailSignDec(responseMessage.substring(startIdx, endIdx));
 	}
 
-	private static String getBodyStr(Object object) throws JAXBException {
-		String bodyStr = null;
-		String schemaLocation = SchemaLocation.get(object, "XSD_1.0");
-		log.debug("schemaLocation = {}" , schemaLocation);
-
-		bodyStr = JAXBFactory.marshal(object, schemaLocation);
+	@Override
+	protected String getBodyContents(Object object) throws JAXBException {
+		String bodyStr = super.getBodyContents(object);
 		bodyStr = "<![CDATA[".concat(bodyStr).concat("]]>");
 		return bodyStr;
 	}

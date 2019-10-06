@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 AsianaIDT Inc.
+ * Copyright 2011-2019 KoreanAir
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package com.koreanair.common_adapter.eretail.connector;
 
+import java.util.Map;
+
 import javax.xml.soap.SOAPException;
 
 /**
@@ -28,5 +30,12 @@ import javax.xml.soap.SOAPException;
  * @since 2019. 10. 3.
  */
 public interface ERetailConnector {
+
+	public Map<String, String> getResponseCookieMap();
+	public void setResponseCookieMap(Map<String, String> responseCookieMap);
+
 	public Object sendAndReceive(Object obj, Class<?> responseClass) throws SOAPException;
+
+	public String getJsessionId();
+	public void setJsessionId(String jsessionId);
 }

@@ -1,17 +1,23 @@
 package com.koreanair.common_adapter.eretail.avail.flexpricer;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.soap.SOAPException;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.stereotype.Component;
 
+import com.koreanair.common_adapter.eretail.ERetailBaseAdapter;
 import com.koreanair.common_adapter.eretail.connector.ERetailConnector;
 import com.koreanair.common_adapter.eretail.connector.ERetailSoapConnectorImpl;
-import com.koreanair.common_adapter.eretail.connector.ERetailUrlConnectionConnectorImpl;
+import com.koreanair.common_adapter.eretail.override.OverrideAdapter;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
 import com.koreanair.common_adapter.eretail.vo.SegmentInfoVO;
@@ -23,9 +29,7 @@ import com.koreanair.common_adapter.utils.GenericException;
 import com.koreanair.common_adapter.utils.GenericException.ExceptionCode;
 import com.koreanair.common_adapter.utils.JAXBFactory;
 import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
-import com.koreanair.common_adapter.utils.SchemaLocation;
 import com.koreanair.external.eretail.vo.common.overrideinput.OverrideInput;
-import com.koreanair.external.eretail.vo.common.overrideinput.OverrideInput.EMBEDDEDTRANSACTION;
 import com.koreanair.external.eretail.vo.farecommon.farecontext.LISTCORPORATENUMBER;
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.DISCOUNTINFOPTCLISTPTCType;
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.DISCOUNTINFOPTCType;
@@ -43,23 +47,67 @@ import com.koreanair.external.eretail.vo.flexpricer.flexpricercommoninput.LISTDE
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FlexPricerAdapter {
+@Component
+public class FlexPricerAdapter extends ERetailBaseAdapter {
 
 	private ERetailConnector retailCon = new ERetailSoapConnectorImpl();	// SOAPMesage 기반 connector
 //	private ERetailConnector retailCon = new ERetailUrlConnectionConnectorImpl();	// URL Connection기반 connector
 
-	public FlexPricerAvailabilityOutput getFlexPricerAvailability(FlexPricerInputVO inputVo) throws Exception {
-		FlexPricerAvailabilityInput flexPricerAvailabilityInput = organizeFlexPricerAvailabilityInput(inputVo);
-		OverrideInput override = organizeOverrideInput(flexPricerAvailabilityInput);
-		JAXBFactory.setMultiClassInstance(OverrideInput.class, FlexPricerAvailabilityInput.class, OverrideInput.class, FlexPricerAvailabilityOutput.class );
-		log.debug("{}", ObjectSerializeUtil.getObjectToJson(override));
-		log.debug("{}", JAXBFactory.getObjectToXML(override));
-		FlexPricerAvailabilityOutput out = (FlexPricerAvailabilityOutput) retailCon.sendAndReceive(override, FlexPricerAvailabilityOutput.class);
-
-		log.debug("out = {}", JAXBFactory.getObjectToXML(out));
-		return out;
+	public FlexPricerAdapter() {
+		log.debug("FlexPricerAdapter ready!");
 	}
 
+	/**
+	 * <pre>
+	 * FlexPricerInput을 호출하고 그 응답을 받아온다.
+	 * </pre>
+	 *
+	 * @param inputVo
+	 * @return
+	 * @throws JAXBException
+	 * @throws IOException
+	 * @throws SOAPException
+	 * @throws Exception
+	 */
+	public FlexPricerAvailabilityOutput getFlexPricerAvailability(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+
+		// FlexPricerInput을 구성한다.
+		FlexPricerAvailabilityInput flexPricerAvailabilityInput = organizeFlexPricerAvailabilityInput(inputVo);
+
+		// FlexPricerInput을 OverrideInput에 Embedded 시킨다.
+		OverrideAdapter overrideAdapter = new OverrideAdapter();
+		OverrideInput overrideWithFlexPricerInput = overrideAdapter.getEmbeddedOverrideInput(flexPricerAvailabilityInput);
+
+		// JAXB Marshal을 할때 한꺼번에 수행되어야 하는 POJO (VO) 를 JAXB instance로 등록한다.
+		JAXBFactory.setMultiClassInstance(OverrideInput.class, FlexPricerAvailabilityInput.class, OverrideInput.class, FlexPricerAvailabilityOutput.class );
+
+		log.debug("{}", ObjectSerializeUtil.getObjectToJson(overrideWithFlexPricerInput));
+		log.debug("{}", JAXBFactory.getObjectToXML(overrideWithFlexPricerInput));
+
+		// FlexPricerInput을 호출하고 그 응답을 받아온다.
+		Object output = retailCon.sendAndReceive(overrideWithFlexPricerInput, FlexPricerAvailabilityOutput.class);
+
+		setJsessionid(retailCon.getJsessionId());	// eRetail의 jsession 정보
+		setReturnObject(output);	// 응답받은 Object
+
+		FlexPricerAvailabilityOutput flexPricerOutput = null;
+		if (output instanceof FlexPricerAvailabilityOutput) {
+			flexPricerOutput = (FlexPricerAvailabilityOutput) output;
+		}
+
+		log.debug("out = {}", JAXBFactory.getObjectToXML(output));
+		return flexPricerOutput;
+	}
+
+
+	/**
+	 * <pre>
+	 * FlexPricerInput을 구성한다.
+	 * </pre>
+	 *
+	 * @param inputVo
+	 * @return
+	 */
 	private FlexPricerAvailabilityInput organizeFlexPricerAvailabilityInput(FlexPricerInputVO inputVo) {
 
 		if (ObjectUtils.isEmpty(inputVo.getCffCodeList())) {
@@ -186,43 +234,6 @@ public class FlexPricerAdapter {
 		return flexPricerAvailabilityInput;
 	}
 
-	private OverrideInput organizeOverrideInput(Object object) {
-		OverrideInput overrideInupt = new OverrideInput();
-		overrideInupt.setTRANSACTIONID("Override");
-		overrideInupt.setSITE("CBFICBFI");
-		overrideInupt.setLANGUAGE("GB");
-		overrideInupt.setSOSITEOFFICEID("SELKE08DM");
-		overrideInupt.setSOSITEMINAVAILDATESPAN("N30");
-		overrideInupt.setSOSITENBFLIGHTSAVAIL("30");
-		overrideInupt.setSOSITEPOINTOFSALE("SEL");
-		overrideInupt.setSOSITEPOINTOFTICKETING("SEL");
-		overrideInupt.setSOSITEMINIMALTIME("N30");
-		overrideInupt.setSOSITEAPIV2SERVER("194.156.170.78");
-		overrideInupt.setSOSITEAPIV2SERVERUSERID("GUEST");
-		overrideInupt.setSOSITEAPIV2SERVERPWD("TAZ");
-
-		log.debug("embedded call");
-		EMBEDDEDTRANSACTION embedded = new EMBEDDEDTRANSACTION();
-		String schemaLocation = SchemaLocation.get(object, "XSD_1.0");
-		embedded.setSchemaRef(schemaLocation);
-		embedded.getContent().add(object);
-		overrideInupt.setEMBEDDEDTRANSACTION(embedded);
-
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEMANUALETKTCMD", "TTP/ET"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESISERVERIP", "193.23.185.67"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESISERVERPORT", "18006"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESISAP", "1ASIXJCPU"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESIUSER", "UNSET"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESIPASSWORD", "UNSET"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESI1AXMLFROM", "SEPJCP"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITECORPORATEID", "SEP-UAT"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEAPIV2SERVERPORT", "20002"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEPTCCONFVALIDATION", "FALSE"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESENDFOIDAIRLINE", "FALSE"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEMAXRESNUMATTEMPTS", "0"));
-
-		return overrideInupt;
-	}
 
 	public static void main(String[] args) throws Exception {
 		FlexPricerAdapter adapter = new FlexPricerAdapter();

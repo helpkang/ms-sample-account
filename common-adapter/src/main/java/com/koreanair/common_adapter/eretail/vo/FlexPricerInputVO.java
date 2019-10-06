@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.koreanair.common_adapter.general.vo.consts.TripType;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 /**
@@ -33,6 +34,7 @@ import lombok.Data;
  * @since 2019. 9. 30.
  */
 @Data
+@ApiModel(description = "FlexPrice를 이용하여 항공편 List를 조회할때 사용하는 모델")
 public class FlexPricerInputVO {
 	private String bizType = "";
 	private TripType tripType;
