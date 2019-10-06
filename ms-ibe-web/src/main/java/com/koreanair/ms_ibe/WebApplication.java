@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 (scanBasePackages = {
-	"com.koreanair.ms_ibe",
+	"com.koreanair"
 })
 public class WebApplication {
 
