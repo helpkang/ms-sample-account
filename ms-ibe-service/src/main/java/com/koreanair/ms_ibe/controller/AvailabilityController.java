@@ -51,6 +51,7 @@ public class AvailabilityController {
     )
     @ResponseBody
 	public FlexPricerAvailabilityOutput getDomesticAvailForRevenue(@RequestBody FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+    	log.debug("getDomesticAvailForRevenue start");
     	return availService.getDomesticAvailForRevenue(inputVo);
 	}
 
