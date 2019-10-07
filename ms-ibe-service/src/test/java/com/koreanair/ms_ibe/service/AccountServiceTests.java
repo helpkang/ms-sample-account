@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AccountServiceTests {
 
 	@Autowired
-	AirOfferService service;
+	AccountService service;
 
 	@Autowired
 	AccountRepository accountRepository;
@@ -49,7 +49,7 @@ public class AccountServiceTests {
 		assertEquals(50, getBalance("a"));
 		assertEquals(250, getBalance("b"));
 	}
-	
+
 
 	@Test
 	public void transferPaging() {
@@ -66,15 +66,15 @@ public class AccountServiceTests {
 		PageRequest pp = PageRequest.of(0, 2);
 		Page<Transfer> page = transferRepository.findByFromAccount(fromAccount.getName(), pp);
 		log.debug("page: {}", page);
-		
+
 		page.get().forEach(
 			(transaction)->{log.debug("transaction:{}", transaction);}
 		);
-		
+
 	}
-	
-	
-	
+
+
+
 	private int getBalance(String name){
 		return getAccount(name).getBalance();
 	}
