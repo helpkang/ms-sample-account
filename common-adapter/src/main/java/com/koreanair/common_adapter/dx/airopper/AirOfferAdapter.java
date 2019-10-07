@@ -25,6 +25,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
@@ -53,6 +54,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2019. 9. 26.
  */
 @Slf4j
+@Component
 public class AirOfferAdapter {
 
 	private static RestTemplate restTemplate = new RestTemplate();
