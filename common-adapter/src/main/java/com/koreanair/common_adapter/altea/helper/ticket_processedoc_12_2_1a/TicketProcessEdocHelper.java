@@ -1,10 +1,10 @@
-package com.koreanair.common_adapter.altea.converter.ticket_processedoc_12_2_1a;
+package com.koreanair.common_adapter.altea.helper.ticket_processedoc_12_2_1a;
 
 import com.koreanair.external.altea.vo.ticket_processedoc_12_1_1a.*;
 
 import java.util.List;
 
-public class TicketProcessEdocConverter {
+public class TicketProcessEdocHelper {
 
     public static TicketProcessEDoc makeTicketProcessEDocInput(List<String> ticketList) {
         TicketProcessEDoc input = new TicketProcessEDoc();

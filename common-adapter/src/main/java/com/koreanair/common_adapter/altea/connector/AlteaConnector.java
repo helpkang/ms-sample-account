@@ -1,15 +1,17 @@
-package com.koreanair.common_adapter.altea;
+package com.koreanair.common_adapter.altea.connector;
 
 import com.kal.framework.integration.adaptor.WebServiceVo;
 import com.kal.framework.integration.adaptor.support.UrlConnectionImpl;
 import com.koreanair.common_adapter.altea.vo.AlteaInputVo;
 import com.koreanair.common_adapter.utils.JAXBFactory;
+import org.springframework.stereotype.Component;
 
 import javax.xml.bind.JAXBException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AlteaAdapter {
+@Component
+public class AlteaConnector {
     public  String call(AlteaInputVo vo) throws Exception {
         UrlConnectionImpl impl = new UrlConnectionImpl();
         WebServiceVo inputVo = getWebServiceVo(vo);

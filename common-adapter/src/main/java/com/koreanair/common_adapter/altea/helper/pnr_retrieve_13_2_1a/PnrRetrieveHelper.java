@@ -1,6 +1,6 @@
-package com.koreanair.common_adapter.altea.converter.pnr_retrieve_13_2_1a;
+package com.koreanair.common_adapter.altea.helper.pnr_retrieve_13_2_1a;
 
-import com.koreanair.common_adapter.altea.AlteaAdapter;
+import com.koreanair.common_adapter.altea.connector.AlteaConnector;
 import com.koreanair.common_adapter.altea.vo.AlteaInputVo;
 import com.koreanair.common_adapter.common.vo.*;
 import com.koreanair.common_adapter.utils.JAXBFactory;
@@ -17,7 +17,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PnrRetrieveConverter {
+public class PnrRetrieveHelper {
     public static PNRRetrieve makeRetrievePNRInput(String reservation) {
         reservation = reservation.replaceAll("-","");
         PNRRetrieve input = new PNRRetrieve();
@@ -518,16 +518,16 @@ public class PnrRetrieveConverter {
     public static void main(String[] args)throws Exception {
 
         AlteaInputVo alteainput = new AlteaInputVo();
-        PNRRetrieve pnrinput =  PnrRetrieveConverter.makeRetrievePNRInput("K2MLCB");
+        PNRRetrieve pnrinput =  PnrRetrieveHelper.makeRetrievePNRInput("K2MLCB");
         alteainput.setInputBody(pnrinput);
         alteainput.setOperationName("PNR_Retrieve");
-        AlteaAdapter adapter = new AlteaAdapter();
+        AlteaConnector adapter = new AlteaConnector();
         String result = adapter.call(alteainput);
         result = result.substring(result.indexOf("<soapenv:Body>")+14);
         result = result.substring(0,result.indexOf("</soapenv:Body>"));
         System.out.println(result);
         PNRReply reply = JAXBFactory.unmarshal(result,PNRReply.class);
-        CommonPnrReply output = PnrRetrieveConverter.makeRetrievePNROutput(reply);
+        CommonPnrReply output = PnrRetrieveHelper.makeRetrievePNROutput(reply);
         ObjectSerializeUtil.getObjectToJson(output);
         System.out.println(ObjectSerializeUtil.getObjectToJson(output));
 

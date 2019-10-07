@@ -11,8 +11,7 @@ import java.util.ArrayList;
 
 @Data
 public class VwReservationOutput {
-    public boolean splitPnr;
-
+    private boolean splitPnr;
     private String reservationNumber;
     private String reservationRecLoc;
     private String officeId;                                            //officeid
