@@ -28,7 +28,6 @@ public class StringUtil extends StringUtils {
         if(obj instanceof Element) {
         	Element elements = (Element)obj;
         	strReturn = defaultString(elements.getTextContent());
-        	log.debug("elements.getTextContent()={}",elements.getTextContent());
         } else if (obj instanceof String) {
             strReturn = (String) obj;
         }
