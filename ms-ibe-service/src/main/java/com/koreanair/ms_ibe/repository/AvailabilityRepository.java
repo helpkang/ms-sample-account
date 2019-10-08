@@ -25,7 +25,7 @@ import org.springframework.stereotype.Repository;
 
 import com.koreanair.common_adapter.eretail.avail.flexpricer.FlexPricerAdapter;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
-import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilityoutput.FlexPricerAvailabilityOutput;
+import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
 
 @Repository
 public class AvailabilityRepository {
@@ -33,7 +33,7 @@ public class AvailabilityRepository {
 	@Autowired
 	private FlexPricerAdapter flexPricer;
 
-	public FlexPricerAvailabilityOutput getFlexPricerAvailability(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+	public FlexPricerOutputVO getFlexPricerAvailability(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
 		return flexPricer.getFlexPricerAvailability(inputVo);
 	}
 

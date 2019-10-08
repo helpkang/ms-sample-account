@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
-import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilityoutput.FlexPricerAvailabilityOutput;
+import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
 import com.koreanair.ms_ibe.service.AvailabilityService;
 
 import io.swagger.annotations.Api;
@@ -50,7 +50,7 @@ public class AvailabilityController {
     notes = "Revenue 국내선 항공편 조회"
     )
     @ResponseBody
-	public FlexPricerAvailabilityOutput getDomesticAvailForRevenue(@RequestBody FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+	public FlexPricerOutputVO getDomesticAvailForRevenue(@RequestBody FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
     	log.debug("getDomesticAvailForRevenue start");
     	return availService.getDomesticAvailForRevenue(inputVo);
 	}
