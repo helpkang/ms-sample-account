@@ -17,13 +17,11 @@ package com.koreanair.common_adapter.eretail.override;
 
 import javax.xml.soap.SOAPException;
 
+import org.springframework.stereotype.Component;
+
 import com.koreanair.common_adapter.eretail.ERetailBaseAdapter;
 import com.koreanair.common_adapter.eretail.connector.ERetailConnector;
 import com.koreanair.common_adapter.eretail.connector.ERetailSoapConnectorImpl;
-import com.koreanair.common_adapter.utils.JAXBFactory;
-import com.koreanair.common_adapter.utils.SchemaLocation;
-import com.koreanair.external.eretail.vo.common.overrideinput.OverrideInput;
-import com.koreanair.external.eretail.vo.common.overrideinput.OverrideInput.EMBEDDEDTRANSACTION;
 import com.koreanair.external.eretail.vo.common.overrideoutput.OverrideOutput;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,53 +37,13 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2019. 10. 3.
  */
 @Slf4j
+@Component
 public class OverrideAdapter extends ERetailBaseAdapter {
 	private ERetailConnector retailCon = new ERetailSoapConnectorImpl();	// SOAPMesage 기반 connector
-
-	public OverrideInput getEmbeddedOverrideInput(Object embeddedObject) {
-		OverrideInput overrideInupt = new OverrideInput();
-		overrideInupt.setTRANSACTIONID("Override");
-		overrideInupt.setSITE("CBFICBFI");
-		overrideInupt.setLANGUAGE("GB");
-		overrideInupt.setSOSITEOFFICEID("SELKE08DM");
-		overrideInupt.setSOSITEMINAVAILDATESPAN("N30");
-		overrideInupt.setSOSITENBFLIGHTSAVAIL("30");
-		overrideInupt.setSOSITEPOINTOFSALE("SEL");
-		overrideInupt.setSOSITEPOINTOFTICKETING("SEL");
-		overrideInupt.setSOSITEMINIMALTIME("N30");
-		overrideInupt.setSOSITEAPIV2SERVER("194.156.170.78");
-		overrideInupt.setSOSITEAPIV2SERVERUSERID("GUEST");
-		overrideInupt.setSOSITEAPIV2SERVERPWD("TAZ");
-
-		log.debug("embedded call");
-		EMBEDDEDTRANSACTION embedded = new EMBEDDEDTRANSACTION();
-		String schemaLocation = SchemaLocation.get(embeddedObject);
-		embedded.setSchemaRef(schemaLocation);
-		embedded.getContent().add(embeddedObject);
-		overrideInupt.setEMBEDDEDTRANSACTION(embedded);
-
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEMANUALETKTCMD", "TTP/ET"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESISERVERIP", "193.23.185.67"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESISERVERPORT", "18006"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESISAP", "1ASIXJCPU"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESIUSER", "UNSET"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESIPASSWORD", "UNSET"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESI1AXMLFROM", "SEPJCP"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITECORPORATEID", "SEP-UAT"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEAPIV2SERVERPORT", "20002"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEPTCCONFVALIDATION", "FALSE"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESENDFOIDAIRLINE", "FALSE"));
-		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEMAXRESNUMATTEMPTS", "0"));
-
-		return overrideInupt;
-	}
+	private OverrideHelper helper = new OverrideHelper();
 
 	public OverrideOutput keepAliveOverride() throws SOAPException {
-		OverrideInput overrideInupt = new OverrideInput();
-		overrideInupt.setTRANSACTIONID("Override");
-		overrideInupt.setSITE("CBFICBFI");
-		overrideInupt.setLANGUAGE("GB");
-		Object outObj = retailCon.sendAndReceive(overrideInupt, OverrideOutput.class);
+		Object outObj = retailCon.sendAndReceive(helper.getKeepAliveOverride(), OverrideOutput.class);
 		setJsessionid(retailCon.getJsessionId());
 		OverrideOutput output = (OverrideOutput) outObj;
 		setReturnObject(output);
