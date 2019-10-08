@@ -31,8 +31,5 @@ public class RecommendVO {
 	private String fareFamilyHierarchy = "";
 	private String currency = "";
 	private String displayCurrency = "";
-	private String totalAmountOfPnr = "0";
-	private String totalTaxOfPnr = "0";
-
 	private List<TravellerTypeFareInfoVO> travellerTypeFareInfoList = new ArrayList<>();
 }
