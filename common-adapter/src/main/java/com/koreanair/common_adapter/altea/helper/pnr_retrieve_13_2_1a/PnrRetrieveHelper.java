@@ -521,12 +521,9 @@ public class PnrRetrieveHelper {
         PNRRetrieve pnrinput =  PnrRetrieveHelper.makeRetrievePNRInput("K2MLCB");
         alteainput.setInputBody(pnrinput);
         alteainput.setOperationName("PNR_Retrieve");
+        alteainput.setResponseClass(PNRReply.class);
         AlteaConnector adapter = new AlteaConnector();
-        String result = adapter.call(alteainput);
-        result = result.substring(result.indexOf("<soapenv:Body>")+14);
-        result = result.substring(0,result.indexOf("</soapenv:Body>"));
-        System.out.println(result);
-        PNRReply reply = JAXBFactory.unmarshal(result,PNRReply.class);
+        PNRReply reply = (PNRReply) adapter.call(alteainput);
         CommonPnrReply output = PnrRetrieveHelper.makeRetrievePNROutput(reply);
         ObjectSerializeUtil.getObjectToJson(output);
         System.out.println(ObjectSerializeUtil.getObjectToJson(output));
