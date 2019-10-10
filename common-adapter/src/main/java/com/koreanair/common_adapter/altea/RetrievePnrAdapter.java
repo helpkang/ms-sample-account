@@ -17,13 +17,9 @@ public class RetrievePnrAdapter {
         AlteaInputVo alteainput = new AlteaInputVo();
         alteainput.setInputBody(pnrinput);
         alteainput.setOperationName("PNR_Retrieve");
+        alteainput.setResponseClass(PNRReply.class);
         AlteaConnector adapter = new AlteaConnector();
-        String result = adapter.call(alteainput);
-        result = result.substring(result.indexOf("<soapenv:Body>")+14);
-        result = result.substring(0,result.indexOf("</soapenv:Body>"));
-        System.out.println(result);
-        PNRReply reply = JAXBFactory.unmarshal(result,PNRReply.class);
+        PNRReply reply = (PNRReply) adapter.call(alteainput);
         return PnrRetrieveHelper.makeRetrievePNROutput(reply);
     }
-
 }
