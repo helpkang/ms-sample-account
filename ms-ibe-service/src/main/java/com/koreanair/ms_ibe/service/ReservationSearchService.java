@@ -15,7 +15,7 @@ public class ReservationSearchService {
 
     @Transactional
     public VwReservationOutput getReservation(String recLoc) throws Exception {
-        CommonPnrReply reply = alteaRepository.reservationSearch(recLoc);
+        CommonPnrReply reply = alteaRepository.reservationSearch(recLoc,false);
         VwReservationOutput output = new VwReservationOutput();
         BeanUtils.copyProperties(reply, output);
         return output;

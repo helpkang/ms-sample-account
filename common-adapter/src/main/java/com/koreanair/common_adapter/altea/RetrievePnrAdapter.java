@@ -16,7 +16,7 @@ public class RetrievePnrAdapter {
     @Autowired
     private PnrRetrieveHelper pnrRetrieveHelper;
 
-    public CommonPnrReply retrievePnr(String recLoc)throws Exception{
+    public CommonPnrReply retrievePnr(String recLoc, boolean stateful)throws Exception{
         PNRRetrieve pnrinput =  pnrRetrieveHelper.makeRetrievePNRInput("K2MLCB");
         AlteaInputVo alteainput = new AlteaInputVo();
         alteainput.setInputBody(pnrinput);

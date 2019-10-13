@@ -17,8 +17,8 @@ public class AlteaRepository {
     @Autowired
     private RetrievePnrAdapter pnrAdapter;
 
-    public CommonPnrReply reservationSearch(String recLoc) throws Exception {
-        CommonPnrReply reply = pnrAdapter.retrievePnr(recLoc);
+    public CommonPnrReply reservationSearch(String recLoc, boolean stateful) throws Exception {
+        CommonPnrReply reply = pnrAdapter.retrievePnr(recLoc, stateful);
         return reply;
     }
 
