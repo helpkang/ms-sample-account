@@ -11,6 +11,7 @@ public class AlteaInputVo implements Serializable {
     private Object inputBody;
     private String operationName;
     private String responseName;
+    private Class<?> responseClass;
     private boolean stateful;
 
 }

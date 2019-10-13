@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
-import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilityoutput.FlexPricerAvailabilityOutput;
+import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
 import com.koreanair.ms_ibe.repository.AvailabilityRepository;
 
 @Service
@@ -33,7 +33,7 @@ public class AvailabilityService {
 	@Autowired
 	private AvailabilityRepository availRepository;
 
-	public FlexPricerAvailabilityOutput getDomesticAvailForRevenue(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+	public FlexPricerOutputVO getDomesticAvailForRevenue(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
 		return availRepository.getFlexPricerAvailability(inputVo);
 	}
 }

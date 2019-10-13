@@ -18,6 +18,9 @@ package com.koreanair.common_adapter.eretail.connector;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpCookie;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
@@ -114,7 +117,19 @@ public class ERetailSoapConnectorImpl extends ERetailAbstractSoapConnector {
 
 		SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
 		SOAPConnection soapConnection = soapConnectionFactory.createConnection();
-		SOAPMessage soapResMessage = soapConnection.call(soapReqMessage, "https://uat5.aereww.amadeus.com/soap/SOAPRPCRouterServlet");
+		URL endpoint = new URL(new URL("https://uat5.aereww.amadeus.com"), "/soap/SOAPRPCRouterServlet", new URLStreamHandler() {
+			@Override
+			protected URLConnection openConnection(URL url) throws IOException {
+				URL target = new URL(url.toString());
+				URLConnection connection = target.openConnection();
+				// Connection settings
+				connection.setConnectTimeout(10000); // 10 sec
+				connection.setReadTimeout(60000); // 1 min
+				return (connection);
+			}
+		});
+		SOAPMessage soapResMessage = soapConnection.call(soapReqMessage, endpoint);
+//		SOAPMessage soapResMessage = soapConnection.call(soapReqMessage, "https://uat5.aereww.amadeus.com/soap/SOAPRPCRouterServlet");
 
 		log.debug("");
 		log.debug("Outbound Message - To 1A");
