@@ -1,12 +1,11 @@
 package com.koreanair.common_adapter.common.vo;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class TicketFare {
     private String currency;           /*화폐타입*/
     private Integer fare; 	//baseFare

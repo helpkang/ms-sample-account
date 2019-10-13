@@ -1,15 +1,11 @@
 package com.koreanair.common_adapter.common.vo;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class RefundInfo {
 
     private String refundRegistration;				/* 환불등록번호 */

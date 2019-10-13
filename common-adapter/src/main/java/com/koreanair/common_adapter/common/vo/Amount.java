@@ -1,14 +1,10 @@
 package com.koreanair.common_adapter.common.vo;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class Amount {
     //무상 예매 관련
     private BigInteger milesCost; /* 마일리지 */

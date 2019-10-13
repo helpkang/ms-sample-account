@@ -1,12 +1,8 @@
 package com.koreanair.common_adapter.common.vo;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class Coupons {
 
     private String status;				/* 항공편 상태값 */

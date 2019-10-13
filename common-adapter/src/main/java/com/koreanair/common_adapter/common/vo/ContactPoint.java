@@ -1,12 +1,11 @@
 package com.koreanair.common_adapter.common.vo;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class ContactPoint {
     private String email;					/* 이메일*/
     private String phoneNumber;				/* 핸드폰번호 or 또는 전화번호*/

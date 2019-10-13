@@ -10,7 +10,6 @@ import javax.transaction.Transactional;
 
 @Service
 public class ReservationSearchService {
-
     @Autowired
     private AlteaRepository alteaRepository;
 
@@ -21,5 +20,4 @@ public class ReservationSearchService {
         BeanUtils.copyProperties(reply, output);
         return output;
     }
-
 }

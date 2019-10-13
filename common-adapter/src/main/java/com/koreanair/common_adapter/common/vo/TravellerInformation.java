@@ -1,14 +1,10 @@
 package com.koreanair.common_adapter.common.vo;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.ArrayList;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class TravellerInformation {
 
     private String passengerFirstName;									/* 승객 이름*/
