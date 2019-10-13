@@ -14,19 +14,16 @@ import org.springframework.stereotype.Component;
 public class RetrievePnrAdapter {
 
     @Autowired
-    PnrRetrieveHelper pnrRetrieveHelper;
+    private PnrRetrieveHelper pnrRetrieveHelper;
+
     public CommonPnrReply retrievePnr(String recLoc)throws Exception{
         PNRRetrieve pnrinput =  pnrRetrieveHelper.makeRetrievePNRInput("K2MLCB");
         AlteaInputVo alteainput = new AlteaInputVo();
         alteainput.setInputBody(pnrinput);
         alteainput.setOperationName("PNR_Retrieve");
+        alteainput.setResponseClass(PNRReply.class);
         AlteaConnector adapter = new AlteaConnector();
-        String result = adapter.call(alteainput);
-        result = result.substring(result.indexOf("<soapenv:Body>")+14);
-        result = result.substring(0,result.indexOf("</soapenv:Body>"));
-        System.out.println(result);
-        PNRReply reply = JAXBFactory.unmarshal(result,PNRReply.class);
+        PNRReply reply = (PNRReply) adapter.call(alteainput);
         return pnrRetrieveHelper.makeRetrievePNROutput(reply);
     }
-
 }
