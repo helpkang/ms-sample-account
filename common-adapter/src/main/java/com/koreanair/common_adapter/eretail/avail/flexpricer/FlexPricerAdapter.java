@@ -71,12 +71,13 @@ public class FlexPricerAdapter extends ERetailBaseAdapter {
 		Object output = retailCon.sendAndReceive(overrideWithFlexPricerInput, FlexPricerAvailabilityOutput.class);
 
 		setJsessionid(retailCon.getJsessionId());	// eRetail의 jsession 정보
-		setReturnObject(output);	// 응답받은 Object
+		setReturnOriginObject(output);	// 응답받은 Object
 
 		FlexPricerOutputVO flexPricerOutputVO = null;
 		if (output instanceof FlexPricerAvailabilityOutput) {
 			FlexPricerAvailabilityOutput flexPricerOutput = (FlexPricerAvailabilityOutput) output;
 			flexPricerOutputVO = flexPricerHelper.convertOutputVO(flexPricerOutput, retailCon.getJsessionId());
+			setReturnObject(flexPricerOutputVO);
 		} else {
 			// 받아야 할 응답을 받지 못한 경우이기 때문에 error를 throw 한다.
 			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "알수없는 응답 수신");
@@ -86,29 +87,70 @@ public class FlexPricerAdapter extends ERetailBaseAdapter {
 		return flexPricerOutputVO;
 	}
 
+	public void getCalendarMatrixFareAvailabiltiy(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+
+		if (inputVo.getDateRange() <= 0) {
+			throw new GenericException(ExceptionCode.BAD_REQUEST, "Calendar Fare 조회를 위해서는 DateRange는 필수 사항입니다.");
+		}
+
+		// FlexPricerInput을 구성한다.
+		FlexPricerAvailabilityInput flexPricerAvailabilityInput = flexPricerHelper.getFlexPricerAvailabilityInput(inputVo);
+
+		// FlexPricerInput을 OverrideInput에 Embedded 시킨다.
+		OverrideInput overrideWithFlexPricerInput = overrideHelper.getEmbeddedOverrideInput(flexPricerAvailabilityInput);
+
+		// JAXB Marshal을 할때 한꺼번에 수행되어야 하는 POJO (VO) 를 JAXB instance로 등록한다.
+		JAXBFactory.setMultiClassInstance(OverrideInput.class, FlexPricerAvailabilityInput.class, OverrideInput.class, FlexPricerAvailabilityOutput.class );
+
+		// FlexPricerInput을 호출하고 그 응답을 받아온다.
+		Object output = retailCon.sendAndReceive(overrideWithFlexPricerInput, FlexPricerAvailabilityOutput.class);
+
+		setJsessionid(retailCon.getJsessionId());	// eRetail의 jsession 정보
+		setReturnOriginObject(output);	// 응답받은 Object
+
+		FlexPricerOutputVO flexPricerOutputVO = null;
+		if (output instanceof FlexPricerAvailabilityOutput) {
+			FlexPricerAvailabilityOutput flexPricerOutput = (FlexPricerAvailabilityOutput) output;
+			flexPricerHelper.convertCalendarFareOutputVO(flexPricerOutput, retailCon.getJsessionId());
+			setReturnObject(flexPricerOutputVO);
+		} else {
+			// 받아야 할 응답을 받지 못한 경우이기 때문에 error를 throw 한다.
+			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "알수없는 응답 수신");
+		}
+
+		log.debug("out = {}", JAXBFactory.getObjectToXML(output));
+		//return flexPricerOutputVO;
+	}
 
 	public static void main(String[] args) throws Exception {
 		FlexPricerAdapter adapter = new FlexPricerAdapter();
 		// SELKE08DW
 		FlexPricerInputVO inputVo = new FlexPricerInputVO();
-		inputVo.setDateRange(0);
+		inputVo.setDualDisplay(false);
+		inputVo.setOnlyCalendarFare(true);
+		inputVo.setDateRange(3);
 		inputVo.setTripType(TripType.RT);
 		inputVo.getCffCodeList().add("DOMECOEY");
 
 		SegmentInfoVO segmentInfo = new SegmentInfoVO();
 		segmentInfo.setDepartureAirport("GMP");
 		segmentInfo.setArrivalAirport("CJU");
-		segmentInfo.setDepartureDateTime("201910080000");
+		segmentInfo.setDepartureDateTime("201910270000");
 		inputVo.getSegmentInfoList().add(segmentInfo);
 		segmentInfo = new SegmentInfoVO();
 		segmentInfo.setDepartureAirport("CJU");
 		segmentInfo.setArrivalAirport("GMP");
-		segmentInfo.setDepartureDateTime("201910220000");
+		segmentInfo.setDepartureDateTime("201910290000");
 		inputVo.getSegmentInfoList().add(segmentInfo);
 
 		PassengerConditionVO passengerCondition = new PassengerConditionVO();
 		passengerCondition.setPassengerType(PAXType.ADT);
 		inputVo.getPassengerConditionList().add(passengerCondition);
+
+		passengerCondition = new PassengerConditionVO();
+		passengerCondition.setPassengerType(PAXType.CHD);
+		inputVo.getPassengerConditionList().add(passengerCondition);
+
 //
 //		passengerCondition = new PassengerConditionVO();
 //		passengerCondition.setPassengerType(PAXType.CHD);

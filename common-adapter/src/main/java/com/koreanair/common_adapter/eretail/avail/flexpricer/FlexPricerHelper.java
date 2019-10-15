@@ -106,8 +106,12 @@ public class FlexPricerHelper {
 		flexPricerAvailabilityInput.setTRANSACTIONID(ERetailTransactionId.FLEX_PRICER_AVAILABILITY);
 		flexPricerAvailabilityInput.setSITE(ERetailConsts.SITE_REVENUE);
 		flexPricerAvailabilityInput.setLANGUAGE(ERetailConsts.LANGUAGE);
-		flexPricerAvailabilityInput.setPRICINGTYPE("C");	// PRICING TYPE : I = Itinerary, C=One way Combinable , O=One Way Display
-		flexPricerAvailabilityInput.setDISPLAYTYPE(BigInteger.valueOf(2));
+		String pricingType = "C";
+		if(inputVo.isOnlyCalendarFare()) {
+			pricingType = "I";	// Calendar fare 형식은 가는날 , 오는날의 mix 된 형태의 fare를 표출하는 구조이기 때문에 굳이 owc 나 owd 형태로 표출할 필요가 없음.
+		}
+		flexPricerAvailabilityInput.setPRICINGTYPE(pricingType);	// PRICING TYPE : I = Itinerary, C=One way Combinable , O=One Way Display
+		flexPricerAvailabilityInput.setDISPLAYTYPE(inputVo.isDualDisplay() ? BigInteger.valueOf(2) : BigInteger.ONE);	// 1 = Single Display, either Calendar or Upsell , 2 = Dual Display both calendar
 		flexPricerAvailabilityInput.setTRIPTYPE(inputVo.getTripType().value());
 
 		/* 정렬 기준
@@ -372,5 +376,9 @@ public class FlexPricerHelper {
 
 
 		return output;
+	}
+
+	public void convertCalendarFareOutputVO(FlexPricerAvailabilityOutput flexPricerOutput, String jsessionId) {
+
 	}
 }

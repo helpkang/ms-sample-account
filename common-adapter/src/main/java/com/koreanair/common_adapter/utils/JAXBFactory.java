@@ -57,6 +57,10 @@ public class JAXBFactory {
 	@SuppressWarnings("rawtypes")
 	private static Map<Class,JAXBContext> instances = new HashMap<>();
 
+	private void initializeInstance() {
+
+	}
+
 	public static void setMultiClassInstance(Class primaryClass, Class... classes) throws JAXBException {
 		instances.put(primaryClass, JAXBContext.newInstance(classes));
 	}

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ERetailBaseAdapter {
 	protected String jsessionid = "";
+	protected Object returnOriginObject = null;
 	protected Object returnObject = null;
 
 	public String getJsessionid() {
@@ -28,6 +29,14 @@ public class ERetailBaseAdapter {
 
 	public void setJsessionid(String jsessionid) {
 		this.jsessionid = jsessionid;
+	}
+
+	public Object getReturnOriginObject() {
+		return returnOriginObject;
+	}
+
+	public void setReturnOriginObject(Object returnOriginObject) {
+		this.returnOriginObject = returnOriginObject;
 	}
 
 	public Object getReturnObject() {
