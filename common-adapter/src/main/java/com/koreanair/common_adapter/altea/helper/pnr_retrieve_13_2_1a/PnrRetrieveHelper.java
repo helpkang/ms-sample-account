@@ -10,15 +10,18 @@ import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.PNRRetrieve;
 import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.ReservationControlInformationDetailsType;
 import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.ReservationControlInformationType;
 import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.RetrievePNRType;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
+import org.springframework.stereotype.Component;
+
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class PnrRetrieveHelper {
-    public static PNRRetrieve makeRetrievePNRInput(String reservation) {
+    public PNRRetrieve makeRetrievePNRInput(String reservation) {
         reservation = reservation.replaceAll("-","");
         PNRRetrieve input = new PNRRetrieve();
         PNRRetrieve.RetrievalFacts refacts = new PNRRetrieve.RetrievalFacts();
@@ -39,16 +42,16 @@ public class PnrRetrieveHelper {
         return input;
     }
 
-    public static CommonPnrReply makeRetrievePNROutput(PNRReply output){
-
+    public CommonPnrReply makeRetrievePNROutput(PNRReply output){
         CommonPnrReply reply = new CommonPnrReply();
         ArrayList<TravellerInformation>travellerInformationList = new ArrayList<>();
         ArrayList<TicketInformation>ticketInfoList = new ArrayList<>();
         ArrayList<TicketInformation>emdTicketInfoList = new ArrayList<>();
         ArrayList<PaymentInformation>paymentInformationList = new ArrayList<>();
         ArrayList<Itinerary>itineraryList = new ArrayList<>();
-        ContactPoint contactPoint = new ContactPoint();
+        ArrayList<ContactPoint> contactPointList = new ArrayList<>();
         ArrayList<FreeText>freeTextList = new ArrayList<>();
+        ArrayList<Service>serviceList = new ArrayList<>();
 
 
         if(null!=output){
@@ -99,22 +102,25 @@ public class PnrRetrieveHelper {
             /**
              * 여정 정보
              */
-            if(!CollectionUtils.isEmpty(originDestinationDetailsList)) {
+            if(CollectionUtils.isNotEmpty(originDestinationDetailsList)) {
                 PNRReply.OriginDestinationDetails originDestinationDetails = originDestinationDetailsList.get(0);
                 for(PNRReply.OriginDestinationDetails.ItineraryInfo itineraryInfo : originDestinationDetails.getItineraryInfo()) {
                     Itinerary itinerary = new Itinerary();
                     if(null!=itineraryInfo.getRelatedProduct()){
-                        //boolean isEb = true;
-                        // elementManagementItinerary
                         ElementManagementSegmentType elementManagementItinerary = itineraryInfo.getElementManagementItinerary();
-
                         String segmentName = elementManagementItinerary.getSegmentName();
 
                         // segmentName이 AIR가 아니면 seg 정보 무시
                         if("AIR".equals(segmentName)) {
                             //segment.setta(elementManagementItinerary.getReference().getNumber().toString());
                             //itineraryInfoVo.setLineNumber(elementManagementItinerary.getLineNumber());
-
+                            if(null!=elementManagementItinerary
+                                    &&null!=elementManagementItinerary.getReference()
+                                    &&null!=elementManagementItinerary.getReference().getQualifier()
+                                    &&"ST".equalsIgnoreCase(elementManagementItinerary.getReference().getQualifier())
+                            ) {
+                                itinerary.setSegmentNumber(elementManagementItinerary.getReference().getNumber());
+                            }
                             TravelProductInformationTypeI travelProduct = itineraryInfo.getTravelProduct();
                             // boardpointDetail
                             itinerary.setDepartureCityCode(travelProduct.getBoardpointDetail().getCityCode());	// 출발 도시 코드
@@ -148,7 +154,7 @@ public class PnrRetrieveHelper {
                             // Airline code가 KE이고 OPERATE BY가 없으면 KE 편명으로 판단
                             String companyCode = itineraryInfo.getTravelProduct().getCompanyDetail().getIdentification();
                             if("KE".equals(companyCode)) {
-                                if(!CollectionUtils.isEmpty(itineraryInfo.getItineraryfreeFormText())) {
+                                if(CollectionUtils.isNotEmpty(itineraryInfo.getItineraryfreeFormText())) {
                                     InteractiveFreeTextTypeI132924S itineraryfreeFormText = itineraryInfo.getItineraryfreeFormText().get(0);
 
                                     for(String text : itineraryfreeFormText.getText()) {
@@ -176,17 +182,13 @@ public class PnrRetrieveHelper {
                 }
             }
 
-            ContactPoint mainPhone = null;
-            ContactPoint paxPhone =null;
-            String paxNo = null;
-            //ticketinformation
-            if(!CollectionUtils.isEmpty(output.getDataElementsMaster().getDataElementsIndiv())){
-                String bankT = "";
+
+            if(CollectionUtils.isNotEmpty(output.getDataElementsMaster().getDataElementsIndiv())){
                 for(PNRReply.DataElementsMaster.DataElementsIndiv dataElementsIndiv : output.getDataElementsMaster().getDataElementsIndiv()) {
                     String otNumber = "";
                     if(null!=dataElementsIndiv.getElementManagementData()
-                    &&null!=dataElementsIndiv.getElementManagementData().getReference()
-                    &&null!=dataElementsIndiv.getElementManagementData().getReference().getQualifier()){
+                            &&null!=dataElementsIndiv.getElementManagementData().getReference()
+                            &&null!=dataElementsIndiv.getElementManagementData().getReference().getQualifier()){
                         if("OT".equalsIgnoreCase(dataElementsIndiv.getElementManagementData().getReference().getQualifier())){
                             otNumber = dataElementsIndiv.getElementManagementData().getReference().getNumber().toString();
                         }
@@ -194,51 +196,34 @@ public class PnrRetrieveHelper {
                     List<LongFreeTextType> otherDataFreetextList = dataElementsIndiv.getOtherDataFreetext();
                     for(int k=0; k< otherDataFreetextList.size(); k++){
                         LongFreeTextType otherDataFreetextTmp = otherDataFreetextList.get(k);
-
                         //OtherDataFreetext 하위 값 null 체크 추가 2014.11.11
                         if(null != otherDataFreetextTmp.getFreetextDetail() && null != otherDataFreetextTmp.getLongFreetext())
                         {
                             String contactType = otherDataFreetextTmp.getFreetextDetail().getType();
                             if("7".equals(contactType) || "5".equals(contactType) || "4".equals(contactType) || "3".equals(contactType)){
-                                if(null == dataElementsIndiv.getReferenceForDataElement() || "".equals(dataElementsIndiv.getReferenceForDataElement()) ){
+                                if(null == dataElementsIndiv.getReferenceForDataElement()){
                                     ContactPoint mainTmp = makeContactPoint(contactType, otherDataFreetextTmp.getLongFreetext());
-                                    if(null == mainPhone){
-                                        mainPhone = mainTmp;
-                                    }else if(!"M1".equals(mainPhone.getPhoneCode()) && "M1".equals(mainTmp.getPhoneCode())){
-                                        mainPhone = mainTmp;
-                                    }
-                                }
-                                else
-                                {
-                                    String paxNoTmp = dataElementsIndiv.getReferenceForDataElement().getReference().get(0).getNumber();
+                                    contactPointList.add(mainTmp);
+                                } else {
                                     ContactPoint paxTmp = makeContactPoint(contactType, otherDataFreetextTmp.getLongFreetext());
-                                    if(null == paxPhone){
-                                        paxPhone = paxTmp;
-                                        paxNo = paxNoTmp;
-                                    }else if(Integer.parseInt(paxNo) > Integer.parseInt(paxNoTmp)){
-                                        paxPhone = paxTmp;
-                                        paxNo = paxNoTmp;
-                                    }else if(!"M1".equals(paxPhone.getPhoneCode()) && "M1".equals(paxTmp.getPhoneCode())){
-                                        paxPhone = paxTmp;
-                                        paxNo = paxNoTmp;
-                                    }
+                                    contactPointList.add(paxTmp);
                                 }
                             }
 
                             if("P02".equals(otherDataFreetextTmp.getFreetextDetail().getType()) && null != otherDataFreetextTmp.getLongFreetext() ){
-                                contactPoint.setEmail(StringUtils.substringBefore(otherDataFreetextTmp.getLongFreetext(),"/"));
+
                             }
                         }
                     }//for
 
 
                     //티켓번호 추출, EMD, FH(재발행하기전에 원래 티켓번호) 제외...
-                    if (!CollectionUtils.isEmpty(dataElementsIndiv.getOtherDataFreetext())) {
+                    if (CollectionUtils.isNotEmpty(dataElementsIndiv.getOtherDataFreetext())) {
                         String segmentName = dataElementsIndiv.getElementManagementData().getSegmentName();
                         if ("FA".equals(segmentName) || "FHE".equals(segmentName)) {
                             String freeTextDetailType = dataElementsIndiv.getOtherDataFreetext().get(0).getFreetextDetail().getType();
                             if ("P06".equals(freeTextDetailType) || "P15".equals(freeTextDetailType)) {
-                                TicketInformation tktinfo = new TicketInformation();
+
                                 String[] tempArray = dataElementsIndiv.getOtherDataFreetext().get(0).getLongFreetext().split(" ");
                                 String[] tempArray2 = tempArray[1].split("/");
                                 if (tempArray2.length < 2) {
@@ -249,11 +234,14 @@ public class PnrRetrieveHelper {
                                 //티켓만 뽑는 리스트
                                 if (("FA".equals(segmentName) && "ET".equals(tktType.substring(0, 2))) ||
                                         "FHE".equals(segmentName)) {
+                                    TicketInformation tktinfo = new TicketInformation();
                                     tktinfo.setOtNumber(otNumber);
                                     tktinfo.setTicketNumber(tktNo);
                                     tktinfo.setOfficeId(output.getSecurityInformation().getResponsibilityInformation().getOfficeId());
                                     tktinfo.setIataNumber(output.getSecurityInformation().getResponsibilityInformation().getIataCode().toString());
+                                    tktinfo.setReferenceCodeList(referenceCodeList(dataElementsIndiv));
                                     ticketInfoList.add(tktinfo);
+
                                 }
                                 if (("FA".equals(segmentName) && "DT".equals(tktType.substring(0, 2))) ||
                                         "FHE".equals(segmentName)) {
@@ -262,8 +250,11 @@ public class PnrRetrieveHelper {
                                     emdticket.setTicketNumber(tktNo);
                                     emdticket.setOfficeId(output.getSecurityInformation().getResponsibilityInformation().getOfficeId());
                                     emdticket.setIataNumber(output.getSecurityInformation().getResponsibilityInformation().getIataCode().toString());
+                                    emdticket.setReferenceCodeList(referenceCodeList(dataElementsIndiv));
                                     emdTicketInfoList.add(emdticket);
+                                    List<ReferenceCode>referenceCodeList = referenceCodeList(dataElementsIndiv);
                                 }
+
                             }
                         }
 
@@ -272,17 +263,41 @@ public class PnrRetrieveHelper {
                     //GTR항공권 체크 종료
                     if ("RM".equals(dataElementsIndiv.getElementManagementData().getSegmentName())) {
                         FreeText freetext = new FreeText();
-
                         if ("RM".equals(dataElementsIndiv.getMiscellaneousRemarks().getRemarks().getType())) {
                             if (null != dataElementsIndiv.getMiscellaneousRemarks().getRemarks().getFreetext()) {
                                 freetext.setOtNumber(otNumber);
                                 freetext.setCode(dataElementsIndiv.getElementManagementData().getSegmentName());
                                 freetext.setFreeText(dataElementsIndiv.getMiscellaneousRemarks().getRemarks().getFreetext());
+                                freetext.setReferenceCodeList(referenceCodeList(dataElementsIndiv));
+                                freeTextList.add(freetext);
                             }
                         }
-                        freeTextList.add(freetext);
                     }
 
+                    if ("SSR".equals(dataElementsIndiv.getElementManagementData().getSegmentName())) {
+                        Service ssr = new Service();
+                        if(null!=dataElementsIndiv.getServiceRequest()
+                                &&null!=dataElementsIndiv.getServiceRequest().getSsr()
+                                &&null!=dataElementsIndiv.getServiceRequest().getSsr().getType()
+                        ){
+                            ssr.setOtNumber(otNumber);
+                            ssr.setSsrCode(dataElementsIndiv.getServiceRequest().getSsr().getType());
+                            ssr.setQuantity(dataElementsIndiv.getServiceRequest().getSsr().getQuantity().toString());
+                            ssr.setSsrStatus(dataElementsIndiv.getServiceRequest().getSsr().getStatus());
+                            if(CollectionUtils.isNotEmpty(dataElementsIndiv.getServiceRequest().getSsr().getFreeText())){
+                                ssr.setFreetext(dataElementsIndiv.getServiceRequest().getSsr().getFreeText().get(0));
+                            }
+                            if("RQST".equalsIgnoreCase(dataElementsIndiv.getServiceRequest().getSsr().getType())){
+                                if(CollectionUtils.isNotEmpty(dataElementsIndiv.getServiceRequest().getSsrb())){
+                                    for(SpecialRequirementsDataDetailsTypeI64826C ssrb : dataElementsIndiv.getServiceRequest().getSsrb()){
+                                        ssr.setData(ssrb.getData());
+                                    }
+                                }
+                            }
+                            ssr.setReferenceCodeList(referenceCodeList(dataElementsIndiv));
+                            serviceList.add(ssr);
+                        }
+                    }
 
                     if("FP".equals(dataElementsIndiv.getElementManagementData().getSegmentName())){
                         for(LongFreeTextType dataFreeText : dataElementsIndiv.getOtherDataFreetext()){
@@ -310,13 +325,14 @@ public class PnrRetrieveHelper {
                                 paymentInfo.setApprovalCode(approvalCode+"||"+salesIndicator);
                                 paymentInfo.setCardCompany(cardcompany);
                                 paymentInfo.setAccountNumber(freetext.substring(5, freetext.indexOf("/")).replaceAll("[^\\d]", ""));
+                                paymentInfo.setFreeText(freetext);
                                 String[] temp1  = freetext.split("\\*");
                                 String tempmcp = temp1[1].substring(0,1);
                                 //mcp여부 판단
                                 if("I".equals(tempmcp)){
-                                    paymentInfo.setFreeText("NOMCP");
+                                    paymentInfo.setMcp("NOMCP");
                                 }else{
-                                    paymentInfo.setFreeText("MCP");
+                                    paymentInfo.setMcp("MCP");
                                 }
                                 paymentInformationList.add(paymentInfo);
                             }else if("BA".equals(paymentType)){
@@ -325,7 +341,8 @@ public class PnrRetrieveHelper {
                                 String[]temp = dataFreeText.getLongFreetext().split("\\*");
                                 String approvalCode = temp[1].substring(0,7);
                                 paymentInfo.setApprovalCode(approvalCode);
-                                paymentInfo.setFreeText(bankT);
+                                paymentInfo.setFreeText(freetext);
+                                paymentInfo.setReferenceCodeList(referenceCodeList(dataElementsIndiv));
                                 paymentInformationList.add(paymentInfo);
                             }else if("PA".equals(paymentType)){
                                 PaymentInformation paymentInfo = new PaymentInformation();
@@ -334,7 +351,8 @@ public class PnrRetrieveHelper {
                                     String[]temp = dataFreeText.getLongFreetext().split("\\*");
                                     String approvalCode = temp[1].substring(0,temp[1].length());
                                     paymentInfo.setApprovalCode(approvalCode);
-                                    paymentInfo.setFreeText(bankT);
+                                    paymentInfo.setFreeText(freetext);
+                                    paymentInfo.setReferenceCodeList(referenceCodeList(dataElementsIndiv));
                                     paymentInformationList.add(paymentInfo);
 
                                 }else if(dataFreeText.getLongFreetext().indexOf("CC") > -1){
@@ -364,15 +382,17 @@ public class PnrRetrieveHelper {
                                     //LoggingUtil.doMessageLogging("pa cc approvalCode : ", approvalCode);
                                     paymentInfo.setApprovalCode(approvalCode+"||"+salesIndicator);
                                     paymentInfo.setCardCompany(cardCompany);
+                                    paymentInfo.setFreeText(freetext);
                                     paymentInfo.setAccountNumber(freetext.substring(5, freetext.indexOf("/")).replaceAll("[^\\d]", ""));
                                     String[] temp1  = freetext.split("\\*");
                                     String tempmcp = temp1[1].substring(0,1);
                                     //mcp여부 판단
                                     if("I".equals(tempmcp)){
-                                        paymentInfo.setFreeText("NOMCP");
+                                        paymentInfo.setMcp("NOMCP");
                                     }else{
-                                        paymentInfo.setFreeText("MCP");
+                                        paymentInfo.setMcp("MCP");
                                     }
+                                    paymentInfo.setReferenceCodeList(referenceCodeList(dataElementsIndiv));
                                     paymentInformationList.add(paymentInfo);
                                 }
                                 //간편결제 or 유아
@@ -403,6 +423,8 @@ public class PnrRetrieveHelper {
                                         String[] temp3 = temp2[1].split("\\*");
                                         paymentInfo.setApprovalCode(temp3[0]);
                                     }
+                                    paymentInfo.setFreeText(freetext);
+                                    paymentInfo.setReferenceCodeList(referenceCodeList(dataElementsIndiv));
                                     paymentInformationList.add(paymentInfo);
                                 }else{
                                     //유아 BANKT
@@ -411,7 +433,7 @@ public class PnrRetrieveHelper {
                                         String[]temp2 = dataFreeText.getLongFreetext().split("\\*");
                                         String approvalCode = temp2[1].substring(0,temp2[1].length());
                                         paymentInfo.setApprovalCode(approvalCode);
-                                        paymentInfo.setFreeText(bankT);
+                                        paymentInfo.setFreeText(freetext);
                                         paymentInformationList.add(paymentInfo);
                                         //유아 CC
                                     }else if(dataFreeText.getLongFreetext().indexOf("CC") > -1){
@@ -441,15 +463,17 @@ public class PnrRetrieveHelper {
                                         //LoggingUtil.doMessageLogging("pa cc approvalCode : ", approvalCode);
                                         paymentInfo.setApprovalCode(approvalCode+"||"+salesIndicator);
                                         paymentInfo.setCardCompany(cardCompany);
+                                        paymentInfo.setFreeText(freetext);
                                         paymentInfo.setAccountNumber(freetext.substring(5, freetext.indexOf("/")).replaceAll("[^\\d]", ""));
                                         String[] temp1  = freetext.split("\\*");
                                         String tempmcp = temp1[1].substring(0,1);
                                         //mcp여부 판단
                                         if("I".equals(tempmcp)){
-                                            paymentInfo.setFreeText("NOMCP");
+                                            paymentInfo.setMcp("NOMCP");
                                         }else{
-                                            paymentInfo.setFreeText("MCP");
+                                            paymentInfo.setMcp("MCP");
                                         }
+                                        paymentInfo.setReferenceCodeList(referenceCodeList(dataElementsIndiv));
                                         paymentInformationList.add(paymentInfo);
                                     }else{
                                         //konvni void 배치 처리를 위한 로직
@@ -459,36 +483,43 @@ public class PnrRetrieveHelper {
                                                 String[] temp3 = temp2[1].split("\\*");
                                                 paymentInfo.setApprovalCode(temp3[0]);
                                             }
+                                            paymentInfo.setReferenceCodeList(referenceCodeList(dataElementsIndiv));
                                             paymentInformationList.add(paymentInfo);
                                         }
                                     }
                                 }
                             }
-                            //우대쿠폰정보 추가
-                            if(freetext.contains("CPN")){
-                                PaymentInformation paymentInfo2 = new PaymentInformation();
-                                paymentInfo2.setPaymentTypeCode("CPN");
-                                paymentInfo2.setFreeText(freetext);
-                                paymentInformationList.add(paymentInfo2);
-                            }
+
                         }
                     }
 
                 }
             }
-            if(null!=paxPhone) {
-                contactPoint.setPhoneNumber(paxPhone.getPhoneNumber());
-                contactPoint.setPhoneCode(paxPhone.getPhoneCode());
-            }
+            reply.setServiceList(serviceList);
             reply.setEmdTicketInformationList(emdTicketInfoList);
             reply.setItineraryList(itineraryList);
             reply.setFreeTextList(freeTextList);
-            reply.setContactPoint(contactPoint);
+            reply.setContactPointList(contactPointList);
             reply.setTicketInformationList(ticketInfoList);
             reply.setPaymentInformationList(paymentInformationList);
             reply.setOfficeId(output.getSecurityInformation().getResponsibilityInformation().getOfficeId());
         }
         return reply;
+    }
+
+    private ArrayList<ReferenceCode> referenceCodeList(PNRReply.DataElementsMaster.DataElementsIndiv dataElementsIndiv) {
+        ArrayList<ReferenceCode> referenceCodeList = new ArrayList<>();
+        if(null!=dataElementsIndiv.getReferenceForDataElement()
+                &&CollectionUtils.isNotEmpty(dataElementsIndiv.getReferenceForDataElement().getReference())
+        ) {
+            for(ReferencingDetailsType111975C reference : dataElementsIndiv.getReferenceForDataElement().getReference()){
+                ReferenceCode rf = new ReferenceCode();
+                rf.setReferenceCode(reference.getQualifier());
+                rf.setReferenceNumber(reference.getNumber());
+                referenceCodeList.add(rf);
+            }
+        }
+        return referenceCodeList;
     }
 
     private static ContactPoint makeContactPoint(String type, String number){
@@ -516,18 +547,19 @@ public class PnrRetrieveHelper {
     }
 
     public static void main(String[] args)throws Exception {
-
+        /*
+        PnrRetrieveHelper pnrRetrieveHelper = new PnrRetrieveHelper();
         AlteaInputVo alteainput = new AlteaInputVo();
-        PNRRetrieve pnrinput =  PnrRetrieveHelper.makeRetrievePNRInput("K2MLCB");
+        PNRRetrieve pnrinput =  pnrRetrieveHelper.makeRetrievePNRInput("K2MLCB");
         alteainput.setInputBody(pnrinput);
         alteainput.setOperationName("PNR_Retrieve");
-        alteainput.setResponseClass(PNRReply.class);
         AlteaConnector adapter = new AlteaConnector();
-        PNRReply reply = (PNRReply) adapter.call(alteainput);
-        CommonPnrReply output = PnrRetrieveHelper.makeRetrievePNROutput(reply);
+
+        System.out.println(result);
+        PNRReply reply = JAXBFactory.unmarshal(result,PNRReply.class);
+        CommonPnrReply output = pnrRetrieveHelper.makeRetrievePNROutput(reply);
         ObjectSerializeUtil.getObjectToJson(output);
         System.out.println(ObjectSerializeUtil.getObjectToJson(output));
-
-
+        */
     }
 }

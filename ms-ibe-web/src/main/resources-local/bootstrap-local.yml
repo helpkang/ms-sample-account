@@ -1,17 +1,24 @@
 server:
-    port: 8081
+  port: 8081
 spring:
-    profiles: local
-    h2:
-        console:
-          enabled: true
-    datasource:
-        driverClassName: org.h2.Driver
-    jpa:
-        database-platform: org.hibernate.dialect.H2Dialect
-        properties:
-            hibernate:
-                show_sql: true
-                format_sql: true
-                use_sql_comments: true
-test.haha: local_local                
+  profiles: local
+#   h2:
+#     console:
+#       enabled: true
+  datasource:
+    url: jdbc:oracle:thin:@database-test-orcl.cko0cng81wvy.ap-northeast-2.rds.amazonaws.com:1521:TESTORCL
+    # driverClassName: org.h2.Driver
+    driver-class-name: oracle.jdbc.OracleDriver
+    username: admin
+    password: ibizsoftware1!
+  jpa:
+    # database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.Oracle12cDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+test.haha: local_local        

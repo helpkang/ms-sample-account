@@ -1,9 +1,6 @@
 package com.koreanair.common_adapter.common.vo;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -16,7 +13,7 @@ public class Itinerary {
     private String segmentName;			/*비행기 세그먼트 네임*/
     private BigInteger lineNumber;		/*비행기 LINE NUMBER*/
     private String qualifier;			/*비행기 QUALIFIER*/
-    private BigInteger number;			/*비행기 NUMBER*/
+    private BigInteger segmentNumber;			/*비행기 NUMBER*/
 //	private Boolean domestic;			/*국내석 국제선 구분*/
     /********************************/
 

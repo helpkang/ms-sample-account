@@ -1,16 +1,12 @@
 package com.koreanair.common_adapter.common.vo;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class PaymentInformation {
     private String paymentTypeName;					/* 결제종류명 신용카드 계좌이체 등 */
     private Float totalAmountResult;
@@ -41,6 +37,7 @@ public class PaymentInformation {
     private String expiredMileage;
     private String accountAppoint;					/**/
     private String otNumber;
+    private String mcp;
     private HashMap<Integer,Float> discountFare; 		/* key : travellerID, value : save per passenger*/
     private ArrayList<ReferenceCode> referenceCodeList;
 }

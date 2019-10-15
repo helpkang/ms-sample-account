@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/reservation")
-@Api(value = "recLoc", description = "예약번호(recLoc 6 or reservationNumber 8")
+@Api(value = "recLoc", tags = "예약번호(recLoc 6 or reservationNumber 8")
 @Slf4j
 public class ReservationSearchController {
 
