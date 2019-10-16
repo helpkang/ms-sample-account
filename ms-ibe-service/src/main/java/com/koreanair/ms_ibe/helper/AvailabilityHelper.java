@@ -47,6 +47,7 @@ public class AvailabilityHelper {
 
 		Map<String , List<FareCalendarElementVO>> calenarListMap = new LinkedHashMap<>();
 
+		String currency = "";
 		String lowestAmount = "";
 		String preDate = "";
 		List<FareCalendarElementVO> fareAvailList = null;
@@ -54,7 +55,7 @@ public class AvailabilityHelper {
 
 			FareCalendarElementVO fareCalendarElementVo = new FareCalendarElementVO();
 			BeanUtils.copyProperties(fareMatrixCalendar, fareCalendarElementVo);
-
+			currency = fareMatrixCalendar.getCurrency();
 
 			TravellerTypeFareInfoVO defaultTravellerFareInfo = null;
 			if (!fareMatrixCalendar.isEmptyFare()) {
@@ -86,7 +87,6 @@ public class AvailabilityHelper {
 						lowestAmount = defaultTravellerFareInfo.getAmount();
 					}
 				}
-
 				fareCalendarElementVo.setAmount(StringUtil.removeZeroDecimals(defaultTravellerFareInfo.getAmount()));
 				fareCalendarElementVo.setTotalAmount(StringUtil.removeZeroDecimals(defaultTravellerFareInfo.getTotalAmount()));
 				fareCalendarElementVo.setTax(StringUtil.removeZeroDecimals(String.valueOf(taxWithoutFuel)));
@@ -115,6 +115,7 @@ public class AvailabilityHelper {
 			}
 		}
 		fareCalendarVo.setAvailFareMatrixMap(calenarListMap);
+		fareCalendarVo.setCurrency(currency);
 
 		log.debug("fareCalendarVo = {}", ObjectSerializeUtil.getObjectToJson(fareCalendarVo));
 		return fareCalendarVo;
