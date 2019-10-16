@@ -42,13 +42,12 @@ public class OverrideHelper {
 		overrideInupt.setLANGUAGE("GB");
 		return overrideInupt;
 	}
-
-	public OverrideInput getEmbeddedOverrideInput(Object embeddedObject) {
+	public OverrideInput getDefaultOverrideInput(String officeId) {
 		OverrideInput overrideInupt = new OverrideInput();
 		overrideInupt.setTRANSACTIONID("Override");
 		overrideInupt.setSITE("CBFICBFI");
 		overrideInupt.setLANGUAGE("GB");
-		overrideInupt.setSOSITEOFFICEID("SELKE08DM");
+		overrideInupt.setSOSITEOFFICEID(officeId);
 		overrideInupt.setSOSITEMINAVAILDATESPAN("N30");
 		overrideInupt.setSOSITENBFLIGHTSAVAIL("30");
 		overrideInupt.setSOSITEPOINTOFSALE("SEL");
@@ -57,13 +56,6 @@ public class OverrideHelper {
 		overrideInupt.setSOSITEAPIV2SERVER("194.156.170.78");
 		overrideInupt.setSOSITEAPIV2SERVERUSERID("GUEST");
 		overrideInupt.setSOSITEAPIV2SERVERPWD("TAZ");
-
-		log.debug("embedded call");
-		EMBEDDEDTRANSACTION embedded = new EMBEDDEDTRANSACTION();
-		String schemaLocation = SchemaLocation.get(embeddedObject);
-		embedded.setSchemaRef(schemaLocation);
-		embedded.getContent().add(embeddedObject);
-		overrideInupt.setEMBEDDEDTRANSACTION(embedded);
 
 		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEMANUALETKTCMD", "TTP/ET"));
 		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESISERVERIP", "193.23.185.67"));
@@ -77,6 +69,18 @@ public class OverrideHelper {
 		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEPTCCONFVALIDATION", "FALSE"));
 		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITESENDFOIDAIRLINE", "FALSE"));
 		overrideInupt.getAny().add(JAXBFactory.createElement("SOSITEMAXRESNUMATTEMPTS", "0"));
+
+		return overrideInupt;
+	}
+
+	public OverrideInput getEmbeddedOverrideInput(OverrideInput overrideInupt, Object embeddedObject) {
+
+		log.debug("embedded call");
+		EMBEDDEDTRANSACTION embedded = new EMBEDDEDTRANSACTION();
+		String schemaLocation = SchemaLocation.get(embeddedObject);
+		embedded.setSchemaRef(schemaLocation);
+		embedded.getContent().add(embeddedObject);
+		overrideInupt.setEMBEDDEDTRANSACTION(embedded);
 
 		return overrideInupt;
 	}

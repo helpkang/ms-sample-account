@@ -65,7 +65,7 @@ public class FlexPricerAdapter extends ERetailBaseAdapter {
 		FlexPricerAvailabilityInput flexPricerAvailabilityInput = flexPricerHelper.getFlexPricerAvailabilityInput(inputVo);
 
 		// FlexPricerInput을 OverrideInput에 Embedded 시킨다.
-		OverrideInput overrideWithFlexPricerInput = overrideHelper.getEmbeddedOverrideInput(flexPricerAvailabilityInput);
+		OverrideInput overrideWithFlexPricerInput = overrideHelper.getEmbeddedOverrideInput(overrideHelper.getDefaultOverrideInput(inputVo.getOfficeId()), flexPricerAvailabilityInput);
 
 		// JAXB Marshal을 할때 한꺼번에 수행되어야 하는 POJO (VO) 를 JAXB instance로 등록한다.
 		JAXBFactory.setMultiClassInstance(OverrideInput.class, FlexPricerAvailabilityInput.class, OverrideInput.class, FlexPricerAvailabilityOutput.class );
@@ -115,7 +115,7 @@ public class FlexPricerAdapter extends ERetailBaseAdapter {
 		FlexPricerAvailabilityInput flexPricerAvailabilityInput = flexPricerHelper.getFlexPricerAvailabilityInput(inputVo);
 
 		// FlexPricerInput을 OverrideInput에 Embedded 시킨다.
-		OverrideInput overrideWithFlexPricerInput = overrideHelper.getEmbeddedOverrideInput(flexPricerAvailabilityInput);
+		OverrideInput overrideWithFlexPricerInput = overrideHelper.getEmbeddedOverrideInput(overrideHelper.getDefaultOverrideInput(inputVo.getOfficeId()), flexPricerAvailabilityInput);
 
 		// JAXB Marshal을 할때 한꺼번에 수행되어야 하는 POJO (VO) 를 JAXB instance로 등록한다.
 		JAXBFactory.setMultiClassInstance(OverrideInput.class, FlexPricerAvailabilityInput.class, OverrideInput.class, FlexPricerAvailabilityOutput.class );
@@ -145,6 +145,8 @@ public class FlexPricerAdapter extends ERetailBaseAdapter {
 		FlexPricerAdapter adapter = new FlexPricerAdapter();
 		// SELKE08DW
 		FlexPricerInputVO inputVo = new FlexPricerInputVO();
+		inputVo.setOfficeId("SELKE08IW");
+		inputVo.setOfficeId("SELKE08DM");
 		inputVo.setDualDisplay(false);
 		inputVo.setOnlyCalendarFare(true);
 		inputVo.setDateRange(3);

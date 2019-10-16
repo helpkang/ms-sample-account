@@ -36,6 +36,7 @@ import lombok.Data;
 public class FlexPricerInputVO {
 	private String bizType = "";
 	private TripType tripType;
+	private String officeId = "";
 	private List<String> cffCodeList = new ArrayList<>();
 	private List<SegmentInfoVO> segmentInfoList = new ArrayList<>();
 	private List<PassengerConditionVO> passengerConditionList = new ArrayList<>();
