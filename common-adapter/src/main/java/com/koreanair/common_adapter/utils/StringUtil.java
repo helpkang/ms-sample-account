@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.w3c.dom.Element;
 
 import lombok.extern.slf4j.Slf4j;
@@ -69,4 +70,37 @@ public class StringUtil extends StringUtils {
 
 		return str;
 	}
+
+    public static String removeZeroDecimals(double doubleVal) {
+		String val = String.valueOf(doubleVal);
+		return removeZeroDecimals(val);
+	}
+
+    public static String removeZeroDecimals(float floatVal) {
+		String val = String.valueOf(floatVal);
+		return removeZeroDecimals(val);
+	}
+
+    public static String removeZeroDecimals(BigDecimal bigdecimalVal) {
+		return removeZeroDecimals(bigdecimalVal.doubleValue());
+	}
+
+    public static String removeZeroDecimals(String val) {
+        String retVal = "";
+        if (val.indexOf('.') != -1) {
+			String[] splitString = split(val, '.');
+            String dotBelowStr = splitString[1];
+
+            int intVal = NumberUtils.toInt(dotBelowStr);
+
+			if (intVal <= 0) {
+				retVal = splitString[0];
+			} else {
+				retVal = val;
+			}
+        } else {
+        	retVal = val;
+        }
+        return retVal;
+    }
 }

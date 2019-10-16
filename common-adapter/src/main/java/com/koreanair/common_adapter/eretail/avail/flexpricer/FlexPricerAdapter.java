@@ -1,6 +1,10 @@
 package com.koreanair.common_adapter.eretail.avail.flexpricer;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.soap.SOAPException;
@@ -14,6 +18,7 @@ import com.koreanair.common_adapter.eretail.override.OverrideHelper;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
 import com.koreanair.common_adapter.eretail.vo.SegmentInfoVO;
+import com.koreanair.common_adapter.eretail.vo.flexpricerout.FareMatrixCalendarVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
 import com.koreanair.common_adapter.general.vo.consts.PAXType;
@@ -132,6 +137,7 @@ public class FlexPricerAdapter extends ERetailBaseAdapter {
 		}
 
 		log.debug("out = {}", JAXBFactory.getObjectToXML(output));
+
 		return flexPricerCalendarOutputVO;
 	}
 

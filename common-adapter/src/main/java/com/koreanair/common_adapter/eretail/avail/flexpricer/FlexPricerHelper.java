@@ -442,14 +442,14 @@ public class FlexPricerHelper {
 					for (PriceType travellerTypePrice : listTravellerType.getLISTTRAVELLERTYPEPRICE()) {
 						currency = travellerTypePrice.getCURRENCY().getCODE();
 
-						travellerTypeFareInfoVo.setAmount(travellerTypePrice.getAMOUNT().toString());
-						travellerTypeFareInfoVo.setTax(travellerTypePrice.getTAX().toString());
-						travellerTypeFareInfoVo.setTotalAmount(travellerTypePrice.getTOTALAMOUNT().toString());
+						travellerTypeFareInfoVo.setAmount(StringUtil.removeZeroDecimals(travellerTypePrice.getAMOUNT().toString()));
+						travellerTypeFareInfoVo.setTax(StringUtil.removeZeroDecimals(travellerTypePrice.getTAX().toString()));
+						travellerTypeFareInfoVo.setTotalAmount(StringUtil.removeZeroDecimals(travellerTypePrice.getTOTALAMOUNT().toString()));
 
 						for(LISTTAXType displayTax : travellerTypePrice.getLISTDISPLAYTAX()) {
 							TaxInfoVO taxInfo = new TaxInfoVO();
 							taxInfo.setTaxCode(displayTax.getCODE());
-							taxInfo.setTaxValue(displayTax.getVALUE().toString());
+							taxInfo.setTaxValue(StringUtil.removeZeroDecimals(displayTax.getVALUE().toString()));
 							travellerTypeFareInfoVo.getTaxList().add(taxInfo);
 						}
 					}
@@ -494,8 +494,7 @@ public class FlexPricerHelper {
 				}
 				calendarDataList.add(fareCalendarData);
 			}
-
-			ArrayUtil.sortCollection(calendarDataList, "getDepartureDate");
+			ArrayUtil.sortCollection(calendarDataList, "getDepartureDate", "getReturnDate");
 			output.getFareMatrixCalendarList().addAll(calendarDataList);
 		}
 
