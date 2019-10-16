@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class PnrRetrieveHelper {
+public class RetrievePnrHelper {
     public PNRRetrieve makeRetrievePNRInput(String reservation) {
         reservation = reservation.replaceAll("-","");
         PNRRetrieve input = new PNRRetrieve();
@@ -52,7 +52,6 @@ public class PnrRetrieveHelper {
         ArrayList<ContactPoint> contactPointList = new ArrayList<>();
         ArrayList<FreeText>freeTextList = new ArrayList<>();
         ArrayList<Service>serviceList = new ArrayList<>();
-
 
         if(null!=output){
             //recloc, reservationnumber 추출
