@@ -20,14 +20,20 @@ import java.util.List;
 
 import lombok.Data;
 
+/**
+ * <pre>
+ * Created by bdlee on 2019. 10. 8.
+ * </pre>
+ *
+ * @author bdlee
+ *
+ * @version 1.0.0
+ * @since 2019. 10. 8.
+ */
 @Data
-public class FareMatrixCalendarVO {
-	private String departureDate = "";
-	private String returnDate = "";
-	private String currency = "";
-	private String commercialFareFamilyType = "";
-	private String fareFamilyType = "";
-	private boolean emptyFare = false;
-
-	private List<TravellerTypeFareInfoVO> travellerTypeFareInfoList = new ArrayList<>();
+public class FlexPricerCalendarOutputVO {
+	private String jsessionId = "";
+	private boolean existsError = false;
+	private List<ErrorInfoVO> errorList= new ArrayList<>();
+	private List<FareMatrixCalendarVO> fareMatrixCalendarList = new ArrayList<>();
 }

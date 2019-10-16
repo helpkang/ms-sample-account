@@ -15,6 +15,10 @@
  */
 package com.koreanair.common_adapter.utils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.DecimalFormat;
+
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 
@@ -34,4 +38,35 @@ public class StringUtil extends StringUtils {
 
         return strReturn;
     }
+
+	public static String null2Zero(Object objValue) {
+		String str = "0";
+		if (objValue == null) {
+			str = "0";
+		} else if (objValue instanceof Integer) {
+			str = objValue + "";
+		} else if (objValue instanceof BigDecimal) {
+			str = ((BigDecimal) objValue).toString();
+		} else if (objValue instanceof BigInteger) {
+			str = objValue + "";
+		} else if (objValue instanceof String) {
+			if (objValue.equals(""))
+				str = "0";
+			else
+				str = objValue + "";
+		} else if (objValue instanceof Long) {
+			str = objValue + "";
+		} else if (objValue instanceof Float) {
+			str = objValue + "";
+			if (str.indexOf('E') != -1) {
+				DecimalFormat formatter = new DecimalFormat("####################.0#####");
+				str = formatter.format(objValue) + "";
+			}
+			if (str.equals(".0")) {
+				str = "0";
+			}
+		}
+
+		return str;
+	}
 }

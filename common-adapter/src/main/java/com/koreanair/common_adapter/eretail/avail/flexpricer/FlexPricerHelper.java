@@ -33,6 +33,8 @@ import com.koreanair.common_adapter.eretail.vo.SegmentInfoVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.AvailBoundVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.BoundFareInfoVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.BoundFlightVO;
+import com.koreanair.common_adapter.eretail.vo.flexpricerout.FareMatrixCalendarVO;
+import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlightInfoVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.RecommendFlightVO;
@@ -45,6 +47,7 @@ import com.koreanair.common_adapter.general.vo.consts.ERetailConsts;
 import com.koreanair.common_adapter.general.vo.consts.ERetailTransactionId;
 import com.koreanair.common_adapter.general.vo.consts.PAXType;
 import com.koreanair.common_adapter.general.vo.consts.TripType;
+import com.koreanair.common_adapter.utils.ArrayUtil;
 import com.koreanair.common_adapter.utils.DateUtil;
 import com.koreanair.common_adapter.utils.GenericException;
 import com.koreanair.common_adapter.utils.GenericException.ExceptionCode;
@@ -57,11 +60,14 @@ import com.koreanair.external.eretail.vo.farecommon.travellercommon.DISCOUNTINFO
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.INPUTLISTTRAVELLERType;
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.INPUTTRAVELLERType;
 import com.koreanair.external.eretail.vo.farecommon.travellercommon.LISTTRAVELLERINFOType;
+import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.FFCFFDictionaryMapping;
 import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.FFCFFDictionaryMapping.LISTFAREFAMILY;
 import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.LISTBOUND;
 import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.LISTBOUND.LISTFLIGHT;
 import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.LISTFLIGHTType;
 import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.LISTPROPOSEDBOUNDType;
+import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.ListEmptyTabType;
+import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.ListEmptyTabType.LISTDATE;
 import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.ListPNRType;
 import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.ListPanelType;
 import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.ListRecommendationGroupType;
@@ -82,12 +88,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FlexPricerHelper {
 
-	public FlexPricerHelper() {
-	}
-
 	/**
 	 * <pre>
-	 * FlexPricerInput을 구성한다.
+	 * FlexPricerAvailabilityInput을 구성한다.
 	 * </pre>
 	 *
 	 * @param inputVo
@@ -223,6 +226,16 @@ public class FlexPricerHelper {
 		return flexPricerAvailabilityInput;
 	}
 
+	/**
+	 * <pre>
+	 * FlexPricerAvailabilityOutput 을 FlexPricerOutputVO 로 변환한다.
+	 * Created by bdlee on 2019. 10. 16.
+	 * </pre>
+	 *
+	 * @param flexPricerOutput
+	 * @param jsessionId
+	 * @return
+	 */
 	public FlexPricerOutputVO convertOutputVO(FlexPricerAvailabilityOutput flexPricerOutput, String jsessionId) {
 		FlexPricerOutputVO output = new FlexPricerOutputVO();
 		output.setJsessionId(jsessionId);
@@ -378,7 +391,116 @@ public class FlexPricerHelper {
 		return output;
 	}
 
-	public void convertCalendarFareOutputVO(FlexPricerAvailabilityOutput flexPricerOutput, String jsessionId) {
+	/**
+	 * <pre>
+	 * FlexPricerAvailabilityOutput 를 이용하여 FlexPricerCalendarOutputVO 을 구성한다.
+	 * Created by bdlee on 2019. 10. 16.
+	 * </pre>
+	 * @param flexPriceOutOfAmadues
+	 * @param jsessionId
+	 * @return
+	 */
+	public FlexPricerCalendarOutputVO convertCalendarFareOutputVO(FlexPricerAvailabilityOutput flexPriceOutOfAmadues, String jsessionId) {
+		FlexPricerCalendarOutputVO output = new FlexPricerCalendarOutputVO();
 
+		Map<String, String> cffMap = new HashMap<>();
+        FFCFFDictionaryMapping fareFamilyDictionary = flexPriceOutOfAmadues.getFAREFAMILYDICTIONARY();
+        if(fareFamilyDictionary != null) {
+            for (LISTFAREFAMILY listFareFamily : fareFamilyDictionary.getLISTFAREFAMILY()) {
+                cffMap.put(listFareFamily.getFAREFAMILY(), listFareFamily.getCOMMERCIALFAREFAMILY());
+            }
+        }
+
+		List<ListPanelType> listPanel = flexPriceOutOfAmadues.getLISTPANEL();
+
+		for (ListPanelType listPanelType : listPanel) {
+			if (!"C".equalsIgnoreCase(listPanelType.getTYPE())) {    // CALENDAR
+				continue;
+			}
+
+			List<FareMatrixCalendarVO> calendarDataList = new ArrayList<>();
+
+			String cff = "";
+			String currency ="";
+			for (ListTabType tabType : listPanelType.getLISTTAB()) {
+
+				ListRecommendationGroupType recommendationGroup = tabType.getLISTRECOMMENDATION().get(0);
+				ListPNRType pnrType = recommendationGroup.getLISTPNR().get(0);
+				String fareFamily = recommendationGroup.getFAREFAMILY().getSHORTNAME();
+				cff = cffMap.get(fareFamily);
+
+				List<TravellerTypeFareInfoVO> travellerTypeFareInfoVoList = new ArrayList<>();
+				for (ListTravellerType listTravellerType : pnrType.getLISTTRAVELLERTYPE()) {
+
+					TravellerTypeFareInfoVO travellerTypeFareInfoVo = new TravellerTypeFareInfoVO();
+					String paxType = listTravellerType.getTRAVELLERTYPE().getCODE();
+
+					travellerTypeFareInfoVo.setTravellerType(paxType);
+					travellerTypeFareInfoVo.setTravellerTypeCount(listTravellerType.getNUMBER().intValue());
+
+
+					for (PriceType travellerTypePrice : listTravellerType.getLISTTRAVELLERTYPEPRICE()) {
+						currency = travellerTypePrice.getCURRENCY().getCODE();
+
+						travellerTypeFareInfoVo.setAmount(travellerTypePrice.getAMOUNT().toString());
+						travellerTypeFareInfoVo.setTax(travellerTypePrice.getTAX().toString());
+						travellerTypeFareInfoVo.setTotalAmount(travellerTypePrice.getTOTALAMOUNT().toString());
+
+						for(LISTTAXType displayTax : travellerTypePrice.getLISTDISPLAYTAX()) {
+							TaxInfoVO taxInfo = new TaxInfoVO();
+							taxInfo.setTaxCode(displayTax.getCODE());
+							taxInfo.setTaxValue(displayTax.getVALUE().toString());
+							travellerTypeFareInfoVo.getTaxList().add(taxInfo);
+						}
+					}
+					travellerTypeFareInfoVoList.add(travellerTypeFareInfoVo);
+				}
+
+				FareMatrixCalendarVO fareCalendarData = new FareMatrixCalendarVO();
+				fareCalendarData.getTravellerTypeFareInfoList().addAll(travellerTypeFareInfoVoList);
+
+				int i = 0;
+				for (com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilitycommonoutput.ListTabType.LISTDATE listDate : tabType.getLISTDATE()) {
+					if (i == 0) {
+						fareCalendarData.setDepartureDate(DateUtil.getDateByUserFormat(listDate.getDATE().getCode(), "yyyyMMdd"));
+					} else {
+						fareCalendarData.setReturnDate(DateUtil.getDateByUserFormat(listDate.getDATE().getCode(), "yyyyMMdd"));
+					}
+					i++;
+				}
+
+				fareCalendarData.setCurrency(currency);
+				fareCalendarData.setFareFamilyType(fareFamily);
+				fareCalendarData.setCommercialFareFamilyType(cff);
+				calendarDataList.add(fareCalendarData);
+			}
+
+			// 운임이 없는 일자
+			for (ListEmptyTabType listTab : listPanelType.getLISTEMPTYTAB()) {
+
+				FareMatrixCalendarVO fareCalendarData = new FareMatrixCalendarVO();
+				fareCalendarData.setEmptyFare(true);
+				fareCalendarData.setCurrency("");
+				fareCalendarData.setCommercialFareFamilyType("");
+
+				int i=0;
+				for (LISTDATE listDateOfEmpty : listTab.getLISTDATE()) {
+					if (i == 0) {
+						fareCalendarData.setDepartureDate(DateUtil.getDateByUserFormat(listDateOfEmpty.getDATE().getCode(), "yyyyMMdd"));
+					} else {
+						fareCalendarData.setReturnDate(DateUtil.getDateByUserFormat(listDateOfEmpty.getDATE().getCode(), "yyyyMMdd"));
+					}
+					i++;
+				}
+				calendarDataList.add(fareCalendarData);
+			}
+
+			ArrayUtil.sortCollection(calendarDataList, "getDepartureDate");
+			output.getFareMatrixCalendarList().addAll(calendarDataList);
+		}
+
+		output.setJsessionId(jsessionId);
+
+		return output;
 	}
 }

@@ -14,6 +14,7 @@ import com.koreanair.common_adapter.eretail.override.OverrideHelper;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
 import com.koreanair.common_adapter.eretail.vo.SegmentInfoVO;
+import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
 import com.koreanair.common_adapter.general.vo.consts.PAXType;
 import com.koreanair.common_adapter.general.vo.consts.TripType;
@@ -87,7 +88,19 @@ public class FlexPricerAdapter extends ERetailBaseAdapter {
 		return flexPricerOutputVO;
 	}
 
-	public void getCalendarMatrixFareAvailabiltiy(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+	/**
+	 * <pre>
+	 * FlexPricerAvailabilityInput 을 호출하여 calendar형식의 fare avail을 가져온다.
+	 * Created by bdlee on 2019. 10. 16.
+	 * </pre>
+	 *
+	 * @param inputVo
+	 * @return
+	 * @throws JAXBException
+	 * @throws IOException
+	 * @throws SOAPException
+	 */
+	public FlexPricerCalendarOutputVO getFlexPricerCalendarAvailability(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
 
 		if (inputVo.getDateRange() <= 0) {
 			throw new GenericException(ExceptionCode.BAD_REQUEST, "Calendar Fare 조회를 위해서는 DateRange는 필수 사항입니다.");
@@ -108,18 +121,18 @@ public class FlexPricerAdapter extends ERetailBaseAdapter {
 		setJsessionid(retailCon.getJsessionId());	// eRetail의 jsession 정보
 		setReturnOriginObject(output);	// 응답받은 Object
 
-		FlexPricerOutputVO flexPricerOutputVO = null;
+		FlexPricerCalendarOutputVO flexPricerCalendarOutputVO = null;
 		if (output instanceof FlexPricerAvailabilityOutput) {
 			FlexPricerAvailabilityOutput flexPricerOutput = (FlexPricerAvailabilityOutput) output;
-			flexPricerHelper.convertCalendarFareOutputVO(flexPricerOutput, retailCon.getJsessionId());
-			setReturnObject(flexPricerOutputVO);
+			flexPricerCalendarOutputVO = flexPricerHelper.convertCalendarFareOutputVO(flexPricerOutput, retailCon.getJsessionId());
+			setReturnObject(flexPricerCalendarOutputVO);
 		} else {
 			// 받아야 할 응답을 받지 못한 경우이기 때문에 error를 throw 한다.
 			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "알수없는 응답 수신");
 		}
 
 		log.debug("out = {}", JAXBFactory.getObjectToXML(output));
-		//return flexPricerOutputVO;
+		return flexPricerCalendarOutputVO;
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -160,7 +173,8 @@ public class FlexPricerAdapter extends ERetailBaseAdapter {
 //		passengerCondition.setDefaultPTCDiscountInfo(defaultPTCDiscountInfo);
 //		inputVo.getPassengerConditionList().add(passengerCondition);
 
-		log.debug("{}", ObjectSerializeUtil.getObjectToJson(adapter.getFlexPricerAvailability(inputVo)));
+		//log.debug("{}", ObjectSerializeUtil.getObjectToJson(adapter.getFlexPricerAvailability(inputVo)));
+		log.debug("{}", ObjectSerializeUtil.getObjectToJson(adapter.getFlexPricerCalendarAvailability(inputVo)));
 
 	}
 
