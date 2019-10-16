@@ -24,8 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
+import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
+import com.koreanair.ms_ibe.domain.AvailabilityDomain;
+import com.koreanair.ms_ibe.helper.AvailabilityHelper;
 import com.koreanair.ms_ibe.repository.AvailabilityRepository;
+import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
 
 @Service
 public class AvailabilityService {
@@ -33,7 +37,24 @@ public class AvailabilityService {
 	@Autowired
 	private AvailabilityRepository availRepository;
 
+	@Autowired
+	private AvailabilityHelper availHelper;
+
+	@Autowired
+	private AvailabilityDomain availDomain;
+
 	public FlexPricerOutputVO getDomesticAvailForRevenue(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
 		return availRepository.getFlexPricerAvailability(inputVo);
+	}
+
+	public FareCalendarVO getCalendarFareAvail(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+
+		FlexPricerCalendarOutputVO flexPricerCalendarOutputVo = availRepository.getFlexPricerCalendarAvailability(inputVo);	// 1a로 부터 fare calendar의 raw 데이터를 가져온다.
+
+		FareCalendarVO fareCalendarVo = availHelper.organizeMatrixFareCalendar(flexPricerCalendarOutputVo);	// UI에서 사용할 형태로 Model을 구성한다.
+
+		fareCalendarVo = availDomain.adjustFareCalendar(fareCalendarVo);	// UI에서 사용할 FareCalendar 데이터의 보정 작업.
+
+		return fareCalendarVo;
 	}
 }

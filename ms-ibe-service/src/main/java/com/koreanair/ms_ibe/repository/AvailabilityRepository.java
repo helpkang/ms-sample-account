@@ -25,6 +25,7 @@ import org.springframework.stereotype.Repository;
 
 import com.koreanair.common_adapter.eretail.avail.flexpricer.FlexPricerAdapter;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
+import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
 
 @Repository
@@ -33,8 +34,36 @@ public class AvailabilityRepository {
 	@Autowired
 	private FlexPricerAdapter flexPricer;
 
+	/**
+	 * <pre>
+	 * FlexPricerAvail 조회
+	 * Created by bdlee on 2019. 10. 16.
+	 * </pre>
+	 *
+	 * @param inputVo
+	 * @return
+	 * @throws JAXBException
+	 * @throws IOException
+	 * @throws SOAPException
+	 */
 	public FlexPricerOutputVO getFlexPricerAvailability(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
 		return flexPricer.getFlexPricerAvailability(inputVo);
+	}
+
+	/**
+	 * <pre>
+	 * Fare Calendar avail 조회
+	 * Created by bdlee on 2019. 10. 16.
+	 * </pre>
+	 *
+	 * @param inputVo
+	 * @return
+	 * @throws JAXBException
+	 * @throws IOException
+	 * @throws SOAPException
+	 */
+	public FlexPricerCalendarOutputVO getFlexPricerCalendarAvailability(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+		return flexPricer.getFlexPricerCalendarAvailability(inputVo);
 	}
 
 }

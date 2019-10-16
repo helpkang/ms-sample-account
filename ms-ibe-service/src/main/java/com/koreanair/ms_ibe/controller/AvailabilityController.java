@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
 import com.koreanair.ms_ibe.service.AvailabilityService;
+import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,6 +54,16 @@ public class AvailabilityController {
 	public FlexPricerOutputVO getDomesticAvailForRevenue(@RequestBody FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
     	log.debug("getDomesticAvailForRevenue start");
     	return availService.getDomesticAvailForRevenue(inputVo);
+	}
+
+    @PostMapping(value = "/CalendarFareAvail" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Fare Calendar 조회",
+    notes = "Fare Calendar 조회"
+    )
+    @ResponseBody
+	public FareCalendarVO getCalendarFareAvail(@RequestBody FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+    	log.debug("getCalendarFareAvail start");
+    	return availService.getCalendarFareAvail(inputVo);
 	}
 
 }
