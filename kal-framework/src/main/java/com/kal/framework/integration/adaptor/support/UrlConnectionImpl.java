@@ -130,7 +130,7 @@ public class UrlConnectionImpl implements UrlConnectionService
 				case pid_headertype:
 					urlConnection.setRequestProperty("SOAPAction", "\"" + webserviceVo.getSoapAction() + "\"");
 					urlConnection.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
-					// query = getPidHeader(webserviceVo);
+					query = getPidHeader(webserviceVo);
 					System.out.println("pid restful query : " + query);
 					if (logger.isInfoEnabled()) logger.info("pid restful query : " + query);
 					break;
@@ -477,59 +477,52 @@ public class UrlConnectionImpl implements UrlConnectionService
 	// 	return result;
 	// }
 
-	// protected String getPidHeader(WebServiceVo webserviceVo)
-	// {
-	// 	String result =
-	// 		"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:pips=\"http://PIP_Service_Library/PIP_Session\" xmlns:pip=\"http://PIP_Service_Library/PIP_Processing\"><soapenv:Header><wsse:Security soapenv:mustUnderstand=\"" +
-	// 		webserviceVo.getMustUnderstand() + "\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" +
-	// 		"<wsse:UsernameToken>" +
-	// 		"<wsse:Username>" + webserviceVo.getPipuserName() + "</wsse:Username>" +
-	// 		"<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">" + webserviceVo.getPippassWord() + "</wsse:Password>" +
-	// 		"</wsse:UsernameToken>" +
-	// 		"</wsse:Security>" +
-	// 		"<pips:Session>" +
-	// 		"<pips:sessionType>" + webserviceVo.getPipsession().getSessionType() + "</pips:sessionType>" +
-	// 		"<pips:sessionId>" + webserviceVo.getPipsession().getSessionId() + "</pips:sessionId>" +
-	// 		"<pips:sequenceNumber>" + webserviceVo.getPipsession().getSequenceNumber() + "</pips:sequenceNumber>" +
-	// 		"<pips:securityToken>" + webserviceVo.getPipsession().getSecurityToken() + "</pips:securityToken>" +
-	// 		"</pips:Session>" +
-	// 		"<pip:ProcessingFlow>" +
-	// 		"<pip:guid>" + webserviceVo.getGuid() + "</pip:guid>" +
-	// 		"<pip:requestSystem>" + webserviceVo.getPiprequestSystem() + "</pip:requestSystem>";
+	protected String getPidHeader(WebServiceVo webserviceVo) {
+		String result =
+				"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:pips=\"http://PIP_Service_Library/PIP_Session\" xmlns:pip=\"http://PIP_Service_Library/PIP_Processing\"><soapenv:Header><wsse:Security soapenv:mustUnderstand=\"" +
+						webserviceVo.getMustUnderstand() + "\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" +
+						"<wsse:UsernameToken>" +
+						"<wsse:Username>" + webserviceVo.getPipuserName() + "</wsse:Username>" +
+						"<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">" + webserviceVo.getPippassWord() + "</wsse:Password>" +
+						"</wsse:UsernameToken>" +
+						"</wsse:Security>" +
+						"<pips:Session>" +
+						"<pips:sessionType/>" +
+						"<pips:sessionId/>" +
+						"<pips:sequenceNumber/>" +
+						"<pips:securityToken/>" +
+						"</pips:Session>" +
+						"<pip:ProcessingFlow>" +
+						"<pip:guid>" + webserviceVo.getGuid() + "</pip:guid>" +
+						"<pip:requestSystem>" + webserviceVo.getPiprequestSystem() + "</pip:requestSystem>";
 
-	// 	if ((webserviceVo.getPipemployeeNumber() == null) || (webserviceVo.getPipemployeeNumber() == ""))
-	// 	{
-	// 		result = result + "<pip:employeeNo/>";
-	// 	}
-	// 	else
-	// 	{
-	// 		result = result + "<pip:employeeNo>" + webserviceVo.getPipemployeeNumber() + "</pip:employeeNo>";
-	// 	}
+		if ((webserviceVo.getPipemployeeNumber() == null) || (webserviceVo.getPipemployeeNumber() == "")) {
+			result = result + "<pip:employeeNo/>";
+		} else {
+			result = result + "<pip:employeeNo>" + webserviceVo.getPipemployeeNumber() + "</pip:employeeNo>";
+		}
 
-	// 	result = result + "<pip:lssUserId>" + webserviceVo.getPiplssuserId() + "</pip:lssUserId>" +
-	// 	"<pip:officeId>" + webserviceVo.getPipSourceofficeId() + "</pip:officeId>";
+		result = result + "<pip:lssUserId>" + webserviceVo.getPiplssuserId() + "</pip:lssUserId>" +
+				"<pip:officeId>" + webserviceVo.getPipSourceofficeId() + "</pip:officeId>";
 
-	// 	if ((webserviceVo.getPipdutyCode() == null) || (webserviceVo.getPipdutyCode() == ""))
-	// 	{
-	// 		result = result + "<pip:dutyCode/>";
-	// 	}
-	// 	else
-	// 	{
-	// 		result = result + "<pip:dutyCode>" + webserviceVo.getPipdutyCode() + "</pip:dutyCode>";
-	// 	}
-	// 	result = result +
-	// 	"<pip:wsap>" + webserviceVo.getWsap() + "</pip:wsap>" +
-	// 	"<pip:companyName>" + webserviceVo.getCompanyName() + "</pip:companyName>" +
-	// 	"<pip:workstationId>" + webserviceVo.getWorkstationId() + "</pip:workstationId>" +
-	// 	"</pip:ProcessingFlow>" +
-	// 	"</soapenv:Header>" +
-	// 	"<soapenv:Body>" +
-	// 	webserviceVo.getBodyXml() +
-	// 	"</soapenv:Body>" +
-	// 	"</soapenv:Envelope>";
+		if ((webserviceVo.getPipdutyCode() == null) || (webserviceVo.getPipdutyCode() == "")) {
+			result = result + "<pip:dutyCode/>";
+		} else {
+			result = result + "<pip:dutyCode>" + webserviceVo.getPipdutyCode() + "</pip:dutyCode>";
+		}
+		result = result +
+				"<pip:wsap>" + webserviceVo.getWsap() + "</pip:wsap>" +
+				"<pip:companyName>" + webserviceVo.getCompanyName() + "</pip:companyName>" +
+				"<pip:workstationId>" + webserviceVo.getWorkstationId() + "</pip:workstationId>" +
+				"</pip:ProcessingFlow>" +
+				"</soapenv:Header>" +
+				"<soapenv:Body>" +
+				webserviceVo.getBodyXml() +
+				"</soapenv:Body>" +
+				"</soapenv:Envelope>";
 
-	// 	return result;
-	// }
+		return result;
+	}
 
 	protected String getAmadeusEcommerceHeader(WebServiceVo webserviceVo) {
 		StringBuilder result = new StringBuilder();
@@ -826,6 +819,11 @@ class KalProperties {
 		put("amadeus.altea.soapaction.url", "http://webservices.amadeus.com");
 		put("amadeus.ecommerce.host", "https://uat5.aereww.amadeus.com/soap/SOAPRPCRouterServlet");
 		put("pip.ecommerce.host", "http://pipstg.koreanair.com/PAP1AWIBE01/V1_01");
+
+		// GPS Direct Property
+		put("gps.direct.host", "http://gpsdev.koreanair.com/GPS.SRV.WS01/V1_01");
+		put("gps.host", "http://pipstg.koreanair.com/PAPGPWPID01/V1_01");
+
 	}};
 
 	public String getProperty(String key) {
