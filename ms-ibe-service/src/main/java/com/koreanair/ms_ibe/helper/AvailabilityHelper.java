@@ -26,6 +26,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FareMatrixCalendarVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.TaxInfoVO;
@@ -35,12 +36,26 @@ import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
 import com.koreanair.common_adapter.utils.StringUtil;
 import com.koreanair.ms_ibe.service.vo.FareCalendarElementVO;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
+import com.koreanair.ms_ibe.service.vo.availability.AvailSearchCriteriaVO;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 public class AvailabilityHelper {
+
+	/**
+	 * <pre>
+	 * UI의 조건을 Adapter에서 사용 가능한 형태로 변경한다.
+	 * </pre>
+	 * @param inputVo
+	 * @return
+	 */
+	public FlexPricerInputVO availSearchCriteria2FlexPricerInput(AvailSearchCriteriaVO inputVo) {
+		FlexPricerInputVO flexPricerInputVo = new FlexPricerInputVO();
+		BeanUtils.copyProperties(inputVo, flexPricerInputVo);
+		return flexPricerInputVo;
+	}
 
 	public FareCalendarVO organizeMatrixFareCalendar(FlexPricerCalendarOutputVO flexPricerCalendarOutputVo ) throws IOException {
 		FareCalendarVO fareCalendarVo = new FareCalendarVO();

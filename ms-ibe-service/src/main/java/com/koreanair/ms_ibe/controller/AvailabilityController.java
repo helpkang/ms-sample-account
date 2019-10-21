@@ -32,6 +32,7 @@ import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
 import com.koreanair.ms_ibe.service.AvailabilityService;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
+import com.koreanair.ms_ibe.service.vo.availability.AvailSearchCriteriaVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -61,7 +62,7 @@ public class AvailabilityController {
     notes = "Fare Calendar 조회"
     )
     @ResponseBody
-	public FareCalendarVO getCalendarFareAvail(@RequestBody FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+	public FareCalendarVO getCalendarFareAvail(@RequestBody AvailSearchCriteriaVO inputVo) throws JAXBException, IOException, SOAPException {
     	log.debug("getCalendarFareAvail start");
     	return availService.getCalendarFareAvail(inputVo);
 	}

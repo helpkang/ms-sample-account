@@ -26,10 +26,10 @@ import org.springframework.stereotype.Service;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
-import com.koreanair.ms_ibe.domain.AvailabilityDomain;
 import com.koreanair.ms_ibe.helper.AvailabilityHelper;
 import com.koreanair.ms_ibe.repository.AvailabilityRepository;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
+import com.koreanair.ms_ibe.service.vo.availability.AvailSearchCriteriaVO;
 
 @Service
 public class AvailabilityService {
@@ -40,21 +40,24 @@ public class AvailabilityService {
 	@Autowired
 	private AvailabilityHelper availHelper;
 
-	@Autowired
-	private AvailabilityDomain availDomain;
-
 	public FlexPricerOutputVO getDomesticAvailForRevenue(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
 		return availRepository.getFlexPricerAvailability(inputVo);
 	}
 
-	public FareCalendarVO getCalendarFareAvail(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+	public FareCalendarVO getCalendarFareAvail(AvailSearchCriteriaVO inputVo) throws JAXBException, IOException, SOAPException {
 
-		FlexPricerCalendarOutputVO flexPricerCalendarOutputVo = availRepository.getFlexPricerCalendarAvailability(inputVo);	// 1a로 부터 fare calendar의 raw 데이터를 가져온다.
+		FlexPricerInputVO flexPricerInputVo = availHelper.availSearchCriteria2FlexPricerInput(inputVo);	// UI의 조건을 Avail 조회 vo로 변환한다.
+
+		FlexPricerCalendarOutputVO flexPricerCalendarOutputVo = availRepository.getFlexPricerCalendarAvailability(flexPricerInputVo);	// 1a로 부터 fare calendar의 raw 데이터를 가져온다.
 
 		FareCalendarVO fareCalendarVo = availHelper.organizeMatrixFareCalendar(flexPricerCalendarOutputVo);	// UI에서 사용할 형태로 Model을 구성한다.
 
-		fareCalendarVo = availDomain.adjustFareCalendar(fareCalendarVo);	// UI에서 사용할 FareCalendar 데이터의 보정 작업.
+		return adjustFareCalendar(fareCalendarVo);	// UI에서 사용할 FareCalendar 데이터의 보정 작업.
+	}
 
+	private FareCalendarVO adjustFareCalendar(FareCalendarVO fareCalendarVo) {
+		// DB 조회를 통한 FF , CFF 정보 채우기
+		// 기타 비지니스 로직 포함.
 		return fareCalendarVo;
 	}
 }
