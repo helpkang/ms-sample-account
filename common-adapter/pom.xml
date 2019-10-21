@@ -104,6 +104,7 @@
 			<systemPath>${project.basedir}\externalLib\amadeus-altea.jar</systemPath>
 		</dependency>
 
+
 		<!-- https://mvnrepository.com/artifact/org.apache.ws.security/wss4j -->
 		<dependency>
 			<groupId>org.apache.ws.security</groupId>
@@ -126,6 +127,12 @@
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.koreanair.ms_ibe</groupId>
+			<artifactId>common-external</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 
 	</dependencies>

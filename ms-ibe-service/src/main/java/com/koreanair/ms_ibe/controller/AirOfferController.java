@@ -27,7 +27,7 @@ public class AirOfferController {
 
     @PostMapping(value = "/getAirOfferList" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "airOffer List 조회",
-    notes = "airOffer List 조회"
+            notes = "airOffer List 조회"
     )
     @ResponseBody
     public AirOffersListReply getAirOfferList(@RequestBody AirOfferInputVO inputVo) {

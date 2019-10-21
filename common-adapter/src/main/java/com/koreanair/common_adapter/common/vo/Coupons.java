@@ -29,5 +29,6 @@ public class Coupons {
     private String beforeDepartureRefundPenaltyAmount;		//출발 전 환불패널티 금액
     private String afterDepartureRefundPenaltyAmount;		//출발 후 환불패널티 금액
     private String penaltyCurrency;							//환불패널티 통화코드
+    private String validateDate;                            //환불 가능한 날짜
 
 }

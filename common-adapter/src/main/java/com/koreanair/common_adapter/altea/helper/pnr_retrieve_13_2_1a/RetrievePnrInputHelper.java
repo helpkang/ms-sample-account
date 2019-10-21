@@ -1,26 +1,20 @@
 package com.koreanair.common_adapter.altea.helper.pnr_retrieve_13_2_1a;
 
-import com.koreanair.common_adapter.altea.connector.AlteaConnector;
-import com.koreanair.common_adapter.altea.vo.AlteaInputVo;
 import com.koreanair.common_adapter.common.vo.*;
-import com.koreanair.common_adapter.utils.JAXBFactory;
-import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
 import com.koreanair.external.altea.vo.pnr_reply_13_2_1a.*;
 import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.PNRRetrieve;
 import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.ReservationControlInformationDetailsType;
 import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.ReservationControlInformationType;
 import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.RetrievePNRType;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class RetrievePnrHelper {
+public class RetrievePnrInputHelper {
     public PNRRetrieve makeRetrievePNRInput(String reservation) {
         reservation = reservation.replaceAll("-","");
         PNRRetrieve input = new PNRRetrieve();
