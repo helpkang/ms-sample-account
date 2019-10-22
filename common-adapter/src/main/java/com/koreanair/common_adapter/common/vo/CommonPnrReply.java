@@ -21,5 +21,6 @@ public class CommonPnrReply {
     private String companyId;											//회사코드
     private String pnrCreateDateTime;								    /*PNR 생성일*/
     private String iataNumber;                                          //iata번호
+    private boolean splitPnr;                                           //split pnr여부
 
 }

@@ -1,13 +1,9 @@
 package com.koreanair.ms_ibe.repository;
 
-import com.koreanair.common_adapter.altea.RetrievePnrAdapter;
-import com.koreanair.common_adapter.altea.TicketProcessEdocAdapter;
-import com.koreanair.common_adapter.common.vo.CommonPnrReply;
-import com.koreanair.common_adapter.common.vo.CommonTicketReply;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.koreanair.ms_ibe.service.vo.AlipayAuthenticationOutput;
+import com.koreanair.ms_ibe.service.vo.ChinapayAuthenticationOutput;
+import com.koreanair.ms_ibe.service.vo.PaymentAuthenticationInput;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
 
 
 @Repository
@@ -27,5 +23,13 @@ public class PaymentAuthenticationDbRepository {
 
     public String getToss() {
         return "";
+    }
+
+    public AlipayAuthenticationOutput insertAlipay(PaymentAuthenticationInput inputVo) {
+        return null;
+    }
+
+    public ChinapayAuthenticationOutput insertChinapay(PaymentAuthenticationInput inputVo) {
+        return null;
     }
 }

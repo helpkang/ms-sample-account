@@ -1,13 +1,16 @@
 package com.koreanair.ms_ibe.service.vo;
 
+import com.koreanair.common_adapter.common.vo.TravellerInformation;
+import com.koreanair.external.dx.vo.Itinerary;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@Data
-@ApiModel(value="이체요청", description="이체요청")
-public class PaymentAuthenticationInput {
+import java.util.ArrayList;
 
+@Data
+@ApiModel(value="결제 인증 요청", description="결제 인증 요청시 사용되는 클래스")
+public class PaymentAuthenticationInput {
     //ui에서 받는 값
     @ApiModelProperty(value = "국내선여부")
     private Boolean domestic;
@@ -29,7 +32,7 @@ public class PaymentAuthenticationInput {
     private String currency;
     @ApiModelProperty(value = "officeId")
     private String officeId;
-    @ApiModelProperty(value = "UI에서 발급한 고유값")
+    @ApiModelProperty(value = "UI에서 발급한 고유 값", notes = "결제로그 table이나, 사이버소스 결제시 pares값을 저장하고 부르는 키값으로 사용됨")
     private String tid;
     @ApiModelProperty(value = "할부개월수")
     private String installments;
@@ -65,7 +68,7 @@ public class PaymentAuthenticationInput {
     private String appUrl;
     @ApiModelProperty(value = "payco mobileCallbackurl")
     private String cancelMobileUrl;
-    @ApiModelProperty(value = "payco languagecode 2자리 ex) EN, KR")
+    @ApiModelProperty(value = "payco languagecode 2자리", notes="ex) EN, KR")
     private String language;
     @ApiModelProperty(value = "payco 무통장입금완료통보 url ")
     private String nonBankbookDepositInformUrl;
@@ -75,6 +78,8 @@ public class PaymentAuthenticationInput {
     //토스에서 사용하는 변수
     @ApiModelProperty(value = "toss apiKey")
     private String apikey;
+    @ApiModelProperty(value = "비과세")
+    private String amountTaxFree;
 
     //paypal에서 사용하는 변수
     @ApiModelProperty(value = "paypal userId")
@@ -84,14 +89,29 @@ public class PaymentAuthenticationInput {
     @ApiModelProperty(value = "paypal signature")
     private String signature;
 
+    //alipay에서 사용하는 변수
+    private PaymentOption paymentOption;
+
+    //cbsc acsurl요청시 사용되는 변수
+    private String expireMonth;
+    private String expireYear;
+    private String address1;
+    private String address2;
+    private String city;
+    private String country;
+    private String email;
     private String firstName;
     private String lastName;
-    private String email;
-    private String telephone;
-    private String address;
-    private String city;
-    private String state;
     private String postalCode;
+    private String state;
+
+    //cbsc2.0에서 사용하는 변수
+    private ArrayList<TravellerInformation>travellerInformationList;
+    private ArrayList<Itinerary>itineraryList;
+    private String telephone;
+    private String referenceId;
+
+    private String address;
     private String cardType;
     private String bankType;
     private String cardNumber;
@@ -102,13 +122,10 @@ public class PaymentAuthenticationInput {
     private String cardCode;
     private String reqType;
     private String flightSessionId;
-    private String country;
-
     private String mode;
     private String notiUrl;
     private String confirmUrl;
     private String accountNumber;
-    private String referenceId;
     private String partnerUserId;
 
 }

@@ -1,7 +1,6 @@
 package com.koreanair.ms_ibe.controller;
 
 
-import com.koreanair.ms_ibe.domain.rp.VwReservationOutput;
 import com.koreanair.ms_ibe.service.ReservationSearchService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

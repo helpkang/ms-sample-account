@@ -38,10 +38,9 @@ public class PaymentAuthenticationDomain {
 		Boolean DomInt = inputVo.getDomestic();
 		Boolean award = inputVo.getAward();
 		String gubun = "0";
-		String adminKey = "";
 		String productName = "";
 		String cid = "";
-		adminKey="7e6251c307b5efcfd4387d52359592ce";
+
 		// 국내무상은 KPYYMMDD3nnnnn
 		if (DomInt && award) {
 			gubun = "3";
@@ -78,7 +77,6 @@ public class PaymentAuthenticationDomain {
 		//비즈니스로직으로 처리된 데이터들을 input에 담는다.
 		inputVo.setCid(cid);
 		inputVo.setOrderNo(orderNo);
-		inputVo.setAdminKey(adminKey);
 		inputVo.setPartnerUserId(partnerUserId);
 		inputVo.setProductName(productName);
 
@@ -363,13 +361,112 @@ public class PaymentAuthenticationDomain {
 			}
 		}
 		orderNo = orderNo+nn+seq;
+
+		String user = "";
+		String pwd = "";
+		String signature="";
+		if(inputVo.getOfficeId().contains("SEL")){
+			//user = "SELRSGG@koreanair.com";
+			user = "SELRSGG_api1.koreanair.com";
+			pwd = "R4PSQJSBMMMM8SDM";
+			signature = "A7Pp-CkbNvlLpUTi3DlAoJ7XFgR3AnCYO6RG0Q12tLWbiM579ae1VurV";
+		}else if(inputVo.getOfficeId().contains("LAX")){
+			//user = "laxppusd@koreanair.com";
+			user = "laxppusd_api1.koreanair.com";
+			pwd = "5KNZ4R2R556ZQN7R";
+			signature = "AvGCpYM8k-0VrhtnLRrD2wSFZAQZAfH9tiourDwIClTe4qgj5IDSuRk6";
+		}else if(inputVo.getOfficeId().contains("TYO")){
+			//user = "tyoppusd@koreanair.com";
+			user = "tyoppusd_api1.koreanair.com";
+			pwd = "L2YC5UQXVYTHFPWA";
+			signature = "AVlhBXS0VGaLx-jqWLXPMRoiijbqAbzwyND.PpAVkARsVUrugrx-.RcX";
+		}else if(inputVo.getOfficeId().contains("BJS")){
+			//user = "bjsppusd@koreanair.com";
+			user = "bjsppusd_api1.koreanair.com";
+			pwd = "KSQHXCSG6YAV5MZK";
+			signature = "AYhJx4Gu1nuk4jY36t0o7c7KL35PAcJBzNniIVDzt1YKNERG2u1bXtG3";
+		}else if(inputVo.getOfficeId().contains("KUL")
+				||inputVo.getOfficeId().contains("JKT")
+				||inputVo.getOfficeId().contains("SYD")){
+			//user = "kulppusd@koreanair.com";
+			user = "kulppusd_api1.koreanair.com";
+			pwd = "E9W29C27AARMKX9P";
+			signature = "AYmoKoL1EaJzuQx8NBSxUQG9ufWBAsQRs6VHD3uhXf2ajkGqPI.5n3W2";
+		}else if(inputVo.getOfficeId().contains("PAR")){
+			//user = "PRGRU@koreanair.com";
+			user = "prgru_api1.koreanair.com";
+			pwd = "QX9LS7FW2PQ7WSB7";
+			signature = "ACdB7LB6h11Zz9RwAAd2Zk1CI8dNA1GsvGC0.qYQsQToLMemG7EYb2yk";
+		}else if(inputVo.getOfficeId().contains("MOW")){
+			//user = "MOWDRG@koreanair.com";
+			user = "MOWDRG_api1.koreanair.com";
+			pwd = "WAJY6H9RWT4QQGP4";
+			signature = "AgVPt9FQ4SgGMTZj24.Y4Vq41Z20AIMSsceGhjaPISgJgZpO1SbLy.Xv";
+		}else if(inputVo.getOfficeId().contains("DXB")){
+			//user = "dxbppusd@koreanair.com";
+			user = "dxbppusd_api1.koreanair.com";
+			pwd = "5Z9E3Z6BL5PMHSQQ";
+			signature = "AUDKIFyD-YyOY6-yKxOVjCy71yVMA3TgmEaHMq-vdE.Cd2FqpeL-d5m9";
+		}
+
+		inputVo.setPwd(pwd);
+		inputVo.setUserId(user);
+		inputVo.setSignature(signature);
 		inputVo.setOrderNo(orderNo);
 		return inputVo;
 	}
 
 	public PaymentAuthenticationInput getTossInput(PaymentAuthenticationInput inputVo, String seq) {
-		String orderNo = "";
+		String orderNo = "TS";
+		SimpleDateFormat sdfmt = new SimpleDateFormat("yyMMdd");
+		GregorianCalendar cal = new GregorianCalendar();
+		String todayDate = sdfmt.format(cal.getTime());
 
+		Boolean DomInt = inputVo.getDomestic();
+		Boolean award = inputVo.getAward();
+		String gubun = "0";
+		String adminKey = "";
+		String productName = "";
+
+		// 국내무상은 KPYYMMDD3nnnnn
+		if (DomInt && award) {
+			gubun = "3";
+			productName="국내선 항공권";
+			adminKey="sk_test_apikey1234567890";
+			// 국제무상은 KPYYMMDD8nnnnn
+		} else if (!DomInt && award) {
+			gubun = "8";
+			productName="국제선 항공권";
+			adminKey="sk_test_apikey1234567890";
+			//국내유상
+		} else if (DomInt && !award) {
+			gubun = "0";
+			productName="국내선 항공권";
+			adminKey="sk_test_apikey1234567890";
+			//국제유상
+		} else if (!DomInt && !award) {
+			gubun = "6";
+			productName="국제선 항공권";
+			adminKey="sk_test_apikey1234567890";
+		}
+		if("EB".equals(inputVo.getMode())){
+			if(award){
+				gubun = "8";
+			}else{
+				gubun = "6";
+			}
+			productName="국제선 초과 수하물";
+		}
+		orderNo = orderNo+todayDate+gubun+seq;
+
+		inputVo.setAdminKey(adminKey);
+		inputVo.setOrderNo(orderNo);
+		inputVo.setProductName(productName);
+		if(!inputVo.getDomestic()){
+			inputVo.setAmountTaxFree(inputVo.getAmount());
+		}else{
+			inputVo.setAmountTaxFree("0");
+		}
 		return inputVo;
 	}
 }

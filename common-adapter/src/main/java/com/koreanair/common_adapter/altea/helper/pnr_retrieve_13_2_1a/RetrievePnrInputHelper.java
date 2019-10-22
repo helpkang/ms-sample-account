@@ -59,6 +59,12 @@ public class RetrievePnrInputHelper {
                 }
             }
 
+            for(StatusDetailsType183347C statusInfo : output.getPnrHeaderTag().getStatusInformation()){
+                if("AXR".equals(statusInfo.getIndicator())){
+                    reply.setSplitPnr(true);
+                }
+            }
+
             for(PNRReply.TravellerInfo travellerInfo : output.getTravellerInfo()){
                 PNRReply.TravellerInfo.PassengerData passengerData = travellerInfo.getPassengerData().get(0);
                 for(int i=0;i<passengerData.getTravellerInformation().getPassenger().size();i++){

@@ -62,7 +62,7 @@ public class ObjectSerializeUtil {
 	}
 
 	public static Object convertJsonToObject(String str, Class clazz) throws JsonParseException, JsonMappingException, IOException {
-	    Object obj= jacksonMapper.readValue(str, clazz);
+	    Object obj = jacksonMapper.readValue(str, clazz);
 	    return obj;
 	}
 }

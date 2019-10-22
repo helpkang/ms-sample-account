@@ -1,5 +1,6 @@
 package com.koreanair.ms_ibe.domain.rp;
 
+import com.koreanair.ms_ibe.service.vo.VwReservationOutput;
 import org.springframework.stereotype.Component;
 
 @Component
