@@ -49,11 +49,10 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.koreanair.common.utils.JAXBFactory;
 import com.koreanair.external.eretail.vo.common.overrideinput.OverrideInput;
 
 import lombok.extern.slf4j.Slf4j;

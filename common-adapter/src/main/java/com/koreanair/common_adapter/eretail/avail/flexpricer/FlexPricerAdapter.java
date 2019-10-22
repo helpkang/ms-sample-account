@@ -1,16 +1,16 @@
 package com.koreanair.common_adapter.eretail.avail.flexpricer;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.soap.SOAPException;
 
 import org.springframework.stereotype.Component;
 
+import com.koreanair.common.exception.GenericException;
+import com.koreanair.common.exception.GenericException.ExceptionCode;
+import com.koreanair.common.utils.JAXBFactory;
+import com.koreanair.common.utils.ObjectSerializeUtil;
 import com.koreanair.common_adapter.eretail.ERetailBaseAdapter;
 import com.koreanair.common_adapter.eretail.connector.ERetailConnector;
 import com.koreanair.common_adapter.eretail.connector.ERetailSoapConnectorImpl;
@@ -18,15 +18,10 @@ import com.koreanair.common_adapter.eretail.override.OverrideHelper;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
 import com.koreanair.common_adapter.eretail.vo.SegmentInfoVO;
-import com.koreanair.common_adapter.eretail.vo.flexpricerout.FareMatrixCalendarVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
 import com.koreanair.common_adapter.general.vo.consts.PAXType;
 import com.koreanair.common_adapter.general.vo.consts.TripType;
-import com.koreanair.common_adapter.utils.GenericException;
-import com.koreanair.common_adapter.utils.GenericException.ExceptionCode;
-import com.koreanair.common_adapter.utils.JAXBFactory;
-import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
 import com.koreanair.external.eretail.vo.common.overrideinput.OverrideInput;
 import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilityinput.FlexPricerAvailabilityInput;
 import com.koreanair.external.eretail.vo.flexpricer.flexpriceravailabilityoutput.FlexPricerAvailabilityOutput;

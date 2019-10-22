@@ -1,23 +1,33 @@
 package com.koreanair.common_adapter.altea.helper.pnr_retrieve_13_2_1a;
 
-import com.koreanair.common_adapter.altea.connector.AlteaConnector;
-import com.koreanair.common_adapter.altea.vo.AlteaInputVo;
-import com.koreanair.common_adapter.common.vo.*;
-import com.koreanair.common_adapter.utils.JAXBFactory;
-import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
-import com.koreanair.external.altea.vo.pnr_reply_13_2_1a.*;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Component;
+
+import com.koreanair.common_adapter.common.vo.CommonPnrReply;
+import com.koreanair.common_adapter.common.vo.ContactPoint;
+import com.koreanair.common_adapter.common.vo.FreeText;
+import com.koreanair.common_adapter.common.vo.Itinerary;
+import com.koreanair.common_adapter.common.vo.PaymentInformation;
+import com.koreanair.common_adapter.common.vo.ReferenceCode;
+import com.koreanair.common_adapter.common.vo.Service;
+import com.koreanair.common_adapter.common.vo.TicketInformation;
+import com.koreanair.common_adapter.common.vo.TravellerInformation;
+import com.koreanair.external.altea.vo.pnr_reply_13_2_1a.ElementManagementSegmentType;
+import com.koreanair.external.altea.vo.pnr_reply_13_2_1a.InteractiveFreeTextTypeI132924S;
+import com.koreanair.external.altea.vo.pnr_reply_13_2_1a.LongFreeTextType;
+import com.koreanair.external.altea.vo.pnr_reply_13_2_1a.PNRReply;
+import com.koreanair.external.altea.vo.pnr_reply_13_2_1a.ProductDateTimeTypeI171495C;
+import com.koreanair.external.altea.vo.pnr_reply_13_2_1a.ReferencingDetailsType111975C;
+import com.koreanair.external.altea.vo.pnr_reply_13_2_1a.SpecialRequirementsDataDetailsTypeI64826C;
+import com.koreanair.external.altea.vo.pnr_reply_13_2_1a.TravelProductInformationTypeI;
 import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.PNRRetrieve;
 import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.ReservationControlInformationDetailsType;
 import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.ReservationControlInformationType;
 import com.koreanair.external.altea.vo.pnr_retrieve_13_2_1a.RetrievePNRType;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class RetrievePnrHelper {

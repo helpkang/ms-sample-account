@@ -44,7 +44,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.NodeList;
 
-import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
+import com.koreanair.common.utils.ObjectSerializeUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -15,7 +15,7 @@
  */
 package com.koreanair.common_adapter.eretail.override;
 
-import com.koreanair.common_adapter.utils.JAXBFactory;
+import com.koreanair.common.utils.JAXBFactory;
 import com.koreanair.common_adapter.utils.SchemaLocation;
 import com.koreanair.external.eretail.vo.common.overrideinput.OverrideInput;
 import com.koreanair.external.eretail.vo.common.overrideinput.OverrideInput.EMBEDDEDTRANSACTION;

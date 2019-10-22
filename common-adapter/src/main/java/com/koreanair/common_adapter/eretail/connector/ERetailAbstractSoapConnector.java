@@ -29,7 +29,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.koreanair.common_adapter.utils.JAXBFactory;
+import com.koreanair.common.utils.JAXBFactory;
 import com.koreanair.common_adapter.utils.SchemaLocation;
 
 import lombok.extern.slf4j.Slf4j;

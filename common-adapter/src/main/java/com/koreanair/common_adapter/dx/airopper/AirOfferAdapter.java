@@ -32,12 +32,12 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.koreanair.common.exception.GenericException;
+import com.koreanair.common.exception.GenericException.ExceptionCode;
+import com.koreanair.common.utils.ObjectSerializeUtil;
 import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
 import com.koreanair.common_adapter.general.vo.consts.DXHeaders;
 import com.koreanair.common_adapter.general.vo.consts.PAXType;
-import com.koreanair.common_adapter.utils.GenericException;
-import com.koreanair.common_adapter.utils.GenericException.ExceptionCode;
-import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
 import com.koreanair.common_adapter.utils.RestfulInterceptor;
 import com.koreanair.external.dx.vo.AirOffersListReply;
 

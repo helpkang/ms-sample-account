@@ -1,11 +1,10 @@
 package com.koreanair.common_adapter.altea.connector;
 
-import com.kal.framework.integration.adaptor.WebServiceVo;
-import com.kal.framework.integration.adaptor.support.UrlConnectionImpl;
-import com.koreanair.common_adapter.altea.vo.AlteaInputVo;
-import com.koreanair.common_adapter.utils.JAXBFactory;
-import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.soap.MessageFactory;
@@ -16,11 +15,14 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+
+import com.kal.framework.integration.adaptor.WebServiceVo;
+import com.kal.framework.integration.adaptor.support.UrlConnectionImpl;
+import com.koreanair.common.utils.JAXBFactory;
+import com.koreanair.common_adapter.altea.vo.AlteaInputVo;
 
 @Component
 public class AlteaConnector {
