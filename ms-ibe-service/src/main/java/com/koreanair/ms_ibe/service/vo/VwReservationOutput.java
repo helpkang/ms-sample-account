@@ -33,4 +33,9 @@ public class VwReservationOutput {
     private ArrayList<TravellerInformation>travellerInformationList;    //승객정보
     @ApiModelProperty(value = "여정 정보")
     private ArrayList<Itinerary>itineraryList;                          //여정정보
+    @ApiModelProperty(value = "연락처 정보")
+    private ArrayList<ContactPoint> contactPointList;                   //연락처정보
+
+
+
 }

@@ -17,6 +17,7 @@ public class TicketProcessEdocAdapter {
 
     @Autowired
     private TicketProcessEdocInputHelper ticketProcessEdocHelper;
+    @Autowired
     private TicketProcessEdocReplyHelper ticketProcessEdocReplyHelper;
 
     public CommonTicketReply ticketProcessEdoc(ArrayList<String> ticketList, boolean stateful)throws Exception{
@@ -25,8 +26,8 @@ public class TicketProcessEdocAdapter {
         alteainput.setInputBody(ticketinput);
         alteainput.setOperationName("TicketProcess_Edoc");
         alteainput.setResponseClass(TicketProcessEDocReply.class);
-        AlteaConnector adapter = new AlteaConnector();
-        TicketProcessEDocReply reply = (TicketProcessEDocReply) adapter.call(alteainput);
+        AlteaConnector connector = new AlteaConnector();
+        TicketProcessEDocReply reply = (TicketProcessEDocReply) connector.call(alteainput);
         CommonTicketReply output = ticketProcessEdocReplyHelper.makeTicketProcessEDocOutput(reply);
         return output;
     }

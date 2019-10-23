@@ -25,10 +25,16 @@ public class PaymentApprovalInput {
         protected CybersourceDmInfo cybersourceDmInfo;
         @ApiModelProperty(value = "인증정보를 담는 클래스")
         protected AuthInfo authinfo;
-
+        @ApiModelProperty(value = "콘비니 결제 정보")
         protected KonbiniInputVo conveni;
         @ApiModelProperty(value = "중국결제 거래번호")
         protected PayEase payEase;
         @ApiModelProperty(value = "KICC, MPI 카드타입 ")
         protected String cardType;
+        @ApiModelProperty(value = "국내여부")
+        protected boolean domestic;
+        @ApiModelProperty(value = "무상여부")
+        protected boolean award;
+        @ApiModelProperty(value = "officeId")
+        protected String officeId;
 }

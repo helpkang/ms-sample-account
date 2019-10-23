@@ -76,4 +76,15 @@ public class TicketInformation {
     private String chargeablePostion;
     private String chargeableHourChk;
     private ArrayList<ReferenceCode> referenceCodeList;
+
+    //pnr조회
+    private String ticketURL;
+    //보내기
+    private String emailURL;
+    //영수증
+    private String receiptURL;
+    //
+    private String refundURL;
+    private String paymentReceiptURL;
+    private String cashReceiptURL;
 }

@@ -816,6 +816,7 @@ class KalProperties {
 		put("amadeus.altea.host", "https://nodeA1.test.webservices.amadeus.com/1ASIWGENKEU/");
 		put("pip.ecommerce.soapaction.url", "http://pip.koreanair.com");
 		put("PNR_Retrieve", "PNRRET_13_2_1A");
+		put("TicketProcess_Edoc", "TATREQ_12_1_1A");
 		put("amadeus.altea.soapaction.url", "http://webservices.amadeus.com");
 		put("amadeus.ecommerce.host", "https://uat5.aereww.amadeus.com/soap/SOAPRPCRouterServlet");
 		put("pip.ecommerce.host", "http://pipstg.koreanair.com/PAP1AWIBE01/V1_01");

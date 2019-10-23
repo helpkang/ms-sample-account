@@ -3,7 +3,6 @@ package com.koreanair.ms_ibe.service;
 import com.koreanair.common_adapter.common.vo.CommonPnrReply;
 import com.koreanair.common_adapter.common.vo.CommonTicketReply;
 import com.koreanair.common_adapter.common.vo.TicketInformation;
-import com.koreanair.ms_ibe.domain.rp.ReservationSearchDomain;
 import com.koreanair.ms_ibe.helper.ReservationSearchHelper;
 import com.koreanair.ms_ibe.repository.AlteaRepository;
 import com.koreanair.ms_ibe.service.vo.VwReservationOutput;
@@ -22,8 +21,8 @@ public class ReservationSearchService {
     @Autowired
     private ReservationSearchHelper reservationSearchHelper;
 
-    @Autowired
-    private ReservationSearchDomain reservationSearchDomain;
+    //@Autowired
+    //private ReservationSearchDomain reservationSearchDomain;
 
     @Transactional
     public VwReservationOutput getReservation(String recLoc) throws Exception {
@@ -38,7 +37,7 @@ public class ReservationSearchService {
 
         //pnr과 ticket을 merge한다.
         VwReservationOutput output = reservationSearchHelper.makeVwReservationOutput(reply,ticketReply);
-        reservationSearchDomain.reservationSearchProcess(output);
+        //reservationSearchDomain.reservationSearchProcess(output);
 
         return output;
     }

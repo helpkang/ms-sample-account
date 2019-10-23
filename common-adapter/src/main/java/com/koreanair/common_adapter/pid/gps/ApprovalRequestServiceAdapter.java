@@ -1,6 +1,6 @@
 package com.koreanair.common_adapter.pid.gps;
 
-import com.koreanair.common_adapter.pid.gps.helper.PaymentApprovallHelper;
+import com.koreanair.common_adapter.pid.gps.helper.GpsPaymentApprovallHelper;
 import com.koreanair.common_adapter.pid.gps.vo.PaymentApprovalInputVo;
 import com.koreanair.common_adapter.pid.gps.vo.PaymentApprovalOutputVo;
 import com.koreanair.common_external.pid.gps.approvalRequest.ApprovalRequestService;
@@ -12,11 +12,15 @@ import org.springframework.stereotype.Component;
 public class ApprovalRequestServiceAdapter {
 
     @Autowired
-    private PaymentApprovallHelper approvalHelper;
+    private GpsPaymentApprovallHelper approvalHelper;
+
+
 
     public PaymentApprovalOutputVo approvalRequest(PaymentApprovalInputVo input)throws Exception{
         ApprovalRequestService inputVo = approvalHelper.makeApprovalRequestServiceInput(input);
+
         GeneralInfo2 output = new GeneralInfo2();
+
         PaymentApprovalOutputVo outputVo = approvalHelper.makeApprovalRequestServiceOutput(output);
         return outputVo;
     }
