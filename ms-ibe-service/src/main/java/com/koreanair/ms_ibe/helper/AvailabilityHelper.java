@@ -16,6 +16,7 @@
 package com.koreanair.ms_ibe.helper;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,17 +27,25 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import com.koreanair.common.exception.GenericException;
+import com.koreanair.common.exception.GenericException.ExceptionCode;
+import com.koreanair.common.utils.DateUtil;
+import com.koreanair.common.utils.ObjectSerializeUtil;
+import com.koreanair.common.utils.StringUtil;
+import com.koreanair.common_adapter.dx.vo.AirCalendarInputVO;
+import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
+import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
+import com.koreanair.common_adapter.eretail.vo.SegmentInfoVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FareMatrixCalendarVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.TaxInfoVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.TravellerTypeFareInfoVO;
 import com.koreanair.common_adapter.general.vo.consts.PAXType;
-import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
-import com.koreanair.common_adapter.utils.StringUtil;
+import com.koreanair.common_adapter.general.vo.consts.TripType;
 import com.koreanair.ms_ibe.service.vo.FareCalendarElementVO;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
-import com.koreanair.ms_ibe.service.vo.availability.AvailSearchCriteriaVO;
+import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,7 +60,7 @@ public class AvailabilityHelper {
 	 * @param inputVo
 	 * @return
 	 */
-	public FlexPricerInputVO availSearchCriteria2FlexPricerInput(AvailSearchCriteriaVO inputVo) {
+	public FlexPricerInputVO availBookingCriteria2FlexPricerInput(BookingCriteriaVO inputVo) {
 		FlexPricerInputVO flexPricerInputVo = new FlexPricerInputVO();
 		BeanUtils.copyProperties(inputVo, flexPricerInputVo);
 		return flexPricerInputVo;
@@ -136,5 +145,94 @@ public class AvailabilityHelper {
 		return fareCalendarVo;
 	}
 
+	public AirOfferInputVO bookingCriteria2AirOfferInput(BookingCriteriaVO searchVo) throws ParseException {
+		AirOfferInputVO airOfferInputVo = new AirOfferInputVO();
 
+		if (TripType.RT != searchVo.getTripType() && TripType.OW != searchVo.getTripType()) {
+			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "편도, 왕복 인 경우만 사용 가능 합니다.");
+		}
+
+		int adult = 0;
+		int child = 0;
+		int infant = 0;
+		for (PassengerConditionVO passengerCondition : searchVo.getPassengerConditionList()) {
+			if (PAXType.ADT.equals(passengerCondition.getPassengerType())) {
+				adult = adult + 1;
+			}
+			if (PAXType.CHD.equals(passengerCondition.getPassengerType())) {
+				child = child + 1;
+			}
+			if (PAXType.INF.equals(passengerCondition.getPassengerType())) {
+				infant = infant + 1;
+			}
+		}
+
+		airOfferInputVo.setAdult(adult);
+		airOfferInputVo.setChild(child);
+		airOfferInputVo.setInfant(infant);
+
+		int segIdx = 1;
+		for (SegmentInfoVO segmentInfo : searchVo.getSegmentInfoList()) {
+			if (segIdx == 1) {
+				airOfferInputVo.setDepartureDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDateTime(),"yyyyMMddHHmm", "yyyy-MM-dd"));
+				airOfferInputVo.setOriginLocationCode(segmentInfo.getDepartureAirport());
+				airOfferInputVo.setDestinationLocationCode(segmentInfo.getArrivalAirport());
+			} else {
+				airOfferInputVo.setReturnDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDateTime(),"yyyyMMddHHmm", "yyyy-MM-dd"));
+			}
+			segIdx++;
+		}
+		airOfferInputVo.setCommercialFareFamilies(searchVo.getCffCodeList());
+
+		airOfferInputVo.setDirectFlights(false);
+		airOfferInputVo.setShowSoldOut(false);
+
+		return airOfferInputVo;
+	}
+
+	public AirCalendarInputVO bookingCriteria2AirCalendarInput(BookingCriteriaVO searchVo) throws ParseException {
+		AirCalendarInputVO airCalendarInputVo = new AirCalendarInputVO();
+
+		if (TripType.RT != searchVo.getTripType() && TripType.OW != searchVo.getTripType()) {
+			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "편도, 왕복 인 경우만 사용 가능 합니다.");
+		}
+
+		int adult = 0;
+		int child = 0;
+		int infant = 0;
+		for (PassengerConditionVO passengerCondition : searchVo.getPassengerConditionList()) {
+			if (PAXType.ADT.equals(passengerCondition.getPassengerType())) {
+				adult = adult + 1;
+			}
+			if (PAXType.CHD.equals(passengerCondition.getPassengerType())) {
+				child = child + 1;
+			}
+			if (PAXType.INF.equals(passengerCondition.getPassengerType())) {
+				infant = infant + 1;
+			}
+		}
+
+		airCalendarInputVo.setAdult(adult);
+		airCalendarInputVo.setChild(child);
+		airCalendarInputVo.setInfant(infant);
+
+		int segIdx = 1;
+		for (SegmentInfoVO segmentInfo : searchVo.getSegmentInfoList()) {
+			if (segIdx == 1) {
+				airCalendarInputVo.setDepartureDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDateTime(),"yyyyMMddHHmm", "yyyy-MM-dd"));
+				airCalendarInputVo.setOriginLocationCode(segmentInfo.getDepartureAirport());
+				airCalendarInputVo.setDestinationLocationCode(segmentInfo.getArrivalAirport());
+			} else {
+				airCalendarInputVo.setReturnDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDateTime(),"yyyyMMddHHmm", "yyyy-MM-dd"));
+			}
+			segIdx++;
+		}
+		airCalendarInputVo.setCommercialFareFamilies(searchVo.getCffCodeList());
+
+		airCalendarInputVo.setDirectFlights(false);
+		airCalendarInputVo.setShowSoldOut(false);
+		airCalendarInputVo.setFlexibility(3);	// 7*7 calendar 형식으로 표기
+
+		return airCalendarInputVo;
+	}
 }

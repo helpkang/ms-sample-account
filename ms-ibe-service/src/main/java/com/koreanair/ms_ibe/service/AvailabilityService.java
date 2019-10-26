@@ -16,6 +16,7 @@
 package com.koreanair.ms_ibe.service;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.soap.SOAPException;
@@ -23,13 +24,17 @@ import javax.xml.soap.SOAPException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.koreanair.common_adapter.dx.vo.AirCalendarInputVO;
+import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
 import com.koreanair.ms_ibe.helper.AvailabilityHelper;
+import com.koreanair.ms_ibe.repository.AirCalendarRepository;
+import com.koreanair.ms_ibe.repository.AirOfferRepository;
 import com.koreanair.ms_ibe.repository.AvailabilityRepository;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
-import com.koreanair.ms_ibe.service.vo.availability.AvailSearchCriteriaVO;
+import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
 
 @Service
 public class AvailabilityService {
@@ -38,15 +43,21 @@ public class AvailabilityService {
 	private AvailabilityRepository availRepository;
 
 	@Autowired
+    private AirOfferRepository airOfferRepository;
+
+	@Autowired
+	private AirCalendarRepository airCalendarRepository;
+
+	@Autowired
 	private AvailabilityHelper availHelper;
 
 	public FlexPricerOutputVO getDomesticAvailForRevenue(FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
 		return availRepository.getFlexPricerAvailability(inputVo);
 	}
 
-	public FareCalendarVO getCalendarFareAvail(AvailSearchCriteriaVO inputVo) throws JAXBException, IOException, SOAPException {
+	public FareCalendarVO getCalendarFareAvail(BookingCriteriaVO inputVo) throws JAXBException, IOException, SOAPException {
 
-		FlexPricerInputVO flexPricerInputVo = availHelper.availSearchCriteria2FlexPricerInput(inputVo);	// UI의 조건을 Avail 조회 vo로 변환한다.
+		FlexPricerInputVO flexPricerInputVo = availHelper.availBookingCriteria2FlexPricerInput(inputVo);	// UI의 조건을 Avail 조회 vo로 변환한다.
 
 		FlexPricerCalendarOutputVO flexPricerCalendarOutputVo = availRepository.getFlexPricerCalendarAvailability(flexPricerInputVo);	// 1a로 부터 fare calendar의 raw 데이터를 가져온다.
 
@@ -59,5 +70,15 @@ public class AvailabilityService {
 		// DB 조회를 통한 FF , CFF 정보 채우기
 		// 기타 비지니스 로직 포함.
 		return fareCalendarVo;
+	}
+
+	public void getAvailFlightOfRevenue(BookingCriteriaVO inputVo) throws ParseException {
+		AirOfferInputVO  airOfferInput = availHelper.bookingCriteria2AirOfferInput(inputVo);	// 조회조건을 AirOffer input 형태로 변경
+		AirCalendarInputVO airCalendarInput = availHelper.bookingCriteria2AirCalendarInput(inputVo);	// 조회조건을 airCalendar 의 input 형태로 변경
+
+		airOfferRepository.getAirOfferList(airOfferInput);
+		airCalendarRepository.getAirCalendar(airCalendarInput);
+
+		availHelper.organizeAvailFlight();
 	}
 }
