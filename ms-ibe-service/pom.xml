@@ -21,6 +21,13 @@
     <spring-cloud.version>Greenwich.SR2</spring-cloud.version>
   </properties>
   <dependencies>
+
+    <dependency>
+	    <groupId>com.koreanair.ms_ibe</groupId>
+	    <artifactId>ms-common</artifactId>
+	    <version>${project.parent.version}</version>
+    </dependency>
+
     <dependency>
         <groupId>com.koreanair.ms_ibe</groupId>
       <artifactId>ms-ibe-domain</artifactId>
