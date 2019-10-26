@@ -22,4 +22,6 @@ public class DXHeaders {
 	}
 
 	public static final String Authorization = "Z6h6u893ZR428ebUU28Y9Xs92Na886dh";
+	public static final String AuthorizationUat = "D5v7pyQZZN8WMUjrmmCjAzg8Dxhd2UAT";
+	public static final String AuthorizationPDT = "Z2TN9rQCFuGM3VknrbTstkaZvAS7pPDT";
 }

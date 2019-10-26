@@ -1,7 +1,5 @@
 package com.koreanair.ms_ibe.controller;
 
-import java.text.ParseException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
 import com.koreanair.external.dx.vo.AirOffersListReply;
 import com.koreanair.ms_ibe.service.AirOfferService;
-import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,10 +27,10 @@ public class AirOfferController {
 
     @PostMapping(value = "/getAirOfferList" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "airOffer List 조회",
-    notes = "airOffer List 조회"
+            notes = "airOffer List 조회"
     )
     @ResponseBody
-    public AirOffersListReply getAirOfferList(@RequestBody BookingCriteriaVO inputVo) throws ParseException {
+    public AirOffersListReply getAirOfferList(@RequestBody AirOfferInputVO inputVo) {
     	log.debug("getAirOfferList start!");
         return service.getAirOfferList(inputVo);
     }

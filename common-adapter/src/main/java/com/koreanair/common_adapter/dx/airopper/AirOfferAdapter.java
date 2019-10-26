@@ -143,7 +143,7 @@ public class AirOfferAdapter {
 
 		// http header에 인증값
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", DXHeaders.Authorization);
+		headers.set("Authorization", DXHeaders.AuthorizationPDT);
 		headers.set("Content-Type", "application/json");
 
 		HttpEntity<?> entity = new HttpEntity<>(headers);

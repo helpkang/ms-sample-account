@@ -30,6 +30,7 @@ public class AlteaConnector {
         UrlConnectionImpl impl = new UrlConnectionImpl();
         WebServiceVo inputVo = getWebServiceVo(vo);
         String response = impl.call(inputVo);
+        System.out.println(response);
         return getResponseObject(response, vo.getResponseClass());
     }
 

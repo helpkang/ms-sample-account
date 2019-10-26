@@ -18,7 +18,6 @@ package com.koreanair.ms_ibe.repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.koreanair.common_adapter.dx.airopper.AirCalendarAdapter;
 import com.koreanair.common_adapter.dx.airopper.AirOfferAdapter;
 import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
 import com.koreanair.external.dx.vo.AirOffersListReply;
