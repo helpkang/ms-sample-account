@@ -1,19 +1,27 @@
 package com.koreanair.common_adapter.altea.helper.ticket_processedoc_12_2_1a;
 
-import com.koreanair.common_adapter.common.vo.*;
-
-import com.koreanair.common_adapter.utils.BookingUtil;
-import com.koreanair.common_adapter.utils.DateUtil;
-import com.koreanair.external.altea.vo.ticket_processedocreply_12_1_1a.*;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+
+import com.koreanair.common.utils.DateUtil;
+import com.koreanair.common_adapter.common.vo.CommonTicketReply;
+import com.koreanair.common_adapter.common.vo.Coupons;
+import com.koreanair.common_adapter.common.vo.DeductedAmountsVo;
+import com.koreanair.common_adapter.common.vo.PaymentInformation;
+import com.koreanair.common_adapter.common.vo.TicketInformation;
+import com.koreanair.common_adapter.utils.BookingUtil;
+import com.koreanair.external.altea.vo.ticket_processedocreply_12_1_1a.DateAndTimeDetailsTypeI;
+import com.koreanair.external.altea.vo.ticket_processedocreply_12_1_1a.FormOfPaymentDetailsTypeI;
+import com.koreanair.external.altea.vo.ticket_processedocreply_12_1_1a.InteractiveFreeTextTypeI;
+import com.koreanair.external.altea.vo.ticket_processedocreply_12_1_1a.MonetaryInformationDetailsTypeI;
+import com.koreanair.external.altea.vo.ticket_processedocreply_12_1_1a.TicketProcessEDocReply;
 
 @Component
 public class TicketProcessEdocReplyHelper {
