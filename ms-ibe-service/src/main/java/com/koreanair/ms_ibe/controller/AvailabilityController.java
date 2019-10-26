@@ -16,6 +16,7 @@
 package com.koreanair.ms_ibe.controller;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.soap.SOAPException;
@@ -30,8 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
+import com.koreanair.external.dx.vo.AirOffersListReply;
+import com.koreanair.ms_ibe.service.AirOfferService;
 import com.koreanair.ms_ibe.service.AvailabilityService;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
+import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -45,6 +49,9 @@ public class AvailabilityController {
 
 	@Autowired
 	private AvailabilityService availService;
+
+    @Autowired
+    private AirOfferService airOfferService;
 
     @PostMapping(value = "/DomesticAvailForRevenue" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Revenue 국내선 항공편 조회",
@@ -61,9 +68,28 @@ public class AvailabilityController {
     notes = "Fare Calendar 조회"
     )
     @ResponseBody
-	public FareCalendarVO getCalendarFareAvail(@RequestBody FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
+	public FareCalendarVO getCalendarFareAvail(@RequestBody BookingCriteriaVO inputVo) throws JAXBException, IOException, SOAPException {
     	log.debug("getCalendarFareAvail start");
     	return availService.getCalendarFareAvail(inputVo);
+	}
+
+    @PostMapping(value = "/AirOfferList" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "airOffer List 조회",
+    notes = "airOffer List 조회"
+    )
+    @ResponseBody
+    public AirOffersListReply getAirOfferList(@RequestBody BookingCriteriaVO inputVo) throws ParseException {
+    	log.debug("getAirOfferList start!");
+        return airOfferService.getAirOfferList(inputVo);
+    }
+
+    @PostMapping(value = "/AvailFlightOfRevenue" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "예약가능한 항공편 조회",
+    notes = "예약가능한 항공편 조회"
+    )
+    @ResponseBody
+    public void getAvailFlightOfRevenue(@RequestBody BookingCriteriaVO inputVo) {
+    	return availService.getAvailFlightOfRevenue(inputVo);
 	}
 
 }

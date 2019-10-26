@@ -23,6 +23,18 @@
   <dependencies>
 
     <dependency>
+	    <groupId>com.koreanair.ms_ibe</groupId>
+	    <artifactId>ms-common</artifactId>
+	    <version>${project.parent.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.koreanair.ms_ibe</groupId>
+      <artifactId>ms-ibe-domain</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.koreanair.ms_ibe</groupId>
       <artifactId>common-adapter</artifactId>
       <version>${project.parent.version}</version>

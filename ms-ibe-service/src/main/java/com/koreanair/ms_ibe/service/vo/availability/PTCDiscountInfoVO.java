@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Koreanair.
+ * Copyright 2011-2019 KoreanAir
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.koreanair.ms_ibe.domain;
+package com.koreanair.ms_ibe.service.vo.availability;
 
-import org.springframework.stereotype.Component;
+import java.io.Serializable;
 
-import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
+import lombok.Data;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Component
-@Slf4j
-public class AvailabilityDomain {
-
-
-	public FareCalendarVO adjustFareCalendar(FareCalendarVO fareCalendarVo) {
-
-		// DB 조회를 통한 FF , CFF 정보 채우기
-		// 기타 비지니스 로직 포함.
-
-		return fareCalendarVo;
-	}
+/**
+ * <pre>
+ * PTC정보를 담는다.
+ * </pre>
+ *
+ * @author bdlee
+ *
+ * @version 1.0.0
+ * @since 2019. 9. 30.
+ */
+@Data
+public class PTCDiscountInfoVO implements Serializable{
+	private String ptCode = "";
+	private String ptcRate = "";
+	private String ptcDesc = "";
 }

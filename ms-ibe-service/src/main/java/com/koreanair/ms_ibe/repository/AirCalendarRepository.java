@@ -19,18 +19,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.koreanair.common_adapter.dx.airopper.AirCalendarAdapter;
-import com.koreanair.common_adapter.dx.airopper.AirOfferAdapter;
-import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
-import com.koreanair.external.dx.vo.AirOffersListReply;
+import com.koreanair.common_adapter.dx.vo.AirCalendarInputVO;
+import com.koreanair.external.dx.vo.AirCalendarReply;
 
 @Repository
-public class AirOfferRepository {
+public class AirCalendarRepository {
 
 	@Autowired
-	private AirOfferAdapter airOffer;
+	private AirCalendarAdapter airCalendar;
 
-	public AirOffersListReply getAirOfferList(AirOfferInputVO inputVo) {
-		return airOffer.getAirOfferList(inputVo);
+	public AirCalendarReply getAirCalendar(AirCalendarInputVO inputVo) {
+		return airCalendar.getAirCalendar(inputVo);
 	}
 
 }
