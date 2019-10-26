@@ -607,19 +607,6 @@ public class DateUtil {
         return getNumericMonth(alphaMonth, false);
     }
 
-    public static String changeDateFormat(String dateStr, String beforeFormat, String afterFormat) {
-        SimpleDateFormat format = new SimpleDateFormat(beforeFormat);
-        try {
-            Date date = format.parse(dateStr);
-            SimpleDateFormat toFromat = new SimpleDateFormat(afterFormat);
-            return toFromat.format(date);
-        } catch (Exception ex) {
-            // do Noting;
-        }
-        return "";
-    }
-
-
     /*	Refactoring	*/
 
     /**
