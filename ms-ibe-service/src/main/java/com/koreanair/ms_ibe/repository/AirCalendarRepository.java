@@ -20,7 +20,7 @@ import org.springframework.stereotype.Repository;
 
 import com.koreanair.common_adapter.dx.aircalendar.AirCalendarAdapter;
 import com.koreanair.common_adapter.dx.vo.AirCalendarInputVO;
-import com.koreanair.external.dx.vo.AirCalendarReply;
+import com.koreanair.common_adapter.dx.vo.AirCalendarOutputVO;
 
 @Repository
 public class AirCalendarRepository {
@@ -28,7 +28,7 @@ public class AirCalendarRepository {
 	@Autowired
 	private AirCalendarAdapter airCalendar;
 
-	public AirCalendarReply getAirCalendar(AirCalendarInputVO inputVo) {
+	public AirCalendarOutputVO getAirCalendar(AirCalendarInputVO inputVo) {
 		return airCalendar.getAirCalendar(inputVo);
 	}
 
