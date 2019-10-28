@@ -145,6 +145,12 @@ public class DateUtil {
         return DateTimeFormatter.ofPattern("yyyyMMdd").format(LocalDate.now());
     }
 
+	public static String getStringDate(LocalDate date) {
+		return date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+	}
+	public static String getStringDate(LocalDateTime date) {
+		return date.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+	}
 
     public static String todayGmt(String officeId) {
 
