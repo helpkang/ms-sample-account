@@ -33,6 +33,7 @@ import com.koreanair.common.utils.DateUtil;
 import com.koreanair.common.utils.ObjectSerializeUtil;
 import com.koreanair.common.utils.StringUtil;
 import com.koreanair.common_adapter.dx.vo.AirCalendarInputVO;
+import com.koreanair.common_adapter.dx.vo.AirCalendarOutputVO;
 import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
@@ -43,9 +44,11 @@ import com.koreanair.common_adapter.eretail.vo.flexpricerout.TaxInfoVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.TravellerTypeFareInfoVO;
 import com.koreanair.common_adapter.general.vo.consts.PAXType;
 import com.koreanair.common_adapter.general.vo.consts.TripType;
+import com.koreanair.external.dx.vo.AirOffersListReply;
 import com.koreanair.ms_ibe.service.vo.FareCalendarElementVO;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
 import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
+import com.koreanair.ms_ibe.service.vo.availability.UpsellBoundAvailVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -234,5 +237,20 @@ public class AvailabilityHelper {
 		airCalendarInputVo.setFlexibility(3);	// 7*7 calendar 형식으로 표기
 
 		return airCalendarInputVo;
+	}
+
+	/**
+	 * <pre>
+	 * airOfferReply와 airCalendar의 결과를 이용하여 upsell 형태를 구성한다.
+	 * </pre>
+	 *
+	 * @param airOfferList
+	 * @param airCalendarOutput
+	 * @return
+	 */
+	public UpsellBoundAvailVO organizeAvailFlight(AirOffersListReply airOfferList, AirCalendarOutputVO airCalendarOutput) {
+		UpsellBoundAvailVO upsellBoundAvail = new UpsellBoundAvailVO();
+
+		return upsellBoundAvail;
 	}
 }

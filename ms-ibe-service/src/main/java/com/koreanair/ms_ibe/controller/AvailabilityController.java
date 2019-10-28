@@ -36,6 +36,7 @@ import com.koreanair.ms_ibe.service.AirOfferService;
 import com.koreanair.ms_ibe.service.AvailabilityService;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
 import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
+import com.koreanair.ms_ibe.service.vo.availability.UpsellBoundAvailVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -88,7 +89,7 @@ public class AvailabilityController {
     notes = "예약가능한 항공편 조회"
     )
     @ResponseBody
-    public void getAvailFlightOfRevenue(@RequestBody BookingCriteriaVO inputVo) {
+    public UpsellBoundAvailVO getAvailFlightOfRevenue(@RequestBody BookingCriteriaVO inputVo) throws ParseException {
     	return availService.getAvailFlightOfRevenue(inputVo);
 	}
 
