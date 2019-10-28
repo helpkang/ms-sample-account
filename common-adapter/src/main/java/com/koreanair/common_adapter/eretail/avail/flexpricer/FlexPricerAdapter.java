@@ -14,6 +14,7 @@ import com.koreanair.common.utils.ObjectSerializeUtil;
 import com.koreanair.common_adapter.eretail.ERetailBaseAdapter;
 import com.koreanair.common_adapter.eretail.connector.ERetailConnector;
 import com.koreanair.common_adapter.eretail.connector.ERetailSoapConnectorImpl;
+import com.koreanair.common_adapter.eretail.helper.FlexPricerHelper;
 import com.koreanair.common_adapter.eretail.override.OverrideHelper;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
