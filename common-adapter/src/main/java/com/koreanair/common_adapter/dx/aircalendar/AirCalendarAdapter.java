@@ -35,7 +35,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.koreanair.common.exception.GenericException;
 import com.koreanair.common.exception.GenericException.ExceptionCode;
 import com.koreanair.common.utils.ObjectSerializeUtil;
+import com.koreanair.common_adapter.dx.helper.AirCalendarHelper;
 import com.koreanair.common_adapter.dx.vo.AirCalendarInputVO;
+import com.koreanair.common_adapter.dx.vo.AirCalendarOutputVO;
 import com.koreanair.common_adapter.general.vo.consts.DXHeaders;
 import com.koreanair.common_adapter.general.vo.consts.PAXType;
 import com.koreanair.common_adapter.utils.RestfulInterceptor;
@@ -49,6 +51,8 @@ public class AirCalendarAdapter {
 
 	private static RestTemplate restTemplate = new RestTemplate();
 
+	private AirCalendarHelper airCalendarHelper = new AirCalendarHelper();
+
 	/**
 	 * <pre>
 	 * airOffer List를 가져온다.
@@ -58,7 +62,7 @@ public class AirCalendarAdapter {
 	 * @param inputVo
 	 * @return
 	 */
-	public AirCalendarReply getAirCalendar(AirCalendarInputVO inputVo) {
+	public AirCalendarOutputVO getAirCalendar(AirCalendarInputVO inputVo) {
 
 		if (StringUtils.isBlank(inputVo.getDepartureDateTime())) {
 			throw new GenericException(ExceptionCode.BAD_REQUEST, "출발일시는 필수 사항입니다.");
@@ -146,7 +150,10 @@ public class AirCalendarAdapter {
 		AirCalendarReply airCalendarList = responseEntity.getBody();
 		log.debug("{}", ObjectSerializeUtil.getObjectToJson(airCalendarList));
 
-		return airCalendarList;
+		AirCalendarOutputVO calendarOutput = airCalendarHelper.convertAirCalendarReply2AirCalendarOutput(airCalendarList);
+		log.debug("calendarOutput = {}", ObjectSerializeUtil.getObjectToJson(calendarOutput));
+
+		return calendarOutput;
 	}
 
 	public static void main(String[] args) {

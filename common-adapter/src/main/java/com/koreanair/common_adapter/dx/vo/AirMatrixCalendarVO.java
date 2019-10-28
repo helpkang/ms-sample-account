@@ -24,7 +24,6 @@ import lombok.Data;
 public class AirMatrixCalendarVO {
 	private String departureDate = "";
 	private String returnDate = "";
-	private String currency = "";
 	private String commercialFareFamilyType = "";
 	private String fareFamilyType = "";
 	private String fareClass = "";

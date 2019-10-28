@@ -69,6 +69,7 @@ public class AirCalendarHelper {
 				calendarBound.setBoundId(String.valueOf(boundIdx));
 				calendarBound.setDepartureAirport(bound.getOriginLocationCode());
 				calendarBound.setArrivalAirport(bound.getDestinationLocationCode());
+				calendarBound.setFareFamilyType(bound.getFareFamilyCode());
 
 				for(Price price : bound.getPrices().getTotalPrices()) {
 					calendarBound.setBase(String.valueOf(price.getBase()));
