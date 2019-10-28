@@ -1,18 +1,17 @@
 package com.koreanair.ms_ibe.helper;
 
-import com.koreanair.common_adapter.utils.ObjectSerializeUtil;
-import com.koreanair.common_adapter.utils.StringUtil;
+import com.koreanair.common.utils.ObjectSerializeUtil;
+import com.koreanair.common.utils.StringUtil;
 import com.koreanair.ms_ibe.service.vo.*;
 import com.koreanair.ms_ibe.util.JsonUtil;
-import org.springframework.boot.json.JacksonJsonParser;
-import org.springframework.boot.json.JsonParser;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.core.UriBuilder;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component
 public class PaymentAuthenticationHelper {
@@ -27,7 +26,7 @@ public class PaymentAuthenticationHelper {
         return envMap;
     }
 
-    public String makeKakaoBodyInputData(PaymentAuthenticationInput inputVo) {
+    public String makeKakaoBodyInputData(KakaoAuthenticationInput inputVo) {
         String bodyStr = "";
         HashMap<String,Object> bodyMap = new HashMap<String,Object>();
         bodyMap.put("cid", inputVo.getCid());
@@ -55,7 +54,7 @@ public class PaymentAuthenticationHelper {
             stringObjectMap.put("resultCode", "Fail");
         }
         resultStr = JsonUtil.mapToString(stringObjectMap);
-        output = (KakaoAuthenticationOutput)ObjectSerializeUtil.convertJsonToObject(resultStr, KakaoAuthenticationOutput.class);
+        output = (KakaoAuthenticationOutput) ObjectSerializeUtil.convertJsonToObject(resultStr, KakaoAuthenticationOutput.class);
         return output;
     }
 
@@ -68,7 +67,7 @@ public class PaymentAuthenticationHelper {
         return envMap;
     }
 
-    public String makePaypalBodyInputData(PaymentAuthenticationInput inputVo) {
+    public String makePaypalBodyInputData(PaypalAuthenticationInput inputVo) {
         String bodyStr = "";
         HashMap<String,Object> bodyMap = new HashMap<>();
         bodyMap.put("USER", inputVo.getUserId());
@@ -91,7 +90,7 @@ public class PaymentAuthenticationHelper {
         return bodyStr;
     }
 
-    public HashMap<String,Object> makePaycoBodyInputData(PaymentAuthenticationInput inputVo) {
+    public HashMap<String,Object> makePaycoBodyInputData(PaycoAuthenticationInput inputVo) {
         String bodyStr = "";
         ArrayList<HashMap<String,Object>> orderProducts = new ArrayList<HashMap<String,Object>>();
         HashMap<String,Object>orderProduct = new HashMap<String, Object>();
@@ -196,4 +195,176 @@ public class PaymentAuthenticationHelper {
         output = (TossAuthenticationOutput)ObjectSerializeUtil.convertJsonToObject(resultStr, TossAuthenticationOutput.class);
         return output;
     }
+
+    public HashMap<String, String> makeAlipayHeaderInputData(PaymentAuthenticationInput inputVo) {
+        HashMap<String, String>envMap = new HashMap<>();
+        envMap.put("method", "GET");
+        envMap.put("Content-Type", "application/json");
+        envMap.put("Accept", "application/json");
+        return envMap;
+    }
+
+    public HashMap<String,Object> makeAlipayInputData(AlipayAuthenticationInput inputVo) {
+        HashMap<String,Object> inputMap = new HashMap<>();
+        HashMap<String,Object> paramMap = new HashMap<>();
+        paramMap.put("pnrNumber",inputVo.getReservationRecLoc());
+        paramMap.put("pnrNumeralNumber",inputVo.getReservationNumber());
+        paramMap.put("total_fee",inputVo.getAmount());
+        paramMap.put("userId","ANONYMOUS");
+        paramMap.put("officeId",inputVo.getOfficeId());
+        //pc or mobile
+        paramMap.put("device","PCW");
+        paramMap.put("return_url",inputVo.getCallbackUrl());
+        paramMap.put("nt_url",inputVo.getNotifyUrl());
+        inputMap.put("param", paramMap);
+        inputMap.put("host", "https://gps.koreanair.com/pg/aliPay/return_oid.jsp");
+        return inputMap;
+    }
+
+    public AlipayAuthenticationOutput makeAlipayOutputData(String result, AlipayAuthenticationInput inputVo) {
+        AlipayAuthenticationOutput output = new AlipayAuthenticationOutput();
+        if(result != null) {
+            result = result.replaceAll("\r\n", "").replaceAll("\n", "");
+            if (result.contains("out_trade_no") && result.contains("sign")) {
+                if (result.contains(",") && result.split(",").length > 0) {
+                    String[] resultStr = result.split(",");
+                    output.setOrderNo(resultStr[0].substring(resultStr[0].indexOf("=") + 1).trim());
+                    output.setMd5(resultStr[1].substring(resultStr[1].indexOf("=") + 1).trim());
+                }
+            }
+        }else{
+            //exception처리
+        }
+        HashMap<String,Object>paramMap = new HashMap<>();
+        paramMap.put("_input_charset", "utf-8");
+        paramMap.put("it_b_pay", "10m");
+        paramMap.put("notify_url", inputVo.getNotifyUrl());
+        paramMap.put("out_trade_no", output.getOrderNo());
+        paramMap.put("partner", "2088701818975853");
+        paramMap.put("payment_type", "1");
+        paramMap.put("paymethod", "bankPay");
+        paramMap.put("return_url", inputVo.getCallbackUrl());
+        paramMap.put("seller_email", "hechen@koreanair.com");
+        paramMap.put("service", "create_direct_pay_by_user");
+        paramMap.put("show_url", "http://www.xxx.com/order/myorder.jsp");
+        paramMap.put("subject", "KOREANAIR");
+        paramMap.put("total_fee", inputVo.getAmount());
+        paramMap.put("sign", output.getMd5());
+        String param = urlEncodeUTF8(paramMap);
+        String url  = "https://mapi.alipay.com/gateway.do?"+param;
+        output.setUrl(url);
+        return output;
+    }
+
+    public String urlEncodeUTF8(Map<?,?> map) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<?,?> entry : map.entrySet()) {
+            if (sb.length() > 0) {
+                sb.append("&");
+            }
+            System.out.println(sb.toString());
+            sb.append(String.format("%s=%s",
+                    urlEncodeUTF8(entry.getKey().toString()), urlEncodeUTF8(entry.getValue().toString())
+            ));
+        }
+        return sb.toString();
+    }
+
+    public String urlEncodeUTF8(String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new UnsupportedOperationException(e);
+        }
+    }
+
+    public HashMap<String, String> makeChinapayHeaderInputData(ChinapayAuthenticationInput inputVo) {
+        HashMap<String, String>envMap = new HashMap<>();
+        envMap.put("method", "GET");
+        envMap.put("Content-Type", "application/json");
+        envMap.put("Accept", "application/json");
+        return envMap;
+    }
+
+    public HashMap<String, Object> makeChinapayInputData(ChinapayAuthenticationInput inputVo) {
+        HashMap<String,Object> inputMap = new HashMap<>();
+        HashMap<String,Object> paramMap = new HashMap<>();
+        paramMap.put("pnrNumber",inputVo.getReservationRecLoc());
+        paramMap.put("pnrNumeralNumber",inputVo.getReservationNumber());
+        paramMap.put("OrderAmt",inputVo.getAmount());
+        paramMap.put("userId","ANONYMOUS");
+        paramMap.put("officeId",inputVo.getOfficeId());
+
+        String[] currentTime = getCurrentTime();
+        paramMap.put("TranDate", currentTime[0]);
+        paramMap.put("TranTime", currentTime[1]);
+        inputVo.setTranDate(currentTime[0]);
+        inputVo.setTranTime(currentTime[1]);
+        paramMap.put("RemoteAddr", "100.1.111.11");
+
+        paramMap.put("mode",inputVo.getMode().toLowerCase());
+        paramMap.put("return_url",inputVo.getCallbackUrl());
+        paramMap.put("nt_url",inputVo.getNotifyUrl());
+        paramMap.put("env","live");
+        paramMap.put("deviceCode","PCW");
+
+        inputMap.put("param", paramMap);
+        inputMap.put("host", "https://gps.koreanair.com/pg/chinaPay/return_oid.jsp");
+        return inputMap;
+    }
+
+    public ChinapayAuthenticationOutput makeChinapayOutputData(String result, ChinapayAuthenticationInput inputVo) {
+        ChinapayAuthenticationOutput output = new ChinapayAuthenticationOutput();
+        if(result != null) {
+            result = result.replaceAll("\r\n", "").replaceAll("\n", "");
+            if(result.contains("oid") && result.contains("signature")){
+                if (result.contains(",") && result.split(",").length > 0) {
+                    String[] resultStr = result.split(",");
+                    inputVo.setOrderNo(resultStr[0].substring(resultStr[0].indexOf("=") + 1).trim());
+                    output.setSignature(resultStr[1].substring(resultStr[1].indexOf("=") + 1).trim());
+                }
+            }
+        }else{
+            //exception처리
+        }
+
+
+        BigDecimal amt = new BigDecimal(inputVo.getAmount());
+        amt = amt.multiply(new BigDecimal("100"));
+
+        String merId = "";
+        String url = "https://payment.chinapay.com/CTITS/service/rest/page/nref/000000000017/0/0/0/0/0";
+        if("upop".equals(inputVo.getMode())|| "upopmob".equals(inputVo.getMode())){
+            merId = "451111802220002";
+        }else{
+            merId = "451111802220001";
+        }
+        output.setVersion("20140728");
+        output.setAccessType("0");
+        output.setAcqCode("000000000000014");
+        output.setMerId(merId);
+        output.setUrl(url);
+        output.setTranType("0001");
+        output.setBusiType("0001");
+        output.setCurryNo("CNY");
+        output.setTranDate(inputVo.getTranDate());
+        output.setTranTime(inputVo.getTranTime());
+        output.setMerBgUrl(inputVo.getNotifyUrl());
+        output.setMerPageUrl(inputVo.getCallbackUrl());
+        output.setMerOrderNo(inputVo.getOrderNo());
+        output.setOrderAmt(amt.toString());
+        return output;
+    }
+
+    private String[] getCurrentTime() {
+        String[] time = new String[2];
+        SimpleDateFormat sdfmt = new SimpleDateFormat("yyyyMMddHHmmss");
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.add(Calendar.HOUR, -1);
+        String todayDate = sdfmt.format(cal.getTime());
+        time[0] = todayDate.substring(0,8);
+        time[1] = todayDate.substring(8,14);
+        return time;
+    }
+
 }

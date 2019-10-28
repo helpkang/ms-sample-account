@@ -3,6 +3,7 @@ package com.koreanair.ms_ibe.helper;
 import com.koreanair.common_adapter.common.vo.CommonPnrReply;
 import com.koreanair.common_adapter.common.vo.CommonTicketReply;
 import com.koreanair.ms_ibe.service.vo.ContactPoint;
+import com.koreanair.ms_ibe.service.vo.Coupons;
 import com.koreanair.ms_ibe.service.vo.TicketInformation;
 import com.koreanair.ms_ibe.service.vo.VwReservationOutput;
 import org.apache.commons.collections4.CollectionUtils;
@@ -43,8 +44,25 @@ public class ReservationSearchHelper {
             }
             vwReservationOutput.setContactPointList(contactPointList);
         }
-        BeanUtils.copyProperties(reply,vwReservationOutput);
 
+        //ticketProcessEdoc 정보
+        ArrayList<TicketInformation> vWticketList = vwReservationOutput.getTicketInformationList();
+        for(TicketInformation vwTicket : vWticketList) {
+            for (com.koreanair.common_adapter.common.vo.TicketInformation adapterTicket : ticketReply.getTicketInformationList()) {
+                if(vwTicket.getTicketNumber().equalsIgnoreCase(adapterTicket.getTicketNumber())) {
+                    ArrayList<Coupons>couponList = new ArrayList<>();
+                    if (CollectionUtils.isNotEmpty(adapterTicket.getCouponList())) {
+                        for (com.koreanair.common_adapter.common.vo.Coupons adapterCoupon : adapterTicket.getCouponList()) {
+                            Coupons coupon = new Coupons();
+                            BeanUtils.copyProperties(adapterCoupon,coupon);
+                            couponList.add(coupon);
+                        }
+                    }
+                    vwTicket.setCouponList(couponList);
+                }
+            }
+        }
+        BeanUtils.copyProperties(reply,vwReservationOutput);
         return vwReservationOutput;
     }
 }

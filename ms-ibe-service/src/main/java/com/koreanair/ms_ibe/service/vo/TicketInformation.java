@@ -1,6 +1,5 @@
 package com.koreanair.ms_ibe.service.vo;
 
-import com.koreanair.common_adapter.common.vo.*;
 import lombok.Data;
 
 import java.util.ArrayList;
