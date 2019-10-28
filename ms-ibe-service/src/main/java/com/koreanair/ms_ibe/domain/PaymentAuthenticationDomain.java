@@ -15,8 +15,9 @@
  */
 package com.koreanair.ms_ibe.domain;
 
+
 import com.koreanair.common_adapter.utils.StringUtil;
-import com.koreanair.ms_ibe.service.vo.PaymentAuthenticationInput;
+import com.koreanair.ms_ibe.service.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,7 @@ import java.util.HashMap;
 @Slf4j
 public class PaymentAuthenticationDomain {
 	//카카오채번 비즈니스로직
-	public PaymentAuthenticationInput getKakaoInput(PaymentAuthenticationInput inputVo,String seq) {
+	public KakaoAuthenticationInput getKakaoInput(KakaoAuthenticationInput inputVo, String seq) {
 		String partnerUserId = "keonline";
 		Date today = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
@@ -84,7 +85,7 @@ public class PaymentAuthenticationDomain {
 		return inputVo;
 	}
 
-	public PaymentAuthenticationInput getPaycoInput(PaymentAuthenticationInput inputVo, String seq) {
+	public PaycoAuthenticationInput getPaycoInput(PaycoAuthenticationInput inputVo, String seq) {
 		String orderNo = "";
 		String orderChannel="";
 		String sellerKey = "S0FSJE";
@@ -181,7 +182,7 @@ public class PaymentAuthenticationDomain {
 		return inputVo;
 	}
 
-	public PaymentAuthenticationInput getPaypalInput(PaymentAuthenticationInput inputVo, String seq) {
+	public PaypalAuthenticationInput getPaypalInput(PaypalAuthenticationInput inputVo, String seq) {
 		String orderNo = "PP";
 		/*
 		거래번호 형태 : PAYPAL 식별코드 (PP) + 숫자 12자리 (PP +  YYMMDDNNnnnn
@@ -416,7 +417,7 @@ public class PaymentAuthenticationDomain {
 		return inputVo;
 	}
 
-	public PaymentAuthenticationInput getTossInput(PaymentAuthenticationInput inputVo, String seq) {
+	public TossAuthenticationInput getTossInput(TossAuthenticationInput inputVo, String seq) {
 		String orderNo = "TS";
 		SimpleDateFormat sdfmt = new SimpleDateFormat("yyMMdd");
 		GregorianCalendar cal = new GregorianCalendar();
@@ -459,7 +460,7 @@ public class PaymentAuthenticationDomain {
 		}
 		orderNo = orderNo+todayDate+gubun+seq;
 
-		inputVo.setAdminKey(adminKey);
+		inputVo.setApikey(adminKey);
 		inputVo.setOrderNo(orderNo);
 		inputVo.setProductName(productName);
 		if(!inputVo.getDomestic()){
