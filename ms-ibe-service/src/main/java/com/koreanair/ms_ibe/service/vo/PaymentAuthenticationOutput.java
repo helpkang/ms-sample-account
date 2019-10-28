@@ -11,10 +11,4 @@ public class PaymentAuthenticationOutput {
     //kakaopay result
     @ApiModelProperty(value = "kakaopay 에서 발급한 tid, ui에서 발급한 tid")
     private String tid;
-
-
-
-
-
-
 }
