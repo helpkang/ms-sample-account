@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.koreanair.common_adapter.dx.airopper;
+package com.koreanair.common_adapter.dx.aircalendar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
