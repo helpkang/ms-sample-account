@@ -75,7 +75,7 @@ public class AvailabilityController {
 	}
 	*/
 
-	@PostMapping(value = "/CalendarFareAvail", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/CalendarFare", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Fare Calendar 조회", notes = "eRetail FlexPricer를 이용하여 Fare Calendar 조회")
 	@ResponseBody
 	public FareCalendarVO getCalendarFareAvail(@RequestBody RevAvailCriteriaMsVO availCriteria) throws JAXBException, IOException, SOAPException {
@@ -83,7 +83,7 @@ public class AvailabilityController {
 		return availService.getCalendarFareAvail(availCriteria);
 	}
 
-	@PostMapping(value = "/AvailFlightOfRevenue", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/AvailFlight", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "예약가능한 항공편 조회", notes = "DxAPI airOffer , airCalendar를 이용하여 upsell 구성", nickname = "")
 	@ResponseBody
 	public RevUpsellAvailMsVO getAvailFlightOfRevenue(@RequestBody RevAvailCriteriaMsVO availCriteria) throws ParseException {
