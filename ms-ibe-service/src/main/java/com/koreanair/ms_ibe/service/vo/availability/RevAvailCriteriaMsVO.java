@@ -27,7 +27,7 @@ import lombok.Data;
 @ApiModel(description = "Revenue availability flight criteria model")
 @Data
 public class RevAvailCriteriaMsVO {
-	@ApiModelProperty(required = true, value="Commercial Fare Family List", notes = "1개 이상", example = "[ECONOMY0, PRESTIGE0, FIRST0]" , dataType = "List", position = 0)	// 노선과 office id를 이용하여 찾아야 한다.
+	@ApiModelProperty(required = true, value="Commercial Fare Family List", notes = "1개 이상", example = "[\"ECONOMY0\", \"PRESTIGE0\", \"FIRST0\"]" , dataType = "List", position = 0)	// 노선과 office id를 이용하여 찾아야 한다.
 	private List<String> cffCodeList = new ArrayList<>();
 
 	@ApiModelProperty(required = true, value="Trip Type", notes = "RT : Round Trip, OW: Oneway trip", example = "RT", position = 1, dataType = "TripType")
