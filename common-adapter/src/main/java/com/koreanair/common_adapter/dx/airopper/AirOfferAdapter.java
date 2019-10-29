@@ -35,6 +35,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.koreanair.common.exception.GenericException;
 import com.koreanair.common.exception.GenericException.ExceptionCode;
 import com.koreanair.common.utils.ObjectSerializeUtil;
+import com.koreanair.common_adapter.dx.helper.AirOfferHelper;
 import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
 import com.koreanair.common_adapter.general.vo.consts.DXHeaders;
 import com.koreanair.common_adapter.general.vo.consts.PAXType;
@@ -58,6 +59,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AirOfferAdapter {
 
 	private static RestTemplate restTemplate = new RestTemplate();
+	private AirOfferHelper airOfferHelper = new AirOfferHelper();
 
 	/**
 	 * <pre>
@@ -155,6 +157,9 @@ public class AirOfferAdapter {
 		AirOffersListReply airOfferList = responseEntity.getBody();
 		log.debug("{}", ObjectSerializeUtil.getObjectToJson(airOfferList));
 
+		// airOfferList에 중복된 값이나 사용하지 않는 값을 제거한다.
+		airOfferList = airOfferHelper.optimizeAirOfferReply(airOfferList);
+		log.debug("optimize = {}", ObjectSerializeUtil.getObjectToJson(airOfferList));
 		return airOfferList;
 	}
 

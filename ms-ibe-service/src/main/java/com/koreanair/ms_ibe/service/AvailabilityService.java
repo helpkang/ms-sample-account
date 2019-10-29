@@ -25,16 +25,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.koreanair.common_adapter.dx.vo.AirCalendarInputVO;
+import com.koreanair.common_adapter.dx.vo.AirCalendarOutputVO;
 import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
+import com.koreanair.external.dx.vo.AirOffersListReply;
 import com.koreanair.ms_ibe.helper.AvailabilityHelper;
 import com.koreanair.ms_ibe.repository.AirCalendarRepository;
 import com.koreanair.ms_ibe.repository.AirOfferRepository;
 import com.koreanair.ms_ibe.repository.AvailabilityRepository;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
 import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
+import com.koreanair.ms_ibe.service.vo.availability.UpsellBoundAvailVO;
 
 @Service
 public class AvailabilityService {
@@ -72,13 +75,24 @@ public class AvailabilityService {
 		return fareCalendarVo;
 	}
 
-	public void getAvailFlightOfRevenue(BookingCriteriaVO inputVo) throws ParseException {
+	/**
+	 * <pre>
+	 * Revenue의 UPSELL을 구성한다.
+	 * </pre>
+	 *
+	 * @param inputVo
+	 * @return
+	 * @throws ParseException
+	 */
+	public UpsellBoundAvailVO getAvailFlightOfRevenue(BookingCriteriaVO inputVo) throws ParseException {
 		AirOfferInputVO  airOfferInput = availHelper.bookingCriteria2AirOfferInput(inputVo);	// 조회조건을 AirOffer input 형태로 변경
 		AirCalendarInputVO airCalendarInput = availHelper.bookingCriteria2AirCalendarInput(inputVo);	// 조회조건을 airCalendar 의 input 형태로 변경
 
-		airOfferRepository.getAirOfferList(airOfferInput);
-		airCalendarRepository.getAirCalendar(airCalendarInput);
+		AirOffersListReply airOfferList = airOfferRepository.getAirOfferList(airOfferInput);	// airOffer의 조회
+		AirCalendarOutputVO airCalendarOutput = airCalendarRepository.getAirCalendar(airCalendarInput);	// airCalendar의 조회
 
-		availHelper.organizeAvailFlight();
+		UpsellBoundAvailVO upsellBoundAvail = availHelper.organizeAvailFlight(airOfferList, airCalendarOutput);	// airOfferReply와 airCalendar의 결과를 이용하여 upsell 형태를 구성한다.
+
+		return upsellBoundAvail;
 	}
 }

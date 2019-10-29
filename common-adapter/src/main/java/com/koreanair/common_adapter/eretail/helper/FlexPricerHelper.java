@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.koreanair.common_adapter.eretail.avail.flexpricer;
+package com.koreanair.common_adapter.eretail.helper;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

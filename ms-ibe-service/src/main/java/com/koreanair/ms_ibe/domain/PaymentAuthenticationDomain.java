@@ -15,15 +15,21 @@
  */
 package com.koreanair.ms_ibe.domain;
 
-import com.koreanair.common_adapter.utils.StringUtil;
-import com.koreanair.ms_ibe.service.vo.*;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+
+import org.springframework.stereotype.Component;
+
+import com.koreanair.common.utils.StringUtil;
+import com.koreanair.ms_ibe.service.vo.KakaoAuthenticationInput;
+import com.koreanair.ms_ibe.service.vo.PaycoAuthenticationInput;
+import com.koreanair.ms_ibe.service.vo.PaypalAuthenticationInput;
+import com.koreanair.ms_ibe.service.vo.TossAuthenticationInput;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
