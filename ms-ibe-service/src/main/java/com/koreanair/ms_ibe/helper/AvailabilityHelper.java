@@ -246,11 +246,7 @@ public class AvailabilityHelper {
 		UpsellBoundAvailVO departureUpsellBoundAvail = new UpsellBoundAvailVO();
 		UpsellBoundAvailVO returnUpsellBoundAvail = new UpsellBoundAvailVO();
 
-		List<UpsellCalendarFareVO> departureUpsellCalendarFareList = new ArrayList<>();
-		List<UpsellCalendarFareVO> returnUpsellCalendarFareList = new ArrayList<>();
-
-		List<AirMatrixCalendarVO> departureCalendarList = new ArrayList<>();
-		List<AirMatrixCalendarVO> returnCalendarList = new ArrayList<>();
+		// 상단 7 Calendar 구성 start
 		for (AirMatrixCalendarVO calendarData : airCalendarOutput.getAirMatrixCalendarList()) {
 
 			int boundIdx = 0;
@@ -297,6 +293,9 @@ public class AvailabilityHelper {
 		if (returnUpsellBoundAvail != null) {
 			revUpsellAvailMsVo.getUpsellBoundAvailList().add(returnUpsellBoundAvail);
 		}
+		// 상단 7 Calendar 구성 end
+
+
 
 		return revUpsellAvailMsVo;
 	}
