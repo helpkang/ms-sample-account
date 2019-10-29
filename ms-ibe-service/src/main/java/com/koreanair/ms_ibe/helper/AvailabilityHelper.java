@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.stereotype.Component;
 
 import com.koreanair.common.exception.GenericException;
@@ -38,15 +39,19 @@ import com.koreanair.common_adapter.dx.vo.AirMatrixCalendarVO;
 import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
 import com.koreanair.common_adapter.dx.vo.CalendarBoundVO;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
+import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
+import com.koreanair.common_adapter.eretail.vo.SegmentInfoVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FareMatrixCalendarVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.TaxInfoVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.TravellerTypeFareInfoVO;
 import com.koreanair.common_adapter.general.vo.consts.PAXType;
 import com.koreanair.common_adapter.general.vo.consts.TripType;
+import com.koreanair.external.dx.vo.AirOffer;
 import com.koreanair.external.dx.vo.AirOffersListReply;
 import com.koreanair.ms_ibe.service.vo.FareCalendarElementVO;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
+import com.koreanair.ms_ibe.service.vo.availability.AvailFlightVO;
 import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
 import com.koreanair.ms_ibe.service.vo.availability.RevAvailCriteriaMsVO;
 import com.koreanair.ms_ibe.service.vo.availability.RevAvailSegmentCriteriaMsVO;
@@ -67,9 +72,48 @@ public class AvailabilityHelper {
 	 * @param inputVo
 	 * @return
 	 */
-	public FlexPricerInputVO availBookingCriteria2FlexPricerInput(BookingCriteriaVO inputVo) {
+	public FlexPricerInputVO availBookingCriteria2FlexPricerInput(RevAvailCriteriaMsVO availCriteria) {
 		FlexPricerInputVO flexPricerInputVo = new FlexPricerInputVO();
-		BeanUtils.copyProperties(inputVo, flexPricerInputVo);
+
+		try {
+			flexPricerInputVo.setOfficeId("SELKE08IW");
+			//flexPricerInputVo.setOfficeId("SELKE08DM");
+
+			flexPricerInputVo.setDualDisplay(false);
+			flexPricerInputVo.setOnlyCalendarFare(true);
+			flexPricerInputVo.setDateRange(3);
+			flexPricerInputVo.setTripType(availCriteria.getTripType());
+			flexPricerInputVo.getCffCodeList().addAll(availCriteria.getCffCodeList());
+
+			for (RevAvailSegmentCriteriaMsVO segment : availCriteria.getSegmentList()) {
+				SegmentInfoVO segmentInfo = new SegmentInfoVO();
+				segmentInfo.setDepartureAirport(segment.getDepartureAirport());
+				segmentInfo.setArrivalAirport(segment.getArrivalAirport());
+				segmentInfo.setDepartureDateTime(DateUtil.changeDateFormat(segment.getDepartureDate(),"yyyyMMdd","yyyyMMddHHmm"));
+				flexPricerInputVo.getSegmentInfoList().add(segmentInfo);
+			}
+
+			for (int i = 0; i < availCriteria.getAdult(); i++) {
+				PassengerConditionVO passengerCondition = new PassengerConditionVO();
+				passengerCondition.setPassengerType(PAXType.ADT);
+				flexPricerInputVo.getPassengerConditionList().add(passengerCondition);
+			}
+			for (int i = 0; i < availCriteria.getChild(); i++) {
+				PassengerConditionVO passengerCondition = new PassengerConditionVO();
+				passengerCondition.setPassengerType(PAXType.CHD);
+				flexPricerInputVo.getPassengerConditionList().add(passengerCondition);
+			}
+			for (int i = 0; i < availCriteria.getInfant(); i++) {
+				PassengerConditionVO passengerCondition = new PassengerConditionVO();
+				passengerCondition.setPassengerType(PAXType.INF);
+				flexPricerInputVo.getPassengerConditionList().add(passengerCondition);
+			}
+
+		} catch (BeansException  e) {
+			log.error("",e);
+		} catch (ParseException e) {
+			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "Date parse error!", e);
+		}
 		return flexPricerInputVo;
 	}
 
@@ -223,13 +267,13 @@ public class AvailabilityHelper {
 	 * @param airCalendarOutput
 	 * @return
 	 */
-	public RevUpsellAvailMsVO organizeAvailFlight(RevAvailCriteriaMsVO inputVo, AirOffersListReply airOfferList, AirCalendarOutputVO airCalendarOutput) {
+	public RevUpsellAvailMsVO organizeAvailFlight(RevAvailCriteriaMsVO availCriteria, AirOffersListReply airOfferList, AirCalendarOutputVO airCalendarOutput) {
 		RevUpsellAvailMsVO revUpsellAvailMsVo = new RevUpsellAvailMsVO();
 
 		String departureDate = "";
 		String returnDate = "";
 		int i=0;
-		for(RevAvailSegmentCriteriaMsVO segment : inputVo.getSegmentList()) {
+		for(RevAvailSegmentCriteriaMsVO segment : availCriteria.getSegmentList()) {
 			if(i==0) {
 				departureDate = segment.getDepartureDate();
 			} else {
@@ -239,7 +283,7 @@ public class AvailabilityHelper {
 		}
 
 		boolean isRoundTrip = false;
-		if (TripType.RT == inputVo.getTripType()) {
+		if (TripType.RT == availCriteria.getTripType()) {
 			isRoundTrip = true;
 		}
 
@@ -295,8 +339,22 @@ public class AvailabilityHelper {
 		}
 		// 상단 7 Calendar 구성 end
 
+		// bound별 flight UPSELL 구성
+		for(AirOffer airOffer : airOfferList.getData().getAirOffers()) {
+			AvailFlightVO departureAvailFlight = new AvailFlightVO();
+			departureUpsellBoundAvail.getAvailFlightList().add(departureAvailFlight);
 
-
+			AvailFlightVO returnAvailFlight = new AvailFlightVO();
+			returnUpsellBoundAvail.getAvailFlightList().add(returnAvailFlight);
+		}
 		return revUpsellAvailMsVo;
+	}
+
+	public static void main(String[] args) {
+		RevAvailCriteriaMsVO availCriteria = new RevAvailCriteriaMsVO();
+		availCriteria.setTripType(TripType.RT);
+		availCriteria.getCffCodeList().add("A");
+		availCriteria.getCffCodeList().add("B");
+		log.debug("RevAvailCriteriaMsVO = {}", ObjectSerializeUtil.getObjectToJson(availCriteria));
 	}
 }

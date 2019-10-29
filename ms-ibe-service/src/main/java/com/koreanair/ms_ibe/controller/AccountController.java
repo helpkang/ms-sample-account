@@ -27,8 +27,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
-@RestController
-@RequestMapping("/api/account")
+//@RestController
+//@RequestMapping("/api/account")
 //@Api(value = "account", description = "account 와 transfer 처리")
 @Slf4j
 public class AccountController {

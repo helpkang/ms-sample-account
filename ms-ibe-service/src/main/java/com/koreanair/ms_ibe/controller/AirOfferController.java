@@ -18,9 +18,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
-@RestController
-@RequestMapping("/api/airOffer")
-@Api(value = "airoffer", description = "DxApi의 AirOffer 호출 처리")
+//@RestController
+//@RequestMapping("/api/airOffer")
+//@Api(value = "airoffer", description = "DxApi의 AirOffer 호출 처리")
 @Slf4j
 public class AirOfferController {
 

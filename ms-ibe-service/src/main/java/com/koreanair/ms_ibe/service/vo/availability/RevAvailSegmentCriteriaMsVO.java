@@ -23,15 +23,12 @@ import lombok.Data;
 @Data
 public class RevAvailSegmentCriteriaMsVO {
 
-	@ApiModelProperty(required = true, value="departure date", notes = "yyyyMMdd", example = "20191115")
+	@ApiModelProperty(required = true, value="departure date", notes = "yyyyMMdd", example = "20191115", position = 1)
 	private String departureDate = "";
 
-	@ApiModelProperty(required = true, value="arrival date", notes = "yyyyMMdd", example = "20191118")
-	private String arrivalDate = "";
-
-	@ApiModelProperty(required = true, value="departure airport", notes = "IATA 3 Letter code", example = "ICN")
+	@ApiModelProperty(required = true, value="departure airport", notes = "IATA 3 Letter code", example = "ICN", position = 2)
 	private String departureAirport = "";
 
-	@ApiModelProperty(required = true, value="arrival airport", notes = "IATA 3 Letter code", example = "NRT")
+	@ApiModelProperty(required = true, value="arrival airport", notes = "IATA 3 Letter code", example = "NRT", position = 3)
 	private String arrivalAirport = "";
 }
