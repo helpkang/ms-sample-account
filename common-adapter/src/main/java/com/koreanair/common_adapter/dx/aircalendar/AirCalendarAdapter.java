@@ -138,7 +138,7 @@ public class AirCalendarAdapter {
 
 		// http header에 인증값
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", DXHeaders.Authorization);
+		headers.set("Authorization", DXHeaders.AuthorizationUat);
 		headers.set("Content-Type", "application/json");
 
 		HttpEntity<?> entity = new HttpEntity<>(headers);
@@ -160,12 +160,12 @@ public class AirCalendarAdapter {
 
 		AirCalendarInputVO inputVo = new AirCalendarInputVO();
 		inputVo.setDepartureDateTime("2020-02-14");
-		inputVo.setReturnDateTime("2020-03-05");
+//		inputVo.setReturnDateTime("2020-03-05");
 		inputVo.setOriginLocationCode("ICN");
 		inputVo.setDestinationLocationCode("DXB");
 		inputVo.setCommercialFareFamilies(Arrays.asList("ECONOMY0", "PRESTIGE0", "FIRST0"));
 		inputVo.setAdult(2);
-		inputVo.setChild(2);
+		inputVo.setChild(1);
 		inputVo.setDirectFlights(false);
 		inputVo.setShowSoldOut(false);
 		inputVo.setFlexibility(3);
