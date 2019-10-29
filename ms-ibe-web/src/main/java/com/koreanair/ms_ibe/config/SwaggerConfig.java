@@ -16,21 +16,21 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableSwagger2
-public class SwaggerConfig {                                    
+public class SwaggerConfig {
     @Bean
-    public Docket api() { 
+    public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
         .apiInfo(apiInfo())
-          .select()                                  
-          .apis(RequestHandlerSelectors.any())              
-          .paths(or(PathSelectors.ant("/api/**/*"), PathSelectors.ant("/inter/**/*")))  
-          .build();                                           
+          .select()
+          .apis(RequestHandlerSelectors.any())
+          .paths(or(PathSelectors.ant("/api/**/*"), PathSelectors.ant("/inter/**/*")))
+          .build();
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Swagger Account")
-                .description("Account API Description")
+                .title("KE Revenue API")
+                .description("KE Revenue API Description")
                 .contact(new Contact("TestName", "http:/test-url.com", "test@test.de"))
                 .license("Apache 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
