@@ -65,12 +65,20 @@ public abstract class PidAbstractConnector implements PidConnector {
     }
 
     protected Map<String, String> tempPropertyMap = new HashMap<String, String>() {{
+        //  pid host
         put("gps.host", "http://gpsdev.koreanair.com/GPS.SRV.WS01/V1_01");
+        put("ods.host", "http://pipstg.koreanair.com/PAPODWPID01/V1_01");
+        put("sss.host", "http://pipstg.koreanair.com/PAPPIWPID01/V1_01");
+
+        //  pid operation
         put("gps.approvalRequest", "GPS_Approval_Request_1_01");
+        put("ods.PNR_ListIbe", "PnrListIbe_Retrieve_01_1");
+        put("sss.searchMemberInfo", "Search_MemberInfo_1_0");
+
         put("pip.pid.soapaction.url", "http://pip.koreanair.com");
 
-        put("pip.userName", "IBE");
-        put("pip.pwd", "aWJLcGLkcGFzc3dvcmQzNtc5");
+        put("pip.userName", "WSKEIBE");
+        put("pip.pwd", "aWJlcGlwcGFzc3dvcmQyNDY4");
         put("guid", "http://pip.koreanair.com");
     }};
 }

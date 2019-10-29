@@ -23,6 +23,10 @@ public class GpsConnectorImpl extends PidAbstractConnector {
         inputVo.setRequestMethod("POST");
         inputVo.setMustUnderstand("0");
         inputVo.setHeaderType(4);
+
+        //  gps direct setting
+        inputVo.setPipuserName("IBE");
+        inputVo.setPippassWord("aWJLcGLkcGFzc3dvcmQzNtc5");
         return inputVo;
     }
 }
