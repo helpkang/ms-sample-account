@@ -93,7 +93,7 @@ public class AvailabilityService {
 		AirOffersListReply airOfferList = airOfferRepository.getAirOfferList(airOfferInput);	// airOffer의 조회
 		AirCalendarOutputVO airCalendarOutput = airCalendarRepository.getAirCalendar(airCalendarInput);	// airCalendar의 조회
 
-		RevUpsellAvailMsVO upsellBoundAvail = availHelper.organizeAvailFlight(airOfferList, airCalendarOutput);	// airOfferReply와 airCalendar의 결과를 이용하여 upsell 형태를 구성한다.
+		RevUpsellAvailMsVO upsellBoundAvail = availHelper.organizeAvailFlight(inputVo, airOfferList, airCalendarOutput);	// airOfferReply와 airCalendar의 결과를 이용하여 upsell 형태를 구성한다.
 
 		return upsellBoundAvail;
 	}

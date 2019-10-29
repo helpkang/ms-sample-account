@@ -34,7 +34,9 @@ import com.koreanair.common.utils.ObjectSerializeUtil;
 import com.koreanair.common.utils.StringUtil;
 import com.koreanair.common_adapter.dx.vo.AirCalendarInputVO;
 import com.koreanair.common_adapter.dx.vo.AirCalendarOutputVO;
+import com.koreanair.common_adapter.dx.vo.AirMatrixCalendarVO;
 import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
+import com.koreanair.common_adapter.dx.vo.CalendarBoundVO;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FareMatrixCalendarVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
@@ -49,6 +51,8 @@ import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
 import com.koreanair.ms_ibe.service.vo.availability.RevAvailCriteriaMsVO;
 import com.koreanair.ms_ibe.service.vo.availability.RevAvailSegmentCriteriaMsVO;
 import com.koreanair.ms_ibe.service.vo.availability.RevUpsellAvailMsVO;
+import com.koreanair.ms_ibe.service.vo.availability.UpsellBoundAvailVO;
+import com.koreanair.ms_ibe.service.vo.availability.UpsellCalendarFareVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -219,8 +223,80 @@ public class AvailabilityHelper {
 	 * @param airCalendarOutput
 	 * @return
 	 */
-	public RevUpsellAvailMsVO organizeAvailFlight(AirOffersListReply airOfferList, AirCalendarOutputVO airCalendarOutput) {
+	public RevUpsellAvailMsVO organizeAvailFlight(RevAvailCriteriaMsVO inputVo, AirOffersListReply airOfferList, AirCalendarOutputVO airCalendarOutput) {
 		RevUpsellAvailMsVO revUpsellAvailMsVo = new RevUpsellAvailMsVO();
+
+		String departureDate = "";
+		String returnDate = "";
+		int i=0;
+		for(RevAvailSegmentCriteriaMsVO segment : inputVo.getSegmentList()) {
+			if(i==0) {
+				departureDate = segment.getDepartureDate();
+			} else {
+				returnDate = segment.getDepartureDate();
+			}
+			i++;
+		}
+
+		boolean isRoundTrip = false;
+		if (TripType.RT == inputVo.getTripType()) {
+			isRoundTrip = true;
+		}
+
+		UpsellBoundAvailVO departureUpsellBoundAvail = new UpsellBoundAvailVO();
+		UpsellBoundAvailVO returnUpsellBoundAvail = new UpsellBoundAvailVO();
+
+		List<UpsellCalendarFareVO> departureUpsellCalendarFareList = new ArrayList<>();
+		List<UpsellCalendarFareVO> returnUpsellCalendarFareList = new ArrayList<>();
+
+		List<AirMatrixCalendarVO> departureCalendarList = new ArrayList<>();
+		List<AirMatrixCalendarVO> returnCalendarList = new ArrayList<>();
+		for (AirMatrixCalendarVO calendarData : airCalendarOutput.getAirMatrixCalendarList()) {
+
+			int boundIdx = 0;
+			CalendarBoundVO calendarBoundOfDeparture = new CalendarBoundVO();
+			CalendarBoundVO calendarBoundOfReturn = new CalendarBoundVO();
+			for (CalendarBoundVO calendarBound : calendarData.getCalendarBoundList()) {
+				if (boundIdx == 0) {
+					calendarBoundOfDeparture = calendarBound;
+				} else {
+					calendarBoundOfReturn = calendarBound;
+				}
+				boundIdx++;
+			}
+
+			if (!isRoundTrip || (isRoundTrip && StringUtils.isNotBlank(returnDate) && returnDate.equals(calendarData.getReturnDate()))) { // 돌아오는 날짜 기준으로 출발일 7 calendar를 구성한다.
+				UpsellCalendarFareVO upsellCalendarFare = new UpsellCalendarFareVO();
+				upsellCalendarFare.setDate(calendarData.getDepartureDate());
+				upsellCalendarFare.setCommercialFareFamilyType(calendarData.getCommercialFareFamilyType());
+				upsellCalendarFare.setFareFamilyType(calendarBoundOfDeparture.getFareFamilyType());
+				upsellCalendarFare.setFareClass(calendarData.getFareClass());
+				upsellCalendarFare.setBaseFare(calendarBoundOfDeparture.getBase());
+				upsellCalendarFare.setTotalTax(calendarBoundOfDeparture.getTotalTax());
+				upsellCalendarFare.setTotalFare(calendarBoundOfDeparture.getTotal());
+				departureUpsellBoundAvail.setBoundId("1");
+				departureUpsellBoundAvail.getUpsellCalendarFareList().add(upsellCalendarFare);
+			}
+
+			if (isRoundTrip && departureDate.equals(calendarData.getDepartureDate())) { // 왕복인 경우 출발일 기준으로 return의 7 calendar를 구성한다.
+				UpsellCalendarFareVO upsellCalendarFare = new UpsellCalendarFareVO();
+				upsellCalendarFare.setDate(calendarData.getReturnDate());
+				upsellCalendarFare.setCommercialFareFamilyType(calendarData.getCommercialFareFamilyType());
+				upsellCalendarFare.setFareFamilyType(calendarBoundOfReturn.getFareFamilyType());
+				upsellCalendarFare.setFareClass(calendarData.getFareClass());
+				upsellCalendarFare.setBaseFare(calendarBoundOfReturn.getBase());
+				upsellCalendarFare.setTotalTax(calendarBoundOfReturn.getTotalTax());
+				upsellCalendarFare.setTotalFare(calendarBoundOfReturn.getTotal());
+				returnUpsellBoundAvail.setBoundId("2");
+				returnUpsellBoundAvail.getUpsellCalendarFareList().add(upsellCalendarFare);
+			}
+
+		}
+
+		revUpsellAvailMsVo.getUpsellBoundAvailList().add(departureUpsellBoundAvail);
+		if (returnUpsellBoundAvail != null) {
+			revUpsellAvailMsVo.getUpsellBoundAvailList().add(returnUpsellBoundAvail);
+		}
 
 		return revUpsellAvailMsVo;
 	}
