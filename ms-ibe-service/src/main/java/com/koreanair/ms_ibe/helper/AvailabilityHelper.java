@@ -36,8 +36,6 @@ import com.koreanair.common_adapter.dx.vo.AirCalendarInputVO;
 import com.koreanair.common_adapter.dx.vo.AirCalendarOutputVO;
 import com.koreanair.common_adapter.dx.vo.AirOfferInputVO;
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
-import com.koreanair.common_adapter.eretail.vo.PassengerConditionVO;
-import com.koreanair.common_adapter.eretail.vo.SegmentInfoVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FareMatrixCalendarVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerCalendarOutputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.TaxInfoVO;
@@ -48,7 +46,9 @@ import com.koreanair.external.dx.vo.AirOffersListReply;
 import com.koreanair.ms_ibe.service.vo.FareCalendarElementVO;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
 import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
-import com.koreanair.ms_ibe.service.vo.availability.UpsellBoundAvailVO;
+import com.koreanair.ms_ibe.service.vo.availability.RevAvailCriteriaMsVO;
+import com.koreanair.ms_ibe.service.vo.availability.RevAvailSegmentCriteriaMsVO;
+import com.koreanair.ms_ibe.service.vo.availability.RevUpsellAvailMsVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -148,40 +148,25 @@ public class AvailabilityHelper {
 		return fareCalendarVo;
 	}
 
-	public AirOfferInputVO bookingCriteria2AirOfferInput(BookingCriteriaVO searchVo) throws ParseException {
+	public AirOfferInputVO bookingCriteria2AirOfferInput(RevAvailCriteriaMsVO searchVo) throws ParseException {
 		AirOfferInputVO airOfferInputVo = new AirOfferInputVO();
 
 		if (TripType.RT != searchVo.getTripType() && TripType.OW != searchVo.getTripType()) {
 			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "편도, 왕복 인 경우만 사용 가능 합니다.");
 		}
 
-		int adult = 0;
-		int child = 0;
-		int infant = 0;
-		for (PassengerConditionVO passengerCondition : searchVo.getPassengerConditionList()) {
-			if (PAXType.ADT.equals(passengerCondition.getPassengerType())) {
-				adult = adult + 1;
-			}
-			if (PAXType.CHD.equals(passengerCondition.getPassengerType())) {
-				child = child + 1;
-			}
-			if (PAXType.INF.equals(passengerCondition.getPassengerType())) {
-				infant = infant + 1;
-			}
-		}
-
-		airOfferInputVo.setAdult(adult);
-		airOfferInputVo.setChild(child);
-		airOfferInputVo.setInfant(infant);
+		airOfferInputVo.setAdult(searchVo.getAdult());
+		airOfferInputVo.setChild(searchVo.getChild());
+		airOfferInputVo.setInfant(searchVo.getInfant());
 
 		int segIdx = 1;
-		for (SegmentInfoVO segmentInfo : searchVo.getSegmentInfoList()) {
+		for (RevAvailSegmentCriteriaMsVO segmentInfo : searchVo.getSegmentList()) {
 			if (segIdx == 1) {
-				airOfferInputVo.setDepartureDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDateTime(),"yyyyMMddHHmm", "yyyy-MM-dd"));
+				airOfferInputVo.setDepartureDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
 				airOfferInputVo.setOriginLocationCode(segmentInfo.getDepartureAirport());
 				airOfferInputVo.setDestinationLocationCode(segmentInfo.getArrivalAirport());
 			} else {
-				airOfferInputVo.setReturnDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDateTime(),"yyyyMMddHHmm", "yyyy-MM-dd"));
+				airOfferInputVo.setReturnDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
 			}
 			segIdx++;
 		}
@@ -193,40 +178,26 @@ public class AvailabilityHelper {
 		return airOfferInputVo;
 	}
 
-	public AirCalendarInputVO bookingCriteria2AirCalendarInput(BookingCriteriaVO searchVo) throws ParseException {
+	public AirCalendarInputVO bookingCriteria2AirCalendarInput(RevAvailCriteriaMsVO searchVo) throws ParseException {
 		AirCalendarInputVO airCalendarInputVo = new AirCalendarInputVO();
 
 		if (TripType.RT != searchVo.getTripType() && TripType.OW != searchVo.getTripType()) {
 			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "편도, 왕복 인 경우만 사용 가능 합니다.");
 		}
 
-		int adult = 0;
-		int child = 0;
-		int infant = 0;
-		for (PassengerConditionVO passengerCondition : searchVo.getPassengerConditionList()) {
-			if (PAXType.ADT.equals(passengerCondition.getPassengerType())) {
-				adult = adult + 1;
-			}
-			if (PAXType.CHD.equals(passengerCondition.getPassengerType())) {
-				child = child + 1;
-			}
-			if (PAXType.INF.equals(passengerCondition.getPassengerType())) {
-				infant = infant + 1;
-			}
-		}
+		airCalendarInputVo.setAdult(searchVo.getAdult());
+		airCalendarInputVo.setChild(searchVo.getChild());
+		airCalendarInputVo.setInfant(searchVo.getInfant());
 
-		airCalendarInputVo.setAdult(adult);
-		airCalendarInputVo.setChild(child);
-		airCalendarInputVo.setInfant(infant);
 
 		int segIdx = 1;
-		for (SegmentInfoVO segmentInfo : searchVo.getSegmentInfoList()) {
+		for (RevAvailSegmentCriteriaMsVO segmentInfo : searchVo.getSegmentList()) {
 			if (segIdx == 1) {
-				airCalendarInputVo.setDepartureDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDateTime(),"yyyyMMddHHmm", "yyyy-MM-dd"));
+				airCalendarInputVo.setDepartureDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
 				airCalendarInputVo.setOriginLocationCode(segmentInfo.getDepartureAirport());
 				airCalendarInputVo.setDestinationLocationCode(segmentInfo.getArrivalAirport());
 			} else {
-				airCalendarInputVo.setReturnDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDateTime(),"yyyyMMddHHmm", "yyyy-MM-dd"));
+				airCalendarInputVo.setReturnDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
 			}
 			segIdx++;
 		}
@@ -248,9 +219,9 @@ public class AvailabilityHelper {
 	 * @param airCalendarOutput
 	 * @return
 	 */
-	public UpsellBoundAvailVO organizeAvailFlight(AirOffersListReply airOfferList, AirCalendarOutputVO airCalendarOutput) {
-		UpsellBoundAvailVO upsellBoundAvail = new UpsellBoundAvailVO();
+	public RevUpsellAvailMsVO organizeAvailFlight(AirOffersListReply airOfferList, AirCalendarOutputVO airCalendarOutput) {
+		RevUpsellAvailMsVO revUpsellAvailMsVo = new RevUpsellAvailMsVO();
 
-		return upsellBoundAvail;
+		return revUpsellAvailMsVo;
 	}
 }

@@ -36,7 +36,8 @@ import com.koreanair.ms_ibe.service.AirOfferService;
 import com.koreanair.ms_ibe.service.AvailabilityService;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
 import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
-import com.koreanair.ms_ibe.service.vo.availability.UpsellBoundAvailVO;
+import com.koreanair.ms_ibe.service.vo.availability.RevAvailCriteriaMsVO;
+import com.koreanair.ms_ibe.service.vo.availability.RevUpsellAvailMsVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -79,17 +80,15 @@ public class AvailabilityController {
     notes = "airOffer List 조회"
     )
     @ResponseBody
-    public AirOffersListReply getAirOfferList(@RequestBody BookingCriteriaVO inputVo) throws ParseException {
+    public AirOffersListReply getAirOfferList(@RequestBody RevAvailCriteriaMsVO inputVo) throws ParseException {
     	log.debug("getAirOfferList start!");
         return airOfferService.getAirOfferList(inputVo);
     }
 
     @PostMapping(value = "/AvailFlightOfRevenue" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "예약가능한 항공편 조회",
-    notes = "예약가능한 항공편 조회"
-    )
+    @ApiOperation(value = "예약가능한 항공편 조회", notes = "예약가능한 항공편 조회")
     @ResponseBody
-    public UpsellBoundAvailVO getAvailFlightOfRevenue(@RequestBody BookingCriteriaVO inputVo) throws ParseException {
+    public RevUpsellAvailMsVO getAvailFlightOfRevenue(@RequestBody RevAvailCriteriaMsVO inputVo) throws ParseException {
     	return availService.getAvailFlightOfRevenue(inputVo);
 	}
 
