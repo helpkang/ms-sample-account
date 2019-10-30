@@ -25,7 +25,6 @@ public class AirOfferHelper {
 	 * <pre>
 	 * airOfferList에 중복된 값이나 사용하지 않는 값을 제거한다.
 	 * </pre>
-	 *
 	 * @param airOffers
 	 * @return
 	 */

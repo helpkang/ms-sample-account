@@ -64,9 +64,7 @@ public class AirOfferAdapter {
 	/**
 	 * <pre>
 	 * airOffer List를 가져온다.
-	 * Created by bdlee on 2019. 9. 27.
 	 * </pre>
-	 *
 	 * @param inputVo
 	 * @return
 	 */
