@@ -52,6 +52,22 @@ public class AvailabilityController {
 	@Autowired
 	private AvailabilityService availService;
 
+	@PostMapping(value = "/CalendarFare", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Fare Calendar 조회", notes = "eRetail FlexPricer를 이용하여 Fare Calendar 조회")
+	@ResponseBody
+	public FareCalendarVO getCalendarFareAvail(@RequestBody RevAvailCriteriaMsVO availCriteria) throws JAXBException, IOException, SOAPException {
+		log.debug("getCalendarFareAvail start");
+		return availService.getCalendarFareAvail(availCriteria);
+	}
+
+	@PostMapping(value = "/AvailFlight", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "예약가능한 항공편 조회", notes = "DxAPI airOffer , airCalendar를 이용하여 upsell 구성", nickname = "")
+	@ResponseBody
+	public RevUpsellAvailMsVO getAvailFlightOfRevenue(@RequestBody RevAvailCriteriaMsVO availCriteria) throws ParseException {
+		log.debug("getAvailFlightOfRevenue start!");
+		return availService.getAvailFlightOfRevenue(availCriteria);
+	}
+
 //	@Autowired
 //	private AirOfferService airOfferService;
 
@@ -74,21 +90,5 @@ public class AvailabilityController {
 		return airOfferService.getAirOfferList(inputVo);
 	}
 	*/
-
-	@PostMapping(value = "/CalendarFare", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Fare Calendar 조회", notes = "eRetail FlexPricer를 이용하여 Fare Calendar 조회")
-	@ResponseBody
-	public FareCalendarVO getCalendarFareAvail(@RequestBody RevAvailCriteriaMsVO availCriteria) throws JAXBException, IOException, SOAPException {
-		log.debug("getCalendarFareAvail start");
-		return availService.getCalendarFareAvail(availCriteria);
-	}
-
-	@PostMapping(value = "/AvailFlight", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "예약가능한 항공편 조회", notes = "DxAPI airOffer , airCalendar를 이용하여 upsell 구성", nickname = "")
-	@ResponseBody
-	public RevUpsellAvailMsVO getAvailFlightOfRevenue(@RequestBody RevAvailCriteriaMsVO availCriteria) throws ParseException {
-		log.debug("getAvailFlightOfRevenue start!");
-		return availService.getAvailFlightOfRevenue(availCriteria);
-	}
 
 }

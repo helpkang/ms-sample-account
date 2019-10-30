@@ -78,199 +78,6 @@ public class AvailabilityHelper {
 
 	/**
 	 * <pre>
-	 * UI의 조건을 Adapter에서 사용 가능한 형태로 변경한다.
-	 * </pre>
-	 * @param inputVo
-	 * @return
-	 */
-	public FlexPricerInputVO availBookingCriteria2FlexPricerInput(RevAvailCriteriaMsVO availCriteria) {
-		FlexPricerInputVO flexPricerInputVo = new FlexPricerInputVO();
-
-		try {
-			flexPricerInputVo.setOfficeId("SELKE08IW");
-			//flexPricerInputVo.setOfficeId("SELKE08DM");
-
-			flexPricerInputVo.setDualDisplay(false);
-			flexPricerInputVo.setOnlyCalendarFare(true);
-			flexPricerInputVo.setDateRange(3);
-			flexPricerInputVo.setTripType(availCriteria.getTripType());
-			flexPricerInputVo.getCffCodeList().addAll(availCriteria.getCffCodeList());
-
-			for (RevAvailSegmentCriteriaMsVO segment : availCriteria.getSegmentList()) {
-				SegmentInfoVO segmentInfo = new SegmentInfoVO();
-				segmentInfo.setDepartureAirport(segment.getDepartureAirport());
-				segmentInfo.setArrivalAirport(segment.getArrivalAirport());
-				segmentInfo.setDepartureDateTime(DateUtil.changeDateFormat(segment.getDepartureDate(),"yyyyMMdd","yyyyMMddHHmm"));
-				flexPricerInputVo.getSegmentInfoList().add(segmentInfo);
-			}
-
-			for (int i = 0; i < availCriteria.getAdult(); i++) {
-				PassengerConditionVO passengerCondition = new PassengerConditionVO();
-				passengerCondition.setPassengerType(PAXType.ADT);
-				flexPricerInputVo.getPassengerConditionList().add(passengerCondition);
-			}
-			for (int i = 0; i < availCriteria.getChild(); i++) {
-				PassengerConditionVO passengerCondition = new PassengerConditionVO();
-				passengerCondition.setPassengerType(PAXType.CHD);
-				flexPricerInputVo.getPassengerConditionList().add(passengerCondition);
-			}
-			for (int i = 0; i < availCriteria.getInfant(); i++) {
-				PassengerConditionVO passengerCondition = new PassengerConditionVO();
-				passengerCondition.setPassengerType(PAXType.INF);
-				flexPricerInputVo.getPassengerConditionList().add(passengerCondition);
-			}
-
-		} catch (BeansException  e) {
-			log.error("",e);
-		} catch (ParseException e) {
-			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "Date parse error!", e);
-		}
-		return flexPricerInputVo;
-	}
-
-	public FareCalendarVO organizeMatrixFareCalendar(FlexPricerCalendarOutputVO flexPricerCalendarOutputVo ) throws IOException {
-		FareCalendarVO fareCalendarVo = new FareCalendarVO();
-
-		Map<String , List<FareCalendarElementVO>> calenarListMap = new LinkedHashMap<>();
-
-		String currency = "";
-		String lowestAmount = "";
-		String preDate = "";
-		List<FareCalendarElementVO> fareAvailList = null;
-		for (FareMatrixCalendarVO fareMatrixCalendar : flexPricerCalendarOutputVo.getFareMatrixCalendarList()) {
-
-			FareCalendarElementVO fareCalendarElementVo = new FareCalendarElementVO();
-			BeanUtils.copyProperties(fareMatrixCalendar, fareCalendarElementVo);
-			currency = fareMatrixCalendar.getCurrency();
-
-			TravellerTypeFareInfoVO defaultTravellerFareInfo = null;
-			if (!fareMatrixCalendar.isEmptyFare()) {
-				for(TravellerTypeFareInfoVO travellerFareInfo : fareMatrixCalendar.getTravellerTypeFareInfoList()) {
-					if (PAXType.ADT.equals(travellerFareInfo.getTravellerType())) {
-						defaultTravellerFareInfo = travellerFareInfo;
-						break;
-					}
-				}
-				if(defaultTravellerFareInfo == null) {
-					defaultTravellerFareInfo = fareMatrixCalendar.getTravellerTypeFareInfoList().get(0);
-				}
-			}
-
-			if(defaultTravellerFareInfo != null) {
-				String fuelCharge = "";
-				for (TaxInfoVO taxInfo : defaultTravellerFareInfo.getTaxList()) {
-					if ("YR".equalsIgnoreCase(taxInfo.getTaxCode()) || "YQ".equalsIgnoreCase(taxInfo.getTaxCode())) {
-						fuelCharge = taxInfo.getTaxValue();
-					}
-				}
-
-				double taxWithoutFuel = NumberUtils.toDouble(defaultTravellerFareInfo.getTax()) - NumberUtils.toDouble(fuelCharge)  ;
-
-				if (StringUtils.isBlank(lowestAmount)) {
-					lowestAmount = defaultTravellerFareInfo.getAmount();
-				} else {
-					if (NumberUtils.toDouble(lowestAmount) > NumberUtils.toDouble(defaultTravellerFareInfo.getAmount())) {
-						lowestAmount = defaultTravellerFareInfo.getAmount();
-					}
-				}
-				fareCalendarElementVo.setAmount(StringUtil.removeZeroDecimals(defaultTravellerFareInfo.getAmount()));
-				fareCalendarElementVo.setTotalAmount(StringUtil.removeZeroDecimals(defaultTravellerFareInfo.getTotalAmount()));
-				fareCalendarElementVo.setTax(StringUtil.removeZeroDecimals(String.valueOf(taxWithoutFuel)));
-				fareCalendarElementVo.setFuelCharge(StringUtil.removeZeroDecimals(fuelCharge));
-			}
-
-			if (!preDate.equalsIgnoreCase(fareMatrixCalendar.getDepartureDate())) {
-				fareAvailList = new ArrayList<>();
-				fareAvailList.add(fareCalendarElementVo);
-
-				calenarListMap.put(fareMatrixCalendar.getDepartureDate(), fareAvailList);
-			} else {
-				if(fareAvailList == null) {
-					fareAvailList = new ArrayList<>();
-				}
-				fareAvailList.add(fareCalendarElementVo);
-			}
-			preDate = fareMatrixCalendar.getDepartureDate();
-		}
-
-		for (List<FareCalendarElementVO> calendarList : calenarListMap.values()) {
-			for(FareCalendarElementVO calendarElement : calendarList) {
-				if (!calendarElement.isEmptyFare() && NumberUtils.toDouble(lowestAmount) == NumberUtils.toDouble(calendarElement.getAmount())) {
-					calendarElement.setLowest(true);
-				}
-			}
-		}
-		fareCalendarVo.setAvailFareMatrixMap(calenarListMap);
-		fareCalendarVo.setCurrency(currency);
-
-		log.debug("fareCalendarVo = {}", ObjectSerializeUtil.getObjectToJson(fareCalendarVo));
-		return fareCalendarVo;
-	}
-
-	public AirOfferInputVO bookingCriteria2AirOfferInput(RevAvailCriteriaMsVO searchVo) throws ParseException {
-		AirOfferInputVO airOfferInputVo = new AirOfferInputVO();
-
-		if (TripType.RT != searchVo.getTripType() && TripType.OW != searchVo.getTripType()) {
-			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "편도, 왕복 인 경우만 사용 가능 합니다.");
-		}
-
-		airOfferInputVo.setAdult(searchVo.getAdult());
-		airOfferInputVo.setChild(searchVo.getChild());
-		airOfferInputVo.setInfant(searchVo.getInfant());
-
-		int segIdx = 1;
-		for (RevAvailSegmentCriteriaMsVO segmentInfo : searchVo.getSegmentList()) {
-			if (segIdx == 1) {
-				airOfferInputVo.setDepartureDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
-				airOfferInputVo.setOriginLocationCode(segmentInfo.getDepartureAirport());
-				airOfferInputVo.setDestinationLocationCode(segmentInfo.getArrivalAirport());
-			} else {
-				airOfferInputVo.setReturnDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
-			}
-			segIdx++;
-		}
-		airOfferInputVo.setCommercialFareFamilies(searchVo.getCffCodeList());
-
-		airOfferInputVo.setDirectFlights(false);
-		airOfferInputVo.setShowSoldOut(false);
-
-		return airOfferInputVo;
-	}
-
-	public AirCalendarInputVO bookingCriteria2AirCalendarInput(RevAvailCriteriaMsVO searchVo) throws ParseException {
-		AirCalendarInputVO airCalendarInputVo = new AirCalendarInputVO();
-
-		if (TripType.RT != searchVo.getTripType() && TripType.OW != searchVo.getTripType()) {
-			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "편도, 왕복 인 경우만 사용 가능 합니다.");
-		}
-
-		airCalendarInputVo.setAdult(searchVo.getAdult());
-		airCalendarInputVo.setChild(searchVo.getChild());
-		airCalendarInputVo.setInfant(searchVo.getInfant());
-
-
-		int segIdx = 1;
-		for (RevAvailSegmentCriteriaMsVO segmentInfo : searchVo.getSegmentList()) {
-			if (segIdx == 1) {
-				airCalendarInputVo.setDepartureDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
-				airCalendarInputVo.setOriginLocationCode(segmentInfo.getDepartureAirport());
-				airCalendarInputVo.setDestinationLocationCode(segmentInfo.getArrivalAirport());
-			} else {
-				airCalendarInputVo.setReturnDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
-			}
-			segIdx++;
-		}
-		airCalendarInputVo.setCommercialFareFamilies(searchVo.getCffCodeList());
-
-		airCalendarInputVo.setDirectFlights(false);
-		airCalendarInputVo.setShowSoldOut(false);
-		airCalendarInputVo.setFlexibility(3);	// 7*7 calendar 형식으로 표기
-
-		return airCalendarInputVo;
-	}
-
-	/**
-	 * <pre>
 	 * airOfferReply와 airCalendar의 결과를 이용하여 upsell 형태를 구성한다.
 	 * </pre>
 	 * @param airOfferList
@@ -541,6 +348,199 @@ public class AvailabilityHelper {
 		}
 		upsellBoundAvail.getAvailFlightList().clear();
 		upsellBoundAvail.getAvailFlightList().addAll(boundAvailMap.values());
+	}
+
+	/**
+	 * <pre>
+	 * UI의 조건을 Adapter에서 사용 가능한 형태로 변경한다.
+	 * </pre>
+	 * @param inputVo
+	 * @return
+	 */
+	public FlexPricerInputVO availBookingCriteria2FlexPricerInput(RevAvailCriteriaMsVO availCriteria) {
+		FlexPricerInputVO flexPricerInputVo = new FlexPricerInputVO();
+
+		try {
+			flexPricerInputVo.setOfficeId("SELKE08IW");
+			//flexPricerInputVo.setOfficeId("SELKE08DM");
+
+			flexPricerInputVo.setDualDisplay(false);
+			flexPricerInputVo.setOnlyCalendarFare(true);
+			flexPricerInputVo.setDateRange(3);
+			flexPricerInputVo.setTripType(availCriteria.getTripType());
+			flexPricerInputVo.getCffCodeList().addAll(availCriteria.getCffCodeList());
+
+			for (RevAvailSegmentCriteriaMsVO segment : availCriteria.getSegmentList()) {
+				SegmentInfoVO segmentInfo = new SegmentInfoVO();
+				segmentInfo.setDepartureAirport(segment.getDepartureAirport());
+				segmentInfo.setArrivalAirport(segment.getArrivalAirport());
+				segmentInfo.setDepartureDateTime(DateUtil.changeDateFormat(segment.getDepartureDate(),"yyyyMMdd","yyyyMMddHHmm"));
+				flexPricerInputVo.getSegmentInfoList().add(segmentInfo);
+			}
+
+			for (int i = 0; i < availCriteria.getAdult(); i++) {
+				PassengerConditionVO passengerCondition = new PassengerConditionVO();
+				passengerCondition.setPassengerType(PAXType.ADT);
+				flexPricerInputVo.getPassengerConditionList().add(passengerCondition);
+			}
+			for (int i = 0; i < availCriteria.getChild(); i++) {
+				PassengerConditionVO passengerCondition = new PassengerConditionVO();
+				passengerCondition.setPassengerType(PAXType.CHD);
+				flexPricerInputVo.getPassengerConditionList().add(passengerCondition);
+			}
+			for (int i = 0; i < availCriteria.getInfant(); i++) {
+				PassengerConditionVO passengerCondition = new PassengerConditionVO();
+				passengerCondition.setPassengerType(PAXType.INF);
+				flexPricerInputVo.getPassengerConditionList().add(passengerCondition);
+			}
+
+		} catch (BeansException  e) {
+			log.error("",e);
+		} catch (ParseException e) {
+			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "Date parse error!", e);
+		}
+		return flexPricerInputVo;
+	}
+
+	public FareCalendarVO organizeMatrixFareCalendar(FlexPricerCalendarOutputVO flexPricerCalendarOutputVo ) throws IOException {
+		FareCalendarVO fareCalendarVo = new FareCalendarVO();
+
+		Map<String , List<FareCalendarElementVO>> calenarListMap = new LinkedHashMap<>();
+
+		String currency = "";
+		String lowestAmount = "";
+		String preDate = "";
+		List<FareCalendarElementVO> fareAvailList = null;
+		for (FareMatrixCalendarVO fareMatrixCalendar : flexPricerCalendarOutputVo.getFareMatrixCalendarList()) {
+
+			FareCalendarElementVO fareCalendarElementVo = new FareCalendarElementVO();
+			BeanUtils.copyProperties(fareMatrixCalendar, fareCalendarElementVo);
+			currency = fareMatrixCalendar.getCurrency();
+
+			TravellerTypeFareInfoVO defaultTravellerFareInfo = null;
+			if (!fareMatrixCalendar.isEmptyFare()) {
+				for(TravellerTypeFareInfoVO travellerFareInfo : fareMatrixCalendar.getTravellerTypeFareInfoList()) {
+					if (PAXType.ADT.equals(travellerFareInfo.getTravellerType())) {
+						defaultTravellerFareInfo = travellerFareInfo;
+						break;
+					}
+				}
+				if(defaultTravellerFareInfo == null) {
+					defaultTravellerFareInfo = fareMatrixCalendar.getTravellerTypeFareInfoList().get(0);
+				}
+			}
+
+			if(defaultTravellerFareInfo != null) {
+				String fuelCharge = "";
+				for (TaxInfoVO taxInfo : defaultTravellerFareInfo.getTaxList()) {
+					if ("YR".equalsIgnoreCase(taxInfo.getTaxCode()) || "YQ".equalsIgnoreCase(taxInfo.getTaxCode())) {
+						fuelCharge = taxInfo.getTaxValue();
+					}
+				}
+
+				double taxWithoutFuel = NumberUtils.toDouble(defaultTravellerFareInfo.getTax()) - NumberUtils.toDouble(fuelCharge)  ;
+
+				if (StringUtils.isBlank(lowestAmount)) {
+					lowestAmount = defaultTravellerFareInfo.getAmount();
+				} else {
+					if (NumberUtils.toDouble(lowestAmount) > NumberUtils.toDouble(defaultTravellerFareInfo.getAmount())) {
+						lowestAmount = defaultTravellerFareInfo.getAmount();
+					}
+				}
+				fareCalendarElementVo.setAmount(StringUtil.removeZeroDecimals(defaultTravellerFareInfo.getAmount()));
+				fareCalendarElementVo.setTotalAmount(StringUtil.removeZeroDecimals(defaultTravellerFareInfo.getTotalAmount()));
+				fareCalendarElementVo.setTax(StringUtil.removeZeroDecimals(String.valueOf(taxWithoutFuel)));
+				fareCalendarElementVo.setFuelCharge(StringUtil.removeZeroDecimals(fuelCharge));
+			}
+
+			if (!preDate.equalsIgnoreCase(fareMatrixCalendar.getDepartureDate())) {
+				fareAvailList = new ArrayList<>();
+				fareAvailList.add(fareCalendarElementVo);
+
+				calenarListMap.put(fareMatrixCalendar.getDepartureDate(), fareAvailList);
+			} else {
+				if(fareAvailList == null) {
+					fareAvailList = new ArrayList<>();
+				}
+				fareAvailList.add(fareCalendarElementVo);
+			}
+			preDate = fareMatrixCalendar.getDepartureDate();
+		}
+
+		for (List<FareCalendarElementVO> calendarList : calenarListMap.values()) {
+			for(FareCalendarElementVO calendarElement : calendarList) {
+				if (!calendarElement.isEmptyFare() && NumberUtils.toDouble(lowestAmount) == NumberUtils.toDouble(calendarElement.getAmount())) {
+					calendarElement.setLowest(true);
+				}
+			}
+		}
+		fareCalendarVo.setAvailFareMatrixMap(calenarListMap);
+		fareCalendarVo.setCurrency(currency);
+
+		log.debug("fareCalendarVo = {}", ObjectSerializeUtil.getObjectToJson(fareCalendarVo));
+		return fareCalendarVo;
+	}
+
+	public AirOfferInputVO bookingCriteria2AirOfferInput(RevAvailCriteriaMsVO searchVo) throws ParseException {
+		AirOfferInputVO airOfferInputVo = new AirOfferInputVO();
+
+		if (TripType.RT != searchVo.getTripType() && TripType.OW != searchVo.getTripType()) {
+			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "편도, 왕복 인 경우만 사용 가능 합니다.");
+		}
+
+		airOfferInputVo.setAdult(searchVo.getAdult());
+		airOfferInputVo.setChild(searchVo.getChild());
+		airOfferInputVo.setInfant(searchVo.getInfant());
+
+		int segIdx = 1;
+		for (RevAvailSegmentCriteriaMsVO segmentInfo : searchVo.getSegmentList()) {
+			if (segIdx == 1) {
+				airOfferInputVo.setDepartureDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
+				airOfferInputVo.setOriginLocationCode(segmentInfo.getDepartureAirport());
+				airOfferInputVo.setDestinationLocationCode(segmentInfo.getArrivalAirport());
+			} else {
+				airOfferInputVo.setReturnDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
+			}
+			segIdx++;
+		}
+		airOfferInputVo.setCommercialFareFamilies(searchVo.getCffCodeList());
+
+		airOfferInputVo.setDirectFlights(false);
+		airOfferInputVo.setShowSoldOut(false);
+
+		return airOfferInputVo;
+	}
+
+	public AirCalendarInputVO bookingCriteria2AirCalendarInput(RevAvailCriteriaMsVO searchVo) throws ParseException {
+		AirCalendarInputVO airCalendarInputVo = new AirCalendarInputVO();
+
+		if (TripType.RT != searchVo.getTripType() && TripType.OW != searchVo.getTripType()) {
+			throw new GenericException(ExceptionCode.BUSINESS_ERROR, "편도, 왕복 인 경우만 사용 가능 합니다.");
+		}
+
+		airCalendarInputVo.setAdult(searchVo.getAdult());
+		airCalendarInputVo.setChild(searchVo.getChild());
+		airCalendarInputVo.setInfant(searchVo.getInfant());
+
+
+		int segIdx = 1;
+		for (RevAvailSegmentCriteriaMsVO segmentInfo : searchVo.getSegmentList()) {
+			if (segIdx == 1) {
+				airCalendarInputVo.setDepartureDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
+				airCalendarInputVo.setOriginLocationCode(segmentInfo.getDepartureAirport());
+				airCalendarInputVo.setDestinationLocationCode(segmentInfo.getArrivalAirport());
+			} else {
+				airCalendarInputVo.setReturnDateTime(DateUtil.changeDateFormat(segmentInfo.getDepartureDate(),"yyyyMMdd", "yyyy-MM-dd"));
+			}
+			segIdx++;
+		}
+		airCalendarInputVo.setCommercialFareFamilies(searchVo.getCffCodeList());
+
+		airCalendarInputVo.setDirectFlights(false);
+		airCalendarInputVo.setShowSoldOut(false);
+		airCalendarInputVo.setFlexibility(3);	// 7*7 calendar 형식으로 표기
+
+		return airCalendarInputVo;
 	}
 
 	public static void main(String[] args) {
