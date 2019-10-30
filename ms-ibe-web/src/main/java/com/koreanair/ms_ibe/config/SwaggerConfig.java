@@ -23,10 +23,10 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
         .apiInfo(apiInfo())
         .tags(
-        		new Tag("Availability", "Revenue availability services"),
-        		new Tag("ReservationSearch", "Reservation search services"),
-                new Tag("Member", "Membership services"),
-                new Tag("InstantSearch", "Instant search services")
+        		new Tag("Availability", "Revenue availability services", 1),
+        		new Tag("ReservationSearch", "Reservation search services", 2),
+                new Tag("Member", "Membership services", 3),
+                new Tag("InstantSearch", "Instant search services", 4)
                 )
           .select()
           .apis(RequestHandlerSelectors.any())
