@@ -27,9 +27,9 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
-//@RestController
-//@RequestMapping("/api/account")
-//@Api(value = "account", description = "account 와 transfer 처리")
+@RestController
+@RequestMapping("/api/account")
+@Api(value = "account", description = "account 와 transfer 처리")
 @Slf4j
 public class AccountController {
 
@@ -44,7 +44,7 @@ public class AccountController {
         @ApiImplicitParam(name = "name", value = "계좌명", required = true, dataType = "string", paramType = "path"),
     })
     public AccountVO getAccount(@PathVariable String name) {
-        return service.getAccount(name);
+        return service.getAccount(name);    
     }
 
     @GetMapping(value = "/transfer/{name}")
@@ -61,7 +61,7 @@ public class AccountController {
         log.info("request: {}", pageRequest);
         try {
             return service.getTransfer(name, pageRequest);
-
+            
         } catch (Exception e) {
             log.error("msg", e);
             throw e;
@@ -79,7 +79,7 @@ public class AccountController {
          return service.getAccount(createAccount.getName());
     }
 
-
+    
     @PostMapping("transfer")
     @ApiOperation(value = "이체",
     notes = "계좌명으로 이체"
@@ -94,5 +94,5 @@ public class AccountController {
          list.add(service.getAccount(trasferAccountVO.getTo()));
          return list;
     }
-
+    
 }

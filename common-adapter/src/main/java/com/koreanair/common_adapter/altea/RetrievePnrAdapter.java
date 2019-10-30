@@ -15,13 +15,16 @@ public class RetrievePnrAdapter {
     @Autowired
     private RetrievePnrInputHelper retrievePnrHelper;
 
+    @Autowired
+    private AlteaConnector connector;
+
+
     public CommonPnrReply retrievePnr(String recLoc, boolean stateful)throws Exception{
         PNRRetrieve pnrinput =  retrievePnrHelper.makeRetrievePNRInput(recLoc);
         AlteaInputVo alteainput = new AlteaInputVo();
         alteainput.setInputBody(pnrinput);
         alteainput.setOperationName("PNR_Retrieve");
         alteainput.setResponseClass(PNRReply.class);
-        AlteaConnector connector = new AlteaConnector();
         PNRReply reply = (PNRReply) connector.call(alteainput);
         return retrievePnrHelper.makeRetrievePNROutput(reply);
     }

@@ -12,14 +12,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@ApiModel(value="계좌 생성", description="계좌 생성 정보")
+@ApiModel(value="CreateAccount", description="")
 public class CreateAccountVO implements Serializable{
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "계좌이름")
+    @ApiModelProperty(value = "name")
     String name;
 
-    @ApiModelProperty(value = "초기잔고", example="10")
+    @ApiModelProperty(value = "init", example="10")
     int initBalance;
 
     

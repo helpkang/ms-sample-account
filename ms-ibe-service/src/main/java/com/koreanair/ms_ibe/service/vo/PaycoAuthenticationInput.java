@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel(value="결제 인증 요청", description="결제 인증 요청시 사용되는 클래스")
+@ApiModel(value="", description="")
 public class PaycoAuthenticationInput extends PaymentAuthenticationInput{
     //페이코에서 인증시 사용하는 변수 서버단에서 채우는 값
     @ApiModelProperty(value = "payco 가맹점번호")

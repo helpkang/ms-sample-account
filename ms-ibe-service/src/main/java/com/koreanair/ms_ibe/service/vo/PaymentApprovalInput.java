@@ -8,33 +8,33 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel(value="결제 승인 요청", description="결제 승인 요청시 사용되는 클래스")
+@ApiModel(value="approvalmodel", description="")
 public class PaymentApprovalInput {
 
-        @ApiModelProperty(value = "결제수단코드")
+        @ApiModelProperty(value = "")
         protected String paymentType;
-        @ApiModelProperty(value = "GPS에 보내는 oid,pnr,코드 값을 담는 클래스")
+        @ApiModelProperty(value = "")
         protected GeneralInfo generalinfo;
-        @ApiModelProperty(value = "현금영수증 요청시 티켓정보를 담는 클래스")
+        @ApiModelProperty(value = "")
         protected TktInfo tktinfo;
-        @ApiModelProperty(value = "IBE에서 사용하지 않는 클래스")
+        @ApiModelProperty(value = "")
         protected TasfInfo tasfinfo;
-        @ApiModelProperty(value = "사이버소스 주소정보를 넣는 클래스")
+        @ApiModelProperty(value = "")
         protected CybersourceAddedInfo cybersourceaddedinfo;
-        @ApiModelProperty(value = "사이버소스 froud유저를 거르기 위한 정보를 담는 클래스")
+        @ApiModelProperty(value = "")
         protected CybersourceDmInfo cybersourceDmInfo;
-        @ApiModelProperty(value = "인증정보를 담는 클래스")
+        @ApiModelProperty(value = "")
         protected AuthInfo authinfo;
-        @ApiModelProperty(value = "콘비니 결제 정보")
+        @ApiModelProperty(value = "")
         protected KonbiniInputVo conveni;
-        @ApiModelProperty(value = "중국결제 거래번호")
+        @ApiModelProperty(value = "")
         protected PayEase payEase;
-        @ApiModelProperty(value = "KICC, MPI 카드타입 ")
+        @ApiModelProperty(value = "")
         protected String cardType;
-        @ApiModelProperty(value = "국내여부")
+        @ApiModelProperty(value = "")
         protected boolean domestic;
-        @ApiModelProperty(value = "무상여부")
+        @ApiModelProperty(value = "")
         protected boolean award;
-        @ApiModelProperty(value = "officeId")
+        @ApiModelProperty(value = "")
         protected String officeId;
 }

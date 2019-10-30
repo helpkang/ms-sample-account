@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-//@RestController
-//@RequestMapping("/api/payment/Authentication")
-//@Api(value = "결제인증", tags = "결제수단별 인증")
+@RestController
+@RequestMapping("/api/payment/Authentication")
+@Api(value = "", tags = "PaymentAuthentication")
 @Slf4j
 public class PaymentAuthenticationController {
 

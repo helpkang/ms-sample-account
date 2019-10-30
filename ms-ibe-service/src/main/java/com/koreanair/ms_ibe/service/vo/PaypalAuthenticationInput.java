@@ -5,13 +5,13 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel(value="결제 인증 요청", description="결제 인증 요청시 사용되는 클래스")
+@ApiModel(value="paypalauthmodel", description="")
 public class PaypalAuthenticationInput extends PaymentAuthenticationInput{
     //paypal에서 사용하는 변수
-    @ApiModelProperty(value = "paypal userId")
+    @ApiModelProperty(value = "paypaluserId")
     private String userId;
-    @ApiModelProperty(value = "paypal pwd")
+    @ApiModelProperty(value = "paypalpwd")
     private String pwd;
-    @ApiModelProperty(value = "paypal signature")
+    @ApiModelProperty(value = "paypalsignature")
     private String signature;
 }

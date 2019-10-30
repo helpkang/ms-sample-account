@@ -10,13 +10,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@ApiModel(value="계좌 정보", description="계좌 정보")
+@ApiModel(value="AccountVO", description="")
 public class AccountVO {
     
-    @ApiModelProperty(value = "계좌이름")
+    @ApiModelProperty(value = "")
     private String name;
 
-    @ApiModelProperty(value = "잔고")
+    @ApiModelProperty(value = "")
     private int balance;
 
     @Builder

@@ -162,8 +162,9 @@ public class PaymentAuthenticationService {
         return output;
     }
 
-    public CbscAuthenticationOutput cbsc(CbscAuthenticationInput inputVo) {
-
-        return null;
+    public CbscAuthenticationOutput cbsc(CbscAuthenticationInput inputVo) throws Exception{
+        com.koreanair.common_adapter.pid.gps.vo.CbscAuthenticationOutput cbscAuthenticationOutput = gpsRepository.cbscAuth(inputVo);
+        CbscAuthenticationOutput output  = paymentAuthenticationHelper.makeCbscAuthenticationOutput(cbscAuthenticationOutput);
+        return output;
     }
 }

@@ -1,15 +1,14 @@
 package com.koreanair.common_adapter.pid.gps.helper;
 
+import com.koreanair.common_adapter.pid.gps.vo.CbscAuthenticationInput;
+import com.koreanair.common_adapter.pid.gps.vo.CbscAuthenticationOutput;
 import com.koreanair.common_adapter.pid.gps.vo.PaymentApprovalInputVo;
 import com.koreanair.common_adapter.pid.gps.vo.PaymentApprovalOutputVo;
 import com.koreanair.common_external.pid.gps.approvalHistory.ApprovalHistoryInputVo;
 import com.koreanair.common_external.pid.gps.approvalHistory.ApprovalHistoryOutputVo;
 import com.koreanair.common_external.pid.gps.approvalHistory.HistoryInfo;
 import com.koreanair.common_external.pid.gps.approvalHistory.HistoryInfo2;
-import com.koreanair.common_external.pid.gps.approvalRequest.ApprovalRequestService;
-import com.koreanair.common_external.pid.gps.approvalRequest.CybersourceDmInfo;
-import com.koreanair.common_external.pid.gps.approvalRequest.GeneralInfo;
-import com.koreanair.common_external.pid.gps.approvalRequest.GeneralInfo2;
+import com.koreanair.common_external.pid.gps.approvalRequest.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -21,11 +20,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 @Component
-public class GpsPaymentApprovallHelper {
+public class PaymentApprovalHelper {
 
     public ApprovalRequestService makeApprovalRequestServiceInput(PaymentApprovalInputVo inputVo) {
         ApprovalRequestService gpsinput = new ApprovalRequestService();
-
         //홈페이지로그인아이디
         inputVo.getGeneralinfo().setUserId("ANONYMOUS");
         //발권시 사용할 officeId
@@ -40,10 +38,8 @@ public class GpsPaymentApprovallHelper {
         inputVo.getGeneralinfo().setApvStatus("A");
         inputVo.getGeneralinfo().setReqNoTyp(1);
         inputVo.getGeneralinfo().setTid("K0");
-
         //국내선 D, 국제선 I
         inputVo.getGeneralinfo().setDomIntTyp("I");
-
         if("KAKAO".equalsIgnoreCase(inputVo.getPaymentType())){
             kakaoInput(inputVo);
         }else if("PAYCO".equalsIgnoreCase(inputVo.getPaymentType())){
@@ -61,8 +57,6 @@ public class GpsPaymentApprovallHelper {
             convertForKmotion(inputVo);
             kiccSamsungPayInput(inputVo);
         }
-
-
 
         gpsinput.setGeneralinfo(inputVo.getGeneralinfo());
         if (null != inputVo.getAuthinfo()) {
@@ -320,6 +314,186 @@ public class GpsPaymentApprovallHelper {
         dmInfo.setDecisionManagerTravelDataJourneyType(inputVo.getCybersourceDmInfo().getDecisionManagerTravelDataJourneyType());
         inputVo.setCybersourceDmInfo(dmInfo);
         return inputVo;
+    }
+
+
+    public ApprovalRequestService makeAuthenticationServiceInput(CbscAuthenticationInput input) {
+        ApprovalRequestService approvalRequestService = new ApprovalRequestService();
+        GeneralInfo generalInfo = new GeneralInfo();
+        generalInfo.setAuthn("3DS");																			//고정값
+        generalInfo.setChannel(4);																				//고정값
+        generalInfo.setCurrency(input.getCurrency());
+        if(!input.getDomestic()){
+            generalInfo.setDomIntTyp("I");
+        }else{
+            generalInfo.setDomIntTyp("D");
+        }
+        generalInfo.setErrLang("ENG");																			//고정값
+        generalInfo.setCcVldYM(input.getExpireMonth()+input.getExpireYear());
+        generalInfo.setForceApvYn("N");																			//고정값
+        generalInfo.setIataNo(input.getIataNumber());
+        generalInfo.setOfcId(input.getOfficeId());
+        generalInfo.setPayDstn("CYBERSOURCE");																	//고정값
+        generalInfo.setReqAmt(input.getAmount());
+        generalInfo.setReqNo(input.getCardNumber());
+        generalInfo.setReqSys("IBE");																			//고정값
+        generalInfo.setSign("0001AA");																	//고정값
+        generalInfo.setApvStatus("U");																			//고정값
+        generalInfo.setPnrRloc(input.getReservationRecLoc());
+        generalInfo.setTid("KO");																				//고정값
+        generalInfo.setPayMthd("C");																			//고정값
+        generalInfo.setUserId("ANONYMOUS");
+        approvalRequestService.setGeneralinfo(generalInfo);
+
+        CybersourceAddedInfo cybersourceAddedInfo = new CybersourceAddedInfo();
+        cybersourceAddedInfo.setAddress1(input.getAddress1());
+        cybersourceAddedInfo.setAddress2("address2");																			//고정값
+        cybersourceAddedInfo.setCity(input.getCity());
+        cybersourceAddedInfo.setCountry(input.getCountry());
+        cybersourceAddedInfo.setEmail(input.getEmail());
+        cybersourceAddedInfo.setFirstName(input.getFirstName());
+        cybersourceAddedInfo.setLastName(input.getLastName());
+        cybersourceAddedInfo.setPaRes("");																						//고정값
+        cybersourceAddedInfo.setPostalCode(input.getPostalCode());
+        cybersourceAddedInfo.setState(input.getState());
+        approvalRequestService.setCybersourceaddedinfo(cybersourceAddedInfo);
+
+        //CBSC 2.0 추가 전달 항목
+
+        return approvalRequestService;
+    }
+
+    public CbscAuthenticationOutput makeAuthenticationServiceOutput(GeneralInfo2 result) {
+        CbscAuthenticationOutput outputVo = new CbscAuthenticationOutput();
+        if(result!=null) {
+            if ("0".equalsIgnoreCase(result.getResultCd())) {
+                if (null != result.getCyberSourceAuthInfo()) {
+                    String enroll = "";
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyVeresEnrolled()) {
+                        enroll = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyVeresEnrolled();
+                    }
+                    String returnUrl = "";
+                    String PaReq = "";
+                    String eci = "";
+                    String authenticationPath = "";
+                    String commerceIndicator = "";
+                    String cavv = "";
+                    String cavvAlgorithm = "";
+                    String paresStatus = "";
+                    String eciRaw = "";
+                    String authenticationResult = "";
+                    String specificationVersion = "";
+                    String authenticationTransactionID = "";
+                    String ucafCollectionIndicator = "";
+                    String ucafAuthenticationData = "";
+                    String directoryServerTransactionID = "";
+
+                    if (null != result.getCyberSourceAuthInfo().getAcsURL()) {
+                        returnUrl = result.getCyberSourceAuthInfo().getAcsURL();
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPaReq()) {
+                        PaReq = result.getCyberSourceAuthInfo().getPaReq();
+                    }
+
+                    String xid = "";
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyXid()) {
+                        xid = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyXid();
+                        outputVo.setXid(xid);
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyEci()) {
+                        eci = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyEci();
+                        outputVo.setEci(eci);
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyAuthenticationPath()) {
+                        authenticationPath = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyAuthenticationPath();
+                        outputVo.setAuthenticationPath(authenticationPath);
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyCommerceIndicator()) {
+                        commerceIndicator = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyCommerceIndicator();
+                        outputVo.setCommerceIndicator(commerceIndicator);
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyCavv()) {
+                        cavv = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyCavv();
+                        outputVo.setCavv(cavv);
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyCavvAlgorithm()) {
+                        cavvAlgorithm = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyCavvAlgorithm();
+                        outputVo.setCavvAlgorithm(cavvAlgorithm);
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyParesStatus()) {
+                        paresStatus = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyParesStatus();
+                        outputVo.setParesStatus(paresStatus);
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyEciRaw()) {
+                        eciRaw = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyEciRaw();
+                        outputVo.setEciRaw(eciRaw);
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyAuthenticationResult()) {
+                        authenticationResult = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyAuthenticationResult();
+                        outputVo.setAuthenticationResult(authenticationResult);
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplySpecificationVersion()) {
+                        specificationVersion = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplySpecificationVersion();
+                        outputVo.setSpecificationVersion(specificationVersion);
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyAuthenticationTransactionID()) {
+                        authenticationTransactionID = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyAuthenticationTransactionID();
+                        outputVo.setAuthenticationTransactionID(authenticationTransactionID);
+                    }
+
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyUcafCollectionIndicator()) {
+                        ucafCollectionIndicator = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyUcafCollectionIndicator();
+                        outputVo.setUcafCollectionIndicator(ucafCollectionIndicator);
+                    }
+
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyUcafAuthenticationData()) {
+                        ucafAuthenticationData = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyUcafAuthenticationData();
+                        outputVo.setUcafAuthenticationData(ucafAuthenticationData);
+                    }
+                    if (null != result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyDirectoryServerTransactionID()) {
+                        directoryServerTransactionID = result.getCyberSourceAuthInfo().getPayerAuthEnrollReplyDirectoryServerTransactionID();
+                        outputVo.setDirectoryServerTransactionID(directoryServerTransactionID);
+                    }
+
+                    outputVo.setAcsUrl(returnUrl);
+                    outputVo.setPaReq(PaReq);
+                    //resultMap.put("tid",inputMap.get("tid").toString());
+                    //resultMap.put("resultCode","S");
+
+                    //paymentLog(input,result,tid,request,"S",inputMap);
+                } else {
+                    if (null != result.getResultCd()) {
+                        try {
+                            // paymentLog(input,result,tid,request,"E",inputMap);
+                        } catch (Exception e) {
+
+                        }
+                    /*
+                    ExceptionVo vo = new ExceptionVo();
+                    vo.setWebService(true);
+                    vo.setSource("GPS");
+                    vo.setType("BIZ");
+                    vo.setCode(result.getResultCd());
+                    vo.setMessage("");
+                    throw BizRuntimeException.create(vo.getCode(), new Object[]{vo});
+                     */
+                    }
+                    //resultMap.put("resultCode","E");
+                }
+                //0이 아닐때는 무조건 오류 처리.
+            } else {
+            /*paymentLog(input,result,tid,request,"E",inputMap);
+            ExceptionVo vo = new ExceptionVo();
+            vo.setWebService(true);
+            vo.setSource("GPS");
+            vo.setType("BIZ");
+            vo.setCode(result.getResultCd());
+            vo.setMessage("");
+            throw BizRuntimeException.create(vo.getCode(), new Object[]{vo});*/
+            }
+            //GPS에서 응답을 못받은 경우, 오류처리
+        }
+        return outputVo;
     }
 
 }

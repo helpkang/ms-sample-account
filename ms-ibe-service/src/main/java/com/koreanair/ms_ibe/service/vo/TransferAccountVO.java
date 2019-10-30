@@ -16,16 +16,16 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
-@ApiModel(value="이체요청", description="이체요청")
+@ApiModel(value="transfermodel", description="")
 public class TransferAccountVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "출금계좌")
+    @ApiModelProperty(value = "")
     String from;
 
-    @ApiModelProperty(value = "받는계좌")
+    @ApiModelProperty(value = "")
     String to;
 
-    @ApiModelProperty(value = "이체금액", example="1")
+    @ApiModelProperty(value = "", example="1")
     int amount;
 }
