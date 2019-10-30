@@ -15,10 +15,12 @@
  */
 package com.koreanair.ms_ibe.service.vo.availability;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class FlightInfoVO {
+public class FlightInfoVO implements Serializable{
 	private boolean	isCodeShare				= false;
 	private boolean	isPrimary				= false;
 	private boolean	isLayover				= false;
@@ -30,14 +32,14 @@ public class FlightInfoVO {
 	private String	operationFlightNo		= "";
 	private String	departureCountry		= "";
 	private String	arrivalCountry			= "";
+	private String	departureTerminal		= "";
+	private String	arrivalTerminal			= "";
 	private String	departureAirport		= "";
 	private String	arrivalAirport			= "";
 	private String	departureAirportDesc	= "";
 	private String	arrivalAirportDesc		= "";
 	private String	departureDate			= "";
-	private String	departureDateOfSchedule	= "";
 	private String	arrivalDate				= "";
-	private String	arrivalDateOfSchedule	= "";
 	private String	departureCity			= "";
 	private String	departureCityDesc		= "";
 	private String	arrivalCity				= "";

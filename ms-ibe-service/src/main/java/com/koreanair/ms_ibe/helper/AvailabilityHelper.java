@@ -18,10 +18,14 @@ package com.koreanair.ms_ibe.helper;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
@@ -48,11 +52,18 @@ import com.koreanair.common_adapter.eretail.vo.flexpricerout.TravellerTypeFareIn
 import com.koreanair.common_adapter.general.vo.consts.PAXType;
 import com.koreanair.common_adapter.general.vo.consts.TripType;
 import com.koreanair.external.dx.vo.AirOffer;
+import com.koreanair.external.dx.vo.AirOfferItem;
 import com.koreanair.external.dx.vo.AirOffersListReply;
+import com.koreanair.external.dx.vo.Bound;
+import com.koreanair.external.dx.vo.FareFamilyWithServicesDictionaryItem;
+import com.koreanair.external.dx.vo.FlightItem;
+import com.koreanair.external.dx.vo.Price;
 import com.koreanair.ms_ibe.service.vo.FareCalendarElementVO;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
 import com.koreanair.ms_ibe.service.vo.availability.AvailFlightVO;
-import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
+import com.koreanair.ms_ibe.service.vo.availability.CommercialFareFamilyVO;
+import com.koreanair.ms_ibe.service.vo.availability.FareFamilyVO;
+import com.koreanair.ms_ibe.service.vo.availability.FlightInfoVO;
 import com.koreanair.ms_ibe.service.vo.availability.RevAvailCriteriaMsVO;
 import com.koreanair.ms_ibe.service.vo.availability.RevAvailSegmentCriteriaMsVO;
 import com.koreanair.ms_ibe.service.vo.availability.RevUpsellAvailMsVO;
@@ -262,7 +273,6 @@ public class AvailabilityHelper {
 	 * <pre>
 	 * airOfferReply와 airCalendar의 결과를 이용하여 upsell 형태를 구성한다.
 	 * </pre>
-	 *
 	 * @param airOfferList
 	 * @param airCalendarOutput
 	 * @return
@@ -340,14 +350,197 @@ public class AvailabilityHelper {
 		// 상단 7 Calendar 구성 end
 
 		// bound별 flight UPSELL 구성
+		String currency = "";
+		Map<String, String> cffMap = new HashMap<>();
+		Map<String, FareFamilyWithServicesDictionaryItem> ffMap = airOfferList.getDictionaries().getFareFamilyWithServices();
+		for (Map.Entry<String, FareFamilyWithServicesDictionaryItem> entry : ffMap.entrySet()) {
+			cffMap.put(entry.getKey(), entry.getValue().getCommercialFareFamily());
+		}
+
 		for(AirOffer airOffer : airOfferList.getData().getAirOffers()) {
+			String offerId = airOffer.getId();
+
+			Bound departureAirBound = null;
+			Bound returnAirBound = null;
+			String offerFareFamily = "";
+			String offerCffCode = "";
+			for (AirOfferItem offerItem : airOffer.getOfferItems()) {
+
+				for (int boundIdx = 0, n = offerItem.getAir().getBounds().size(); boundIdx < n; boundIdx++) {
+					Bound airBound = offerItem.getAir().getBounds().get(boundIdx);
+					if(boundIdx == 0) {
+						departureAirBound = airBound;
+					} else {
+						returnAirBound = airBound;
+					}
+				}
+				offerFareFamily = offerItem.getAir().getFareFamilyCode();
+				offerCffCode = cffMap.get(offerFareFamily);
+			}
+
+			Price departurePrice = null;
+			for(Price price : departureAirBound.getPrices().getTotalPrices()) {
+				departurePrice = price;
+				currency = departurePrice.getCurrencyCode();
+			}
+
+			Price returnPrice = null;
+			if (isRoundTrip) {
+				for(Price price : returnAirBound.getPrices().getTotalPrices()) {
+					returnPrice = price;
+				}
+			}
+
+
 			AvailFlightVO departureAvailFlight = new AvailFlightVO();
+			organizeBoundUpsellAvailFlight(airOfferList, offerId, departureAirBound, offerCffCode, departurePrice, departureAvailFlight);
 			departureUpsellBoundAvail.getAvailFlightList().add(departureAvailFlight);
 
-			AvailFlightVO returnAvailFlight = new AvailFlightVO();
-			returnUpsellBoundAvail.getAvailFlightList().add(returnAvailFlight);
+			if (isRoundTrip) {
+				AvailFlightVO returnAvailFlight = new AvailFlightVO();
+				organizeBoundUpsellAvailFlight(airOfferList, offerId, returnAirBound, offerCffCode, returnPrice, returnAvailFlight);
+				returnUpsellBoundAvail.getAvailFlightList().add(returnAvailFlight);
+			}
+
 		}
+		revUpsellAvailMsVo.setCurrency(currency);
+
+		mergeUpsellFlight(departureUpsellBoundAvail);
+		if (isRoundTrip) {
+			mergeUpsellFlight(returnUpsellBoundAvail);
+		}
+
 		return revUpsellAvailMsVo;
+	}
+
+	/**
+	 * <pre>
+	 * 각 bound별 항공편 정보를 구성한다.
+	 * </pre>
+	 *
+	 * @param airOfferList
+	 * @param offerId
+	 * @param airBound
+	 * @param offerCffCode
+	 * @param boundPrice
+	 * @param availFlightVo
+	 */
+	private void organizeBoundUpsellAvailFlight(AirOffersListReply airOfferList, String offerId, Bound airBound, String offerCffCode, Price boundPrice, AvailFlightVO availFlightVo) {
+		availFlightVo.setDepartureAirport(airBound.getOriginLocationCode());
+		availFlightVo.setArrivalAirport(airBound.getDestinationLocationCode());
+		availFlightVo.setTotalFlyingTime(DurationFormatUtils.formatDuration(TimeUnit.SECONDS.toMillis(airBound.getDuration()), "HH:mm"));	// 초를 밀리초로 변경하고 duration을 HH:mm 형식으로 표기
+
+		int fltIdx = 0;
+		String primaryCarrierCode = "";
+		String primaryFlightNo = "";
+		String primaryBookingClass = "";
+		String primaryCabinClass = "";
+
+		for(FlightItem flightItem : airBound.getFlights()) {
+
+			com.koreanair.external.dx.vo.Flight flight = airOfferList.getDictionaries().getFlight().get(flightItem.getId());
+
+			FlightInfoVO fltInfo = new FlightInfoVO();
+			fltInfo.setDepartureAirport(flight.getDeparture().getLocationCode());
+			fltInfo.setArrivalAirport(flight.getArrival().getLocationCode());
+			fltInfo.setDepartureDate(DateUtil.getStringDate(flight.getDeparture().getDateTime()));
+			fltInfo.setArrivalDate(DateUtil.getStringDate(flight.getArrival().getDateTime()));
+			fltInfo.setDepartureTerminal(flight.getDeparture().getTerminal());
+			fltInfo.setArrivalTerminal(flight.getArrival().getTerminal());
+			fltInfo.setCarrierCode(flight.getMarketingAirlineCode());
+			fltInfo.setOperationCarrierCode(flight.getOperatingAirlineCode());
+			fltInfo.setFlightNo(flight.getMarketingFlightNumber());
+			fltInfo.setAircraftType(flight.getAircraftCode());
+			fltInfo.setFlyingTime(DurationFormatUtils.formatDuration(TimeUnit.SECONDS.toMillis(flight.getDuration()), "HH:mm"));
+			availFlightVo.getFlightInfoList().add(fltInfo);
+
+			if (fltIdx == 0) {
+				primaryCarrierCode = fltInfo.getCarrierCode();
+				primaryFlightNo = fltInfo.getFlightNo();
+				primaryBookingClass = flightItem.getBookingClass();
+				primaryCabinClass = flightItem.getCabin();
+			}
+			fltIdx++;
+		}
+
+		availFlightVo.setPrimaryCarrierCode(primaryCarrierCode);
+		availFlightVo.setPrimaryFlightNo(primaryFlightNo);
+
+
+		CommercialFareFamilyVO cff = new CommercialFareFamilyVO();
+		cff.setCommercialFareFamily(offerCffCode);
+
+		FareFamilyVO fareFamily = new FareFamilyVO();
+		fareFamily.setFareFamily(airBound.getFareFamilyCode());
+		fareFamily.setBaseFare(String.valueOf(boundPrice.getBase()));
+		fareFamily.setTotalFare(String.valueOf(boundPrice.getTotal()));
+		fareFamily.setTotalTax(String.valueOf(boundPrice.getTotalTaxes()));
+		fareFamily.setBookingClass(primaryBookingClass);
+		fareFamily.setCabinClass(primaryCabinClass);
+		fareFamily.getOfferIdList().add(offerId);
+		cff.getFareFamilyDatas().add(fareFamily);
+		availFlightVo.getCommercialFareFamilyList().add(cff);
+	}
+
+	private void mergeUpsellFlight(UpsellBoundAvailVO upsellBoundAvail) {
+		// upsell 항공편을 운임 종류에 따라 병합 처리
+		Map<String, AvailFlightVO> boundAvailMap = new LinkedHashMap<>();
+		for (AvailFlightVO availFlight : upsellBoundAvail.getAvailFlightList()) {
+
+			List<String> fltNoList = new ArrayList<>();
+			for(FlightInfoVO fltInfo : availFlight.getFlightInfoList()) {
+				fltNoList.add(fltInfo.getFlightNo());
+			}
+			String fltNos = StringUtil.join(fltNoList,"/");
+
+			List<String> rbdList = new ArrayList<>();	// RBD (Reservation Booking Designator, 예약클래스 코드)
+			for(CommercialFareFamilyVO cff : availFlight.getCommercialFareFamilyList()) {
+				for (FareFamilyVO farefamily : cff.getFareFamilyDatas()) {
+					rbdList.add(farefamily.getBookingClass());
+				}
+			}
+			String rbds = StringUtil.join(fltNoList,"/");
+
+			//String availKey = fltNos.concat("_").concat(rbds);
+			String availKey = fltNos;
+
+			if (!boundAvailMap.containsKey(availKey)) {	// 신규항목인 경우
+				boundAvailMap.put(availKey, SerializationUtils.clone(availFlight));
+			} else {
+				AvailFlightVO alreadyAvailFlight = boundAvailMap.get(availKey);
+
+				CommercialFareFamilyVO currentCommercialFareFamilyVo = SerializationUtils.clone(availFlight.getCommercialFareFamilyList().get(0));
+				String currentCff = currentCommercialFareFamilyVo.getCommercialFareFamily();
+				FareFamilyVO currentFareFamilyVo = SerializationUtils.clone(currentCommercialFareFamilyVo.getFareFamilyDatas().get(0));
+
+				boolean existsAlreadyCff = false;
+				for(CommercialFareFamilyVO alreadyCff : alreadyAvailFlight.getCommercialFareFamilyList()) {
+					if (currentCff.equalsIgnoreCase(alreadyCff.getCommercialFareFamily())) {
+						existsAlreadyCff = true;
+
+						boolean existsAlreadyFF = false;
+						for (FareFamilyVO alreadyFF : alreadyCff.getFareFamilyDatas()) {
+							if (alreadyFF.getFareFamily().equalsIgnoreCase(currentFareFamilyVo.getFareFamily())) {
+								alreadyFF.getOfferIdList().addAll(currentFareFamilyVo.getOfferIdList());
+								existsAlreadyFF = true;
+								break;
+							}
+						}
+						if (!existsAlreadyFF) {
+							alreadyCff.getFareFamilyDatas().addAll(currentCommercialFareFamilyVo.getFareFamilyDatas());
+						}
+
+						break;
+					}
+				}
+
+				if(!existsAlreadyCff) {
+					alreadyAvailFlight.getCommercialFareFamilyList().addAll(availFlight.getCommercialFareFamilyList());
+				}
+			}
+		}
+		upsellBoundAvail.getAvailFlightList().clear();
+		upsellBoundAvail.getAvailFlightList().addAll(boundAvailMap.values());
 	}
 
 	public static void main(String[] args) {
@@ -356,5 +549,6 @@ public class AvailabilityHelper {
 		availCriteria.getCffCodeList().add("A");
 		availCriteria.getCffCodeList().add("B");
 		log.debug("RevAvailCriteriaMsVO = {}", ObjectSerializeUtil.getObjectToJson(availCriteria));
+		log.debug("{}",DurationFormatUtils.formatDuration( TimeUnit.SECONDS.toMillis(9000), "HH:mm"));
 	}
 }

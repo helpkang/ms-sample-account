@@ -15,14 +15,14 @@
  */
 package com.koreanair.ms_ibe.service.vo.availability;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
 
 @Data
-public class CommercialFareFamilyVO {
-	private String commercialFareFamilyType   = "";
+public class CommercialFareFamilyVO implements Serializable{
 	private String commercialFareFamily   = "";
 	private String commercialFareFamilyName = "";
 

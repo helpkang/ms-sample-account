@@ -15,22 +15,23 @@
  */
 package com.koreanair.ms_ibe.service.vo.availability;
 
-import java.util.LinkedList;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
 
 @Data
-public class FareFamilyVO {
+public class FareFamilyVO implements Serializable{
 
-    private String fareFamily                      = "";
-    private String fareFamilyDesc                  = "";
-    private String seatCount                       = "";
-    private boolean soldout = false;
-    private String bookingClass                    = "";
-    private List<String> recommendIds              = new LinkedList<>();
-    private List<String> fareRuleCodes             = new LinkedList<>();
-	private String fareFamilyDiscountRate = "0";
-	private String cabinClass					   = "";
-
+	private String fareFamily = "";
+	private String fareFamilyDesc = "";
+	private String seatCount = "";
+	private boolean soldout = false;
+	private List<String> offerIdList = new ArrayList<>();
+	private String bookingClass = "";
+	private String cabinClass = "";
+	private String baseFare = "";
+	private String totalFare = "";
+	private String totalTax = "";
 }

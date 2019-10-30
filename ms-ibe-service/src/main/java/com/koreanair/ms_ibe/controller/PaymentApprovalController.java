@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/payment")
-@Api(value = "승인정보", tags = "결제수단별 승인, 캡쳐 ")
+//@RestController
+//@RequestMapping("/api/payment")
+//@Api(value = "승인정보", tags = "결제수단별 승인, 캡쳐 ")
 @Slf4j
 public class PaymentApprovalController {
 

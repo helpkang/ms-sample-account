@@ -25,6 +25,9 @@ import lombok.Data;
 @Data
 public class RevUpsellAvailMsVO {
 
+	@ApiModelProperty(required = true, value="", notes = "currency of upsell", example = "", dataType = "String")
+	private String currency = "";
+
 	@ApiModelProperty(required = true, value="Revenue upsell", notes = "Revenue upsell", example = "", dataType = "List")
 	private List<UpsellBoundAvailVO> upsellBoundAvailList = new ArrayList<>();
 }

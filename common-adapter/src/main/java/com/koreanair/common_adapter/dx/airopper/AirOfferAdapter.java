@@ -98,10 +98,10 @@ public class AirOfferAdapter {
 			travelerList.add(inputVo.getAdult() + PAXType.ADT);
 		}
 		if (inputVo.getChild() > 0) {
-			travelerList.add(inputVo.getAdult() + PAXType.CHD);
+			travelerList.add(inputVo.getChild() + PAXType.CHD);
 		}
 		if (inputVo.getInfant() > 0) {
-			travelerList.add(inputVo.getAdult() + PAXType.INF);
+			travelerList.add(inputVo.getInfant() + PAXType.INF);
 		}
 		multiValueMap.add("travelers", StringUtils.join(travelerList, ","));
 		if(inputVo.getMax() > 0) {
@@ -152,6 +152,7 @@ public class AirOfferAdapter {
 		restTemplate.setInterceptors(Collections.singletonList(new RestfulInterceptor()));
 
 		// Rest 를 Get으로 호출하여 AirOfferList를 가져온다.
+
 		ResponseEntity<AirOffersListReply> responseEntity = restTemplate.exchange(builder.build().toUri(), HttpMethod.GET, entity, AirOffersListReply.class);
 		log.debug("{}", ObjectSerializeUtil.getObjectToJson(responseEntity));
 		AirOffersListReply airOfferList = responseEntity.getBody();

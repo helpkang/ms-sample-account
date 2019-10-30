@@ -15,13 +15,14 @@
  */
 package com.koreanair.ms_ibe.service.vo.availability;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
 
 @Data
-public class AvailFlightVO {
+public class AvailFlightVO implements Serializable {
     private String departureAirport     = "";
     private String departureAirportDesc = "";
     private String departureCity        = "";
