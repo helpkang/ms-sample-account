@@ -37,6 +37,8 @@ import com.koreanair.ms_ibe.repository.AirOfferRepository;
 import com.koreanair.ms_ibe.repository.AvailabilityRepository;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
 import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
+import com.koreanair.ms_ibe.service.vo.availability.RevAvailCriteriaMsVO;
+import com.koreanair.ms_ibe.service.vo.availability.RevUpsellAvailMsVO;
 import com.koreanair.ms_ibe.service.vo.availability.UpsellBoundAvailVO;
 
 @Service
@@ -58,9 +60,9 @@ public class AvailabilityService {
 		return availRepository.getFlexPricerAvailability(inputVo);
 	}
 
-	public FareCalendarVO getCalendarFareAvail(BookingCriteriaVO inputVo) throws JAXBException, IOException, SOAPException {
+	public FareCalendarVO getCalendarFareAvail(RevAvailCriteriaMsVO availCriteria) throws JAXBException, IOException, SOAPException {
 
-		FlexPricerInputVO flexPricerInputVo = availHelper.availBookingCriteria2FlexPricerInput(inputVo);	// UI의 조건을 Avail 조회 vo로 변환한다.
+		FlexPricerInputVO flexPricerInputVo = availHelper.availBookingCriteria2FlexPricerInput(availCriteria);	// UI의 조건을 Avail 조회 vo로 변환한다.
 
 		FlexPricerCalendarOutputVO flexPricerCalendarOutputVo = availRepository.getFlexPricerCalendarAvailability(flexPricerInputVo);	// 1a로 부터 fare calendar의 raw 데이터를 가져온다.
 
@@ -80,18 +82,18 @@ public class AvailabilityService {
 	 * Revenue의 UPSELL을 구성한다.
 	 * </pre>
 	 *
-	 * @param inputVo
+	 * @param availCriteria
 	 * @return
 	 * @throws ParseException
 	 */
-	public UpsellBoundAvailVO getAvailFlightOfRevenue(BookingCriteriaVO inputVo) throws ParseException {
-		AirOfferInputVO  airOfferInput = availHelper.bookingCriteria2AirOfferInput(inputVo);	// 조회조건을 AirOffer input 형태로 변경
-		AirCalendarInputVO airCalendarInput = availHelper.bookingCriteria2AirCalendarInput(inputVo);	// 조회조건을 airCalendar 의 input 형태로 변경
+	public RevUpsellAvailMsVO getAvailFlightOfRevenue(RevAvailCriteriaMsVO availCriteria) throws ParseException {
+		AirOfferInputVO  airOfferInput = availHelper.bookingCriteria2AirOfferInput(availCriteria);	// 조회조건을 AirOffer input 형태로 변경
+		AirCalendarInputVO airCalendarInput = availHelper.bookingCriteria2AirCalendarInput(availCriteria);	// 조회조건을 airCalendar 의 input 형태로 변경
 
 		AirOffersListReply airOfferList = airOfferRepository.getAirOfferList(airOfferInput);	// airOffer의 조회
 		AirCalendarOutputVO airCalendarOutput = airCalendarRepository.getAirCalendar(airCalendarInput);	// airCalendar의 조회
 
-		UpsellBoundAvailVO upsellBoundAvail = availHelper.organizeAvailFlight(airOfferList, airCalendarOutput);	// airOfferReply와 airCalendar의 결과를 이용하여 upsell 형태를 구성한다.
+		RevUpsellAvailMsVO upsellBoundAvail = availHelper.organizeAvailFlight(availCriteria, airOfferList, airCalendarOutput);	// airOfferReply와 airCalendar의 결과를 이용하여 upsell 형태를 구성한다.
 
 		return upsellBoundAvail;
 	}

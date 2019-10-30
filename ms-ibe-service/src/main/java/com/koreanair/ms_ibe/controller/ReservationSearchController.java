@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/reservation")
-@Api(value = "예약조회서비스", tags = "예약조회")
+@Api(value = "예약조회서비스", tags = "ReservationSearch")
 @Slf4j
 public class ReservationSearchController {
 

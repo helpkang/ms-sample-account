@@ -31,12 +31,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.koreanair.common_adapter.eretail.vo.FlexPricerInputVO;
 import com.koreanair.common_adapter.eretail.vo.flexpricerout.FlexPricerOutputVO;
-import com.koreanair.external.dx.vo.AirOffersListReply;
-import com.koreanair.ms_ibe.service.AirOfferService;
+//import com.koreanair.external.dx.vo.AirOffersListReply;
+//import com.koreanair.ms_ibe.service.AirOfferService;
 import com.koreanair.ms_ibe.service.AvailabilityService;
 import com.koreanair.ms_ibe.service.vo.FareCalendarVO;
 import com.koreanair.ms_ibe.service.vo.availability.BookingCriteriaVO;
-import com.koreanair.ms_ibe.service.vo.availability.UpsellBoundAvailVO;
+import com.koreanair.ms_ibe.service.vo.availability.RevAvailCriteriaMsVO;
+import com.koreanair.ms_ibe.service.vo.availability.RevUpsellAvailMsVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,53 +45,50 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/avail")
-@Api(value = "availability", description = "Avail 항공편 조회")
+@Api(tags = { "Availability" }) // SwaggerConfig에 지정된 tag에 의해 설명이 구성된다.
 @Slf4j
 public class AvailabilityController {
 
 	@Autowired
 	private AvailabilityService availService;
 
-    @Autowired
-    private AirOfferService airOfferService;
+//	@Autowired
+//	private AirOfferService airOfferService;
 
-    @PostMapping(value = "/DomesticAvailForRevenue" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Revenue 국내선 항공편 조회",
-    notes = "Revenue 국내선 항공편 조회"
-    )
-    @ResponseBody
+/*
+	@PostMapping(value = "/DomesticAvailForRevenue", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Revenue 국내선 항공편 조회", notes = "Revenue 국내선 항공편 조회")
+	@ResponseBody
 	public FlexPricerOutputVO getDomesticAvailForRevenue(@RequestBody FlexPricerInputVO inputVo) throws JAXBException, IOException, SOAPException {
-    	log.debug("getDomesticAvailForRevenue start");
-    	return availService.getDomesticAvailForRevenue(inputVo);
+		log.debug("getDomesticAvailForRevenue start");
+		return availService.getDomesticAvailForRevenue(inputVo);
+	}
+*/
+
+	/*
+	@PostMapping(value = "/AirOfferList", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "airOffer List 조회", notes = "airOffer List 조회")
+	@ResponseBody
+	public AirOffersListReply getAirOfferList(@RequestBody RevAvailCriteriaMsVO inputVo) throws ParseException {
+		log.debug("getAirOfferList start!");
+		return airOfferService.getAirOfferList(inputVo);
+	}
+	*/
+
+	@PostMapping(value = "/CalendarFare", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Fare Calendar 조회", notes = "eRetail FlexPricer를 이용하여 Fare Calendar 조회")
+	@ResponseBody
+	public FareCalendarVO getCalendarFareAvail(@RequestBody RevAvailCriteriaMsVO availCriteria) throws JAXBException, IOException, SOAPException {
+		log.debug("getCalendarFareAvail start");
+		return availService.getCalendarFareAvail(availCriteria);
 	}
 
-    @PostMapping(value = "/CalendarFareAvail" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Fare Calendar 조회",
-    notes = "Fare Calendar 조회"
-    )
-    @ResponseBody
-	public FareCalendarVO getCalendarFareAvail(@RequestBody BookingCriteriaVO inputVo) throws JAXBException, IOException, SOAPException {
-    	log.debug("getCalendarFareAvail start");
-    	return availService.getCalendarFareAvail(inputVo);
-	}
-
-    @PostMapping(value = "/AirOfferList" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "airOffer List 조회",
-    notes = "airOffer List 조회"
-    )
-    @ResponseBody
-    public AirOffersListReply getAirOfferList(@RequestBody BookingCriteriaVO inputVo) throws ParseException {
-    	log.debug("getAirOfferList start!");
-        return airOfferService.getAirOfferList(inputVo);
-    }
-
-    @PostMapping(value = "/AvailFlightOfRevenue" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "예약가능한 항공편 조회",
-    notes = "예약가능한 항공편 조회"
-    )
-    @ResponseBody
-    public UpsellBoundAvailVO getAvailFlightOfRevenue(@RequestBody BookingCriteriaVO inputVo) throws ParseException {
-    	return availService.getAvailFlightOfRevenue(inputVo);
+	@PostMapping(value = "/AvailFlight", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "예약가능한 항공편 조회", notes = "DxAPI airOffer , airCalendar를 이용하여 upsell 구성", nickname = "")
+	@ResponseBody
+	public RevUpsellAvailMsVO getAvailFlightOfRevenue(@RequestBody RevAvailCriteriaMsVO availCriteria) throws ParseException {
+		log.debug("getAvailFlightOfRevenue start!");
+		return availService.getAvailFlightOfRevenue(availCriteria);
 	}
 
 }

@@ -7,10 +7,12 @@
     </appender>
     <!-- spring boot config -->
     <!-- <include resource="org/springframework/boot/logging/logback/base.xml"/> -->
-    <root level="INFO">
+    <root level="error">
         <appender-ref ref="STDOUT"/>
     </root>
-    
-    <logger name="com.koreanair" level="DEBUG" />
+
+    <logger name="com.koreanair" level="DEBUG" additivity="false">
+    	<appender-ref ref="STDOUT" />
+    </logger>
 
 </configuration>

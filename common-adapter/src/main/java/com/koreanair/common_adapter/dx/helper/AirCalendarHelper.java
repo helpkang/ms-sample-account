@@ -55,7 +55,7 @@ public class AirCalendarHelper {
 		for (AirCalendar airCalendar : airCalendarReply.getData()) {
 			AirMatrixCalendarVO airMatrixCalendar = new AirMatrixCalendarVO();
 			airMatrixCalendar.setDepartureDate(DateUtil.getStringDate(airCalendar.getDepartureDate()));
-			airMatrixCalendar.setReturnDate(DateUtil.getStringDate(airCalendar.getReturnDate()));
+			airMatrixCalendar.setReturnDate(airCalendar.getReturnDate() != null ? DateUtil.getStringDate(airCalendar.getReturnDate()) : null);
 			airMatrixCalendar.setFareFamilyType(airCalendar.getFareFamilyCode());
 			airMatrixCalendar.setCommercialFareFamilyType(cffMap.get(airCalendar.getFareFamilyCode()));
 

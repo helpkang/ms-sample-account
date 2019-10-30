@@ -26,6 +26,6 @@ public class UpsellCalendarFareVO {
 	private String fareFamilyDesc = "";
 	private String fareClass = "";
 	private String baseFare = "";
+	private String totalFare = "";
 	private String totalTax = "";
-	private String currency = "";
 }

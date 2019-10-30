@@ -21,16 +21,10 @@ import java.util.List;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-@ApiModel(description = "Revenue availability upsell bound model")
+@ApiModel(description = "Revenue availability upsell model")
 @Data
-public class UpsellBoundAvailVO {
-	@ApiModelProperty(required = true, value="bound id", notes = "bound index (bound order)", example = "1", dataType = "String")
-	private String boundId = "";
+public class RevUpsellAvailMsVO {
 
-	@ApiModelProperty(required = true, value="upsell calendar fare", notes = "upsell calendar fare", example = "", dataType = "List")
-	List<UpsellCalendarFareVO> upsellCalendarFareList = new ArrayList<>();
-
-	@ApiModelProperty(required = true, value="avail flights", notes = "avail flights", example = "", dataType = "List")
-	List<AvailFlightVO> availFlightList = new ArrayList<>();
+	@ApiModelProperty(required = true, value="Revenue upsell", notes = "Revenue upsell", example = "", dataType = "List")
+	private List<UpsellBoundAvailVO> upsellBoundAvailList = new ArrayList<>();
 }

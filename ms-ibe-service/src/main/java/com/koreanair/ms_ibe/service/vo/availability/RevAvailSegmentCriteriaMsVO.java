@@ -15,22 +15,20 @@
  */
 package com.koreanair.ms_ibe.service.vo.availability;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel(description = "Revenue availability upsell bound model")
+@ApiModel(description = "Revenue availability segment criteria model")
 @Data
-public class UpsellBoundAvailVO {
-	@ApiModelProperty(required = true, value="bound id", notes = "bound index (bound order)", example = "1", dataType = "String")
-	private String boundId = "";
+public class RevAvailSegmentCriteriaMsVO {
 
-	@ApiModelProperty(required = true, value="upsell calendar fare", notes = "upsell calendar fare", example = "", dataType = "List")
-	List<UpsellCalendarFareVO> upsellCalendarFareList = new ArrayList<>();
+	@ApiModelProperty(required = true, value="departure date", notes = "yyyyMMdd", example = "20191115", position = 1)
+	private String departureDate = "";
 
-	@ApiModelProperty(required = true, value="avail flights", notes = "avail flights", example = "", dataType = "List")
-	List<AvailFlightVO> availFlightList = new ArrayList<>();
+	@ApiModelProperty(required = true, value="departure airport", notes = "IATA 3 Letter code", example = "ICN", position = 2)
+	private String departureAirport = "";
+
+	@ApiModelProperty(required = true, value="arrival airport", notes = "IATA 3 Letter code", example = "NRT", position = 3)
+	private String arrivalAirport = "";
 }

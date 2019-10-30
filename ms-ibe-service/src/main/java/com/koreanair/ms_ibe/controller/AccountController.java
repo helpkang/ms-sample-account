@@ -32,12 +32,12 @@ import lombok.extern.slf4j.Slf4j;
 @Api(value = "account", description = "account 와 transfer 처리")
 @Slf4j
 public class AccountController {
-/*
+
     @Autowired
     AccountService service;
 
     @GetMapping(value = "/{name}")
-    @ApiOperation(value = "getAccount",
+    @ApiOperation(value = "계좌조회",
     notes = "계좌정보와 이체내역 조회"
     )
     @ApiImplicitParams({
@@ -48,7 +48,7 @@ public class AccountController {
     }
 
     @GetMapping(value = "/transfer/{name}")
-    @ApiOperation(value = "getTransfer",
+    @ApiOperation(value = "거래내역조회",
     notes = "거래내역 조회"
     )
     @ApiImplicitParams({
@@ -70,7 +70,7 @@ public class AccountController {
     }
 
     @PostMapping
-    @ApiOperation(value = "createAccount",
+    @ApiOperation(value = "계좌 생성",
     notes = "계좌명과 잔액으로 생성"
     )
     @ResponseStatus(HttpStatus.CREATED)
@@ -81,7 +81,7 @@ public class AccountController {
 
     
     @PostMapping("transfer")
-    @ApiOperation(value = "transfer",
+    @ApiOperation(value = "이체",
     notes = "계좌명으로 이체"
     )
     @ResponseStatus(HttpStatus.CREATED)
@@ -94,5 +94,5 @@ public class AccountController {
          list.add(service.getAccount(trasferAccountVO.getTo()));
          return list;
     }
-    */
+    
 }
