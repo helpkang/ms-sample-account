@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.HashMap;
 
 @Data
-@ApiModel(value="결제 승인 요청", description="결제 승인 요청에 대한 output정보를 담는 클래스")
+@ApiModel(value="", description="")
 public class PaymentApprovalOutput {
     @ApiModelProperty(value = "결제타입 코드")
     private String paymentType;				// 결제타입

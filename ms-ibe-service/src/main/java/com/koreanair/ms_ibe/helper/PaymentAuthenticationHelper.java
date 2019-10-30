@@ -4,6 +4,7 @@ import com.koreanair.common.utils.ObjectSerializeUtil;
 import com.koreanair.common.utils.StringUtil;
 import com.koreanair.ms_ibe.service.vo.*;
 import com.koreanair.ms_ibe.util.JsonUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.UriBuilder;
@@ -366,5 +367,9 @@ public class PaymentAuthenticationHelper {
         time[1] = todayDate.substring(8,14);
         return time;
     }
-
+    public CbscAuthenticationOutput makeCbscAuthenticationOutput(com.koreanair.common_adapter.pid.gps.vo.CbscAuthenticationOutput cbscAuthenticationOutput) {
+        CbscAuthenticationOutput output = new CbscAuthenticationOutput();
+        BeanUtils.copyProperties(cbscAuthenticationOutput,output);
+        return output;
+    }
 }

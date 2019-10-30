@@ -1,15 +1,13 @@
-package com.koreanair.ms_ibe.service.vo;
+package com.koreanair.common_adapter.pid.gps.vo;
 
 import com.koreanair.common_adapter.common.vo.TravellerInformation;
 import com.koreanair.external.dx.vo.Itinerary;
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.ArrayList;
 
 @Data
-@ApiModel(value="cbscmodel", description="cbscmodel")
 public class CbscAuthenticationInput extends PaymentAuthenticationInput{
 
     //cbsc acsurl요청시 사용되는 변수
@@ -24,13 +22,11 @@ public class CbscAuthenticationInput extends PaymentAuthenticationInput{
     private String lastName;
     private String postalCode;
     private String state;
-
     //cbsc2.0에서 사용하는 변수
     private ArrayList<TravellerInformation> travellerInformationList;
     private ArrayList<Itinerary>itineraryList;
     private String telephone;
     private String referenceId;
-
     private String address;
     private String cardType;
     private String bankType;

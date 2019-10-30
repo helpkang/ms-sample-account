@@ -6,9 +6,10 @@ import lombok.Data;
 @Data
 public class PaymentAuthenticationOutput {
 
-    @ApiModelProperty(value = "간편결제 거래번호")
+    @ApiModelProperty(value = "")
     private String orderNo;
     //kakaopay result
-    @ApiModelProperty(value = "kakaopay 에서 발급한 tid, ui에서 발급한 tid")
+    @ApiModelProperty(value = "")
     private String tid;
+
 }

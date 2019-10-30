@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/payment")
-@Api(value = "승인정보", tags = "결제수단별 승인, 캡쳐 ")
+@Api(value = "paymentapproval", tags = "ApprovalService")
 @Slf4j
 public class PaymentApprovalController {
 
@@ -23,8 +23,8 @@ public class PaymentApprovalController {
     PaymentApprovalService service;
 
     @PostMapping(value = "/Approval" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "결제 승인서비스",
-            notes = "결제 수단별 승인서비스"
+    @ApiOperation(value = "payment approvalservice",
+            notes = ""
     )
     @ResponseBody
     public PaymentApprovalOutput paymentApproval(@RequestBody PaymentApprovalInput inputVo)throws Exception {
@@ -32,8 +32,8 @@ public class PaymentApprovalController {
     }
 
     @PostMapping(value = "/History" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "결제 조회 서비스",
-            notes = "결제 수단별 "
+    @ApiOperation(value = "payment history",
+            notes = ""
     )
     @ResponseBody
     public PaymentHistoryOutput paymentHistory(@RequestBody PaymentApprovalInput inputVo)throws Exception {
@@ -42,8 +42,8 @@ public class PaymentApprovalController {
     }
 
     @PostMapping(value = "/GetAvailablePaymentType" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "GPS oid별 결제수단 조회 서비스",
-            notes = "결제 수단별 승인서비스"
+    @ApiOperation(value = "payment type search",
+            notes = ""
     )
     @ResponseBody
     public PaymentTypeOutput getPaymentTypeCode(@RequestBody PaymentApprovalInput inputVo)throws Exception {
@@ -52,8 +52,8 @@ public class PaymentApprovalController {
     }
 
     @PostMapping(value = "/PaypalCapture" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "paypal캡쳐 서비스",
-            notes = "paypal결제수단에만 있는 승인 이후에 한번 더 호출하는 서비스"
+    @ApiOperation(value = "paypal capture",
+            notes = ""
     )
     @ResponseBody
     public PaymentApprovalOutput paypalCapture(@RequestBody PaymentApprovalInput inputVo)throws Exception {
@@ -62,8 +62,8 @@ public class PaymentApprovalController {
     }
 
     @PostMapping(value = "/CashReceipt" , consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "현금영수증 GPS에 등록",
-            notes = "bankt결제시 현금영수증 GPS통해서 등록"
+    @ApiOperation(value = "cashreceipt",
+            notes = ""
     )
     @ResponseBody
     public PaymentApprovalOutput cashReceipt(@RequestBody PaymentApprovalInput inputVo)throws Exception {
