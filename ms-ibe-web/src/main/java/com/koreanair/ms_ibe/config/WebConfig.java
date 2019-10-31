@@ -1,6 +1,8 @@
 package com.koreanair.ms_ibe.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -10,38 +12,69 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.koreanair.ms_ibe.filters.HttpFilter;
+
 @Configuration
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
-  @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
-         // registry.addResourceHandler("/swagger-ui.html")
-        //   .addResourceLocations("classpath:/META-INF/resources/");
-          // registry.addResourceHandler("/webjars/**")
-          //   .addResourceLocations("classpath:/META-INF/resources/webjars/");
-          
-          registry.addResourceHandler("**/**")
-          .addResourceLocations("classpath:/META-INF/resources/");
+
+//	@Autowired
+//	@Qualifier(value = "httpInterceptor")
+//	private HandlerInterceptor httpInterceptor;
+//
+//	@Override
+//	public void addInterceptors(InterceptorRegistry registry) {
+//		registry.addInterceptor(httpInterceptor)
+//		.addPathPatterns("/**")
+//		.excludePathPatterns("/user/**");
+//	}
+
+	@Autowired
+	@Qualifier(value = "httpFilter")
+	private HttpFilter httpFilter;	// http요청에 대한 filter - request , response의 payload logging
+
+	@Bean(name="jacksonMapper")
+	public com.fasterxml.jackson.databind.ObjectMapper jacksonMapper() {
+		return new com.fasterxml.jackson.databind.ObjectMapper();
+	}
+
+	@Bean
+	public FilterRegistrationBean<HttpFilter> addHttpFilter() {
+		FilterRegistrationBean<HttpFilter> registrationBean = new FilterRegistrationBean<>(httpFilter);
+		registrationBean.setOrder(0);
+		registrationBean.addUrlPatterns("/*");
+		return registrationBean;
+	}
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		// registry.addResourceHandler("/swagger-ui.html")
+		//   .addResourceLocations("classpath:/META-INF/resources/");
+		// registry.addResourceHandler("/webjars/**")
+		//   .addResourceLocations("classpath:/META-INF/resources/webjars/");
+
+		registry.addResourceHandler("**/**")
+		.addResourceLocations("classpath:/META-INF/resources/");
 
 
-  }
+	}
 
-  @Bean
-  public FormattingConversionService statusConversionService (@Autowired  FormattingConversionService  mvcConversionService) {
-    mvcConversionService.addConverter(new MyCustomEnumConverter());
-    return mvcConversionService;
-  }
+	@Bean
+	public FormattingConversionService statusConversionService (@Autowired  FormattingConversionService  mvcConversionService) {
+		mvcConversionService.addConverter(new MyCustomEnumConverter());
+		return mvcConversionService;
+	}
 
 }
 
 class MyCustomEnumConverter implements Converter<String, HttpStatus> {
-  @Override
-  public HttpStatus convert(String source) {
-    try {
-      return HttpStatus.valueOf(Integer.parseInt(source.split(" ")[0]));
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null; // or SortEnum.asc
-    }
-  }
+	@Override
+	public HttpStatus convert(String source) {
+		try {
+			return HttpStatus.valueOf(Integer.parseInt(source.split(" ")[0]));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null; // or SortEnum.asc
+		}
+	}
 }
