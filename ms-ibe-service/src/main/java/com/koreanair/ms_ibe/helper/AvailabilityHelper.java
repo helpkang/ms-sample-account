@@ -242,9 +242,11 @@ public class AvailabilityHelper {
 		String primaryFlightNo = "";
 		String primaryBookingClass = "";
 		String primaryCabinClass = "";
-
+		String firstDepartureDateTime = "";
+		String lastArrivalDateTime = "";
+		String seatCount = "0";
 		for(FlightItem flightItem : airBound.getFlights()) {
-
+			seatCount = String.valueOf(flightItem.getQuota());
 			com.koreanair.external.dx.vo.Flight flight = airOfferList.getDictionaries().getFlight().get(flightItem.getId());
 
 			FlightInfoVO fltInfo = new FlightInfoVO();
@@ -266,10 +268,14 @@ public class AvailabilityHelper {
 				primaryFlightNo = fltInfo.getFlightNo();
 				primaryBookingClass = flightItem.getBookingClass();
 				primaryCabinClass = flightItem.getCabin();
+				firstDepartureDateTime = fltInfo.getDepartureDate();
 			}
+			lastArrivalDateTime = fltInfo.getArrivalDate();
 			fltIdx++;
 		}
 
+		availFlightVo.setDepartureDate(firstDepartureDateTime);
+		availFlightVo.setArrivalDate(lastArrivalDateTime);
 		availFlightVo.setPrimaryCarrierCode(primaryCarrierCode);
 		availFlightVo.setPrimaryFlightNo(primaryFlightNo);
 
@@ -285,6 +291,7 @@ public class AvailabilityHelper {
 		fareFamily.setBookingClass(primaryBookingClass);
 		fareFamily.setCabinClass(primaryCabinClass);
 		fareFamily.getOfferIdList().add(offerId);
+		fareFamily.setSeatCount(seatCount);
 		cff.getFareFamilyDatas().add(fareFamily);
 		availFlightVo.getCommercialFareFamilyList().add(cff);
 	}

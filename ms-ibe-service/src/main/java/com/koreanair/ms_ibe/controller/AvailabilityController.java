@@ -41,6 +41,8 @@ import com.koreanair.ms_ibe.service.vo.availability.RevUpsellAvailMsVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -53,7 +55,10 @@ public class AvailabilityController {
 	private AvailabilityService availService;
 
 	@PostMapping(value = "/CalendarFare", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Fare Calendar 조회", notes = "eRetail FlexPricer를 이용하여 Fare Calendar 조회")
+	@ApiOperation(value = "Fare Calendar 조회", notes = "eRetail FlexPricer를 이용하여 Fare Calendar 조회", response = FareCalendarVO.class)
+	@ApiResponses({
+		@ApiResponse(code=200,message = "OK")
+	})
 	@ResponseBody
 	public FareCalendarVO getCalendarFareAvail(@RequestBody RevAvailCriteriaMsVO availCriteria) throws JAXBException, IOException, SOAPException {
 		log.debug("getCalendarFareAvail start");
@@ -61,7 +66,7 @@ public class AvailabilityController {
 	}
 
 	@PostMapping(value = "/AvailFlight", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "예약가능한 항공편 조회", notes = "DxAPI airOffer , airCalendar를 이용하여 upsell 구성", nickname = "")
+	@ApiOperation(value = "예약가능한 항공편 조회", notes = "DxAPI airOffer , airCalendar를 이용하여 upsell 구성", nickname = "", response = RevUpsellAvailMsVO.class)
 	@ResponseBody
 	public RevUpsellAvailMsVO getAvailFlightOfRevenue(@RequestBody RevAvailCriteriaMsVO availCriteria) throws ParseException {
 		log.debug("getAvailFlightOfRevenue start!");
